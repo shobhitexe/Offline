@@ -13,6 +13,7 @@ RUN go mod download
 
 COPY . .
 
+
 RUN go build -o main ./cmd/server
 
 
@@ -23,7 +24,6 @@ WORKDIR /root/
 
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
 
 
 EXPOSE 8080
