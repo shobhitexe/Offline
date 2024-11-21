@@ -22,7 +22,7 @@ func NewContainer(db *pgxpool.Pool) *Container {
 	adminService := service.NewAdminService(adminStore)
 
 	return &Container{
-		HealthHandler: handlers.NewHealthHandler(),
+		HealthHandler: handlers.NewHealthHandler(utils),
 		AdminHandler:  handlers.NewAdminHandler(adminService, utils),
 	}
 

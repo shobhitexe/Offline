@@ -1,14 +1,17 @@
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+	"server/internal/models"
+	"server/pkg/utils"
+)
 
-type HealthHandler struct{}
+type HealthHandler struct{ utils utils.Utils }
 
-func NewHealthHandler() *HealthHandler {
-	return &HealthHandler{}
+func NewHealthHandler(utils utils.Utils) *HealthHandler {
+	return &HealthHandler{utils: utils}
 }
 
 func (h *HealthHandler) CheckHealth(w http.ResponseWriter, r *http.Request) {
-
-	w.Write([]byte("Hello!"))
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Everything is fine here", Data: true})
 }
