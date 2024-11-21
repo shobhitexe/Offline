@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@repo/ui": "*",
+    "lucide-react": "^0.460.0",
     "next": "^14.2.3",
+    "next-auth": "^4.24.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

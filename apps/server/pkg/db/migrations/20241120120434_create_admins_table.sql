@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS admins  (
-  id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS admins (
+  id TEXT PRIMARY KEY, 
   name TEXT NOT NULL,
-  username TEXT NOT NULL,
+  username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
