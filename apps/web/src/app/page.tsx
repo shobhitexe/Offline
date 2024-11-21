@@ -1,3 +1,5 @@
-export default function Page(): JSX.Element {
-  return <main></main>;
+import { redirect } from "next/navigation";
+
+export default function page(): JSX.Element {
+  redirect("/dashboard");
 }

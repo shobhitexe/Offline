@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"server/internal/models"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -9,6 +10,7 @@ import (
 
 type AdminStore interface {
 	GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error)
+	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
 }
 
 type adminStore struct {
@@ -27,4 +29,18 @@ func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*
 		return nil, err
 	}
 	return &admin, nil
+}
+
+func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error {
+
+	query := `INSERT INTO login_histories (user_id, user_type, login_ip, user_agent)
+	VALUES ($1, $2, $3, $4)`
+
+	_, err := s.db.Exec(ctx, query, userId, userType, loginIp, userAgent)
+	if err != nil {
+		return fmt.Errorf("failed to record login history: %w", err)
+	}
+
+	return nil
+
 }

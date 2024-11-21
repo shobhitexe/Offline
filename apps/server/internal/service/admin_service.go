@@ -35,5 +35,9 @@ func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.
 		return nil, errors.New("invalid credentials")
 	}
 
+	if err := a.store.RecordLoginHistory(ctx, admin.ID, "admin", payload.LoginIP, payload.UserAgent); err != nil {
+		return nil, errors.New(err.Error())
+	}
+
 	return admin, nil
 }

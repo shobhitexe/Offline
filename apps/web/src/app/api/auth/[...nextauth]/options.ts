@@ -27,6 +27,8 @@ export const options: NextAuthOptions = {
         );
         const userArray = await response.json();
 
+        console.log(userArray);
+
         const { data } = userArray;
 
         if (response.status === 200) {
