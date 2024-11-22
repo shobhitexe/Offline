@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 	"server/internal/models"
 	"server/internal/store"
 
@@ -35,9 +36,17 @@ func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.
 		return nil, errors.New("invalid credentials")
 	}
 
-	if err := a.store.RecordLoginHistory(ctx, admin.ID, "admin", payload.LoginIP, payload.UserAgent); err != nil {
-		return nil, errors.New(err.Error())
-	}
+	// if err := a.store.RecordLoginHistory(ctx, admin.ID, "admin", payload.LoginIP, payload.UserAgent); err != nil {
+	// 	return nil, errors.New(err.Error())
+	// }
+
+	go func() {
+		backgroundCtx := context.Background()
+		if err := a.store.RecordLoginHistory(backgroundCtx, admin.ID, "admin", payload.LoginIP, payload.UserAgent); err != nil {
+
+			log.Printf("failed to record login history: %v", err)
+		}
+	}()
 
 	return admin, nil
 }
