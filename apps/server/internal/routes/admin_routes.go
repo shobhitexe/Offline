@@ -15,6 +15,18 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 			r.Post("/login", h.HandleLogin)
 		})
 
+		//wallet
+		r.Route("/wallet", func(r chi.Router) {
+			r.Get("/balance", h.WalletBalance)
+		})
+
+		//agent
+		r.Route("/agent", func(r chi.Router) {
+			r.Get("/list", h.GetAgentList)
+
+			r.Post("/create", h.CreateAgent)
+		})
+
 	})
 
 }

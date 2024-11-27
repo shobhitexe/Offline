@@ -27,7 +27,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "ui-flex ui-cursor-default ui-gap-2 ui-select-none ui-items-center ui-rounded-sm ui-px-2 ui-py-1.5 ui-text-sm ui-outline-none ui-focus:ui-bg-accent ui-data-[state=open]:ui-bg-accent ui-[&_svg]:ui-pointer-events-none ui-[&_svg]:ui-size-4 ui-[&_svg]:ui-shrink-0",
+      "ui-flex ui-cursor-default ui-gap-2 ui-select-none ui-items-center ui-rounded-sm ui-px-2 ui-py-1.5 ui-text-sm ui-outline-none ui-focus:ui-bg-accent data-[state=open]:ui-bg-accent ui-[&_svg]:ui-pointer-events-none ui-[&_svg]:ui-size-4 ui-[&_svg]:ui-shrink-0",
       inset && "ui-pl-8",
       className
     )}
@@ -47,7 +47,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "ui-z-50 ui-min-w-[8rem] ui-overflow-hidden ui-rounded-md ui-border ui-bg-popover ui-p-1 ui-text-popover-foreground ui-shadow-lg ui-data-[state=open]:ui-animate-in ui-data-[state=closed]:ui-animate-out ui-data-[state=closed]:ui-fade-out-0 ui-data-[state=open]:ui-fade-in-0 ui-data-[state=closed]:ui-zoom-out-95 ui-data-[state=open]:ui-zoom-in-95 ui-data-[side=bottom]:ui-slide-in-from-top-2 ui-data-[side=left]:ui-slide-in-from-right-2 ui-data-[side=right]:ui-slide-in-from-left-2 ui-data-[side=top]:ui-slide-in-from-bottom-2",
+      "ui-z-50 ui-min-w-[8rem] ui-overflow-hidden ui-rounded-md ui-border ui-bg-popover ui-p-1 ui-text-popover-foreground ui-shadow-lg data-[state=open]:ui-animate-in data-[state=closed]:ui-animate-out data-[state=closed]:ui-fade-out-0 data-[state=open]:ui-fade-in-0 data-[state=closed]:ui-zoom-out-95 data-[state=open]:ui-zoom-in-95 data-[side=bottom]:ui-slide-in-from-top-2 data-[side=left]:ui-slide-in-from-right-2 data-[side=right]:ui-slide-in-from-left-2 data-[side=top]:ui-slide-in-from-bottom-2",
       className
     )}
     {...props}
@@ -65,7 +65,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "ui-z-50 ui-min-w-[8rem] ui-overflow-hidden ui-rounded-md ui-border ui-bg-popover ui-p-1 ui-text-popover-foreground ui-shadow-md ui-data-[state=open]:ui-animate-in ui-data-[state=closed]:ui-animate-out ui-data-[state=closed]:ui-fade-out-0 ui-data-[state=open]:ui-fade-in-0 ui-data-[state=closed]:ui-zoom-out-95 ui-data-[state=open]:ui-zoom-in-95 ui-data-[side=bottom]:ui-slide-in-from-top-2 ui-data-[side=left]:ui-slide-in-from-right-2 ui-data-[side=right]:ui-slide-in-from-left-2 ui-data-[side=top]:ui-slide-in-from-bottom-2",
+        "ui-z-50 ui-min-w-[8rem] ui-overflow-hidden ui-rounded-md ui-border ui-bg-popover ui-p-1 ui-text-popover-foreground ui-shadow-md data-[state=open]:ui-animate-in data-[state=closed]:ui-animate-out data-[state=closed]:ui-fade-out-0 data-[state=open]:ui-fade-in-0 data-[state=closed]:ui-zoom-out-95 data-[state=open]:ui-zoom-in-95 data-[side=bottom]:ui-slide-in-from-top-2 data-[side=left]:ui-slide-in-from-right-2 data-[side=right]:ui-slide-in-from-left-2 data-[side=top]:ui-slide-in-from-bottom-2",
         className
       )}
       {...props}
@@ -83,7 +83,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "ui-relative ui-flex ui-cursor-default ui-select-none ui-items-center ui-gap-2 ui-rounded-sm ui-px-2 ui-py-1.5 ui-text-sm ui-outline-none ui-transition-colors ui-focus:ui-bg-accent ui-focus:ui-text-accent-foreground ui-data-[disabled]:ui-pointer-events-none ui-data-[disabled]:ui-opacity-50 ui-[&_svg]:ui-pointer-events-none ui-[&_svg]:ui-size-4 ui-[&_svg]:ui-shrink-0",
+      "ui-relative ui-flex ui-cursor-pointer ui-select-none ui-items-center ui-gap-2 ui-rounded-sm ui-px-2 ui-py-1.5 ui-text-sm ui-outline-none ui-transition-colors ui-focus:ui-bg-accent ui-focus:ui-text-accent-foreground data-[disabled]:ui-pointer-events-none data-[disabled]:ui-opacity-50 ui-[&_svg]:ui-pointer-events-none ui-[&_svg]:ui-size-4 ui-[&_svg]:ui-shrink-0",
       inset && "ui-pl-8",
       className
     )}
@@ -99,7 +99,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "ui-relative ui-flex ui-cursor-default ui-select-none ui-items-center ui-rounded-sm ui-py-1.5 ui-pl-8 ui-pr-2 ui-text-sm ui-outline-none ui-transition-colors ui-focus:ui-bg-accent ui-focus:ui-text-accent-foreground ui-data-[disabled]:ui-pointer-events-none ui-data-[disabled]:ui-opacity-50",
+      "ui-relative ui-flex ui-cursor-default ui-select-none ui-items-center ui-rounded-sm ui-py-1.5 ui-pl-8 ui-pr-2 ui-text-sm ui-outline-none ui-transition-colors ui-focus:ui-bg-accent ui-focus:ui-text-accent-foreground data-[disabled]:ui-pointer-events-none data-[disabled]:ui-opacity-50",
       className
     )}
     checked={checked}
@@ -123,7 +123,7 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "ui-relative ui-flex ui-cursor-default ui-select-none ui-items-center ui-rounded-sm ui-py-1.5 ui-pl-8 ui-pr-2 ui-text-sm ui-outline-none ui-transition-colors ui-focus:ui-bg-accent ui-focus:ui-text-accent-foreground ui-data-[disabled]:ui-pointer-events-none ui-data-[disabled]:ui-opacity-50",
+      "ui-relative ui-flex ui-cursor-default ui-select-none ui-items-center ui-rounded-sm ui-py-1.5 ui-pl-8 ui-pr-2 ui-text-sm ui-outline-none ui-transition-colors ui-focus:ui-bg-accent ui-focus:ui-text-accent-foreground data-[disabled]:ui-pointer-events-none data-[disabled]:ui-opacity-50",
       className
     )}
     {...props}

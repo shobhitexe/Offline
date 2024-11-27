@@ -4,6 +4,8 @@ type sessionUser = {
   id?: string;
   name?: string | null | undefined;
   username?: string;
+  token?: string;
+  sportsShare?: number;
 };
 
 declare module "next-auth" {

@@ -14,15 +14,23 @@ import {
   SidebarMenuItem,
 } from "./index";
 import { usePathname } from "next/navigation";
+import { Gauge, User, Users } from "lucide-react";
 
 const items = [
   {
     title: "Dashboard",
+    icon: Gauge,
     url: "/dashboard",
   },
   {
     title: "User List",
-    url: "/user",
+    icon: User,
+    url: "/user-list",
+  },
+  {
+    title: "Agents List",
+    icon: Users,
+    url: "/agent-list",
   },
 ];
 
@@ -47,6 +55,7 @@ export function AppSidebar() {
                       href={item.url}
                       className={`${isLinkActive(item.url) ? "bg-white shadow hover:bg-white" : "bg-transparent"} p-5`}
                     >
+                      <item.icon />
                       <span className="text-black">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>

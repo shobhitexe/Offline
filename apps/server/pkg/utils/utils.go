@@ -2,7 +2,9 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"server/internal/models"
+	"time"
 
 	"net/http"
 
@@ -14,6 +16,7 @@ type Utils interface {
 	DecodeJSON(r *http.Request, v interface{}) error
 	Validate(v interface{}) error
 	DecodeAndValidateJSON(r *http.Request, v interface{}, validator *validator.Validate) error
+	FormatTime(timestamp string) string
 }
 
 type utils struct {
@@ -49,4 +52,23 @@ func (u *utils) WriteJSON(w http.ResponseWriter, statusCode int, v models.Respon
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(v)
+}
+
+func (u *utils) FormatTime(timestamp string) string {
+
+	t, err := time.Parse(time.RFC3339Nano, timestamp)
+	if err != nil {
+		fmt.Println("Error parsing time:", err)
+		return ""
+	}
+
+	istLocation, err := time.LoadLocation("Asia/Kolkata")
+	if err != nil {
+		fmt.Println("Error loading location:", err)
+		return ""
+	}
+
+	istTime := t.In(istLocation)
+
+	return istTime.Format("02/01/2006, 3:04:05 PM")
 }

@@ -11,7 +11,9 @@ export default function ViewLayout({ children }: { children: ReactNode }) {
         <AppSidebar />
         <main className="flex w-full relative">
           <SidebarTrigger className="absolute -top-2" />
-          <div className="p-3 w-full sm:mt-5 mt-3">{children}</div>
+          <div className="p-3 w-full sm:mt-5 mt-3 h-screen overflow-auto sm:pb-40 pb-20">
+            {children}
+          </div>
         </main>
       </SidebarProvider>
     </div>

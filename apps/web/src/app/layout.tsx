@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { SessionProviders } from "./providers";
 import { options } from "./api/auth/[...nextauth]/options";
 import { ViewLayout } from "@/components";
+import { Toaster } from "@repo/ui";
 
 const fira = Fira_Sans({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -29,6 +30,7 @@ export default async function RootLayout({
       <body className={fira.className}>
         <SessionProviders session={session}>
           <ViewLayout>{children}</ViewLayout>
+          <Toaster />
         </SessionProviders>
       </body>
     </html>

@@ -1,3 +1,5 @@
+import { PageHeading } from "@/components";
+
 const DemoStats = [
   {
     heading: "Parent",
@@ -38,8 +40,8 @@ const DemoInfo = [
 
 export default async function page() {
   return (
-    <div className="w-full flex flex-col gap-3">
-      <div className="text-black text-xl">Dashboard</div>
+    <div className="w-full flex flex-col gap-5">
+      <PageHeading>Dashboard</PageHeading>
 
       <div className="grid sm:grid-cols-3 ss:grid-cols-2 grid-cols-1 w-full items-center justify-between gap-5">
         {DemoStats.map((item) => (

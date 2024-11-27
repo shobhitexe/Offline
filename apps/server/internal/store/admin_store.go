@@ -11,6 +11,8 @@ import (
 type AdminStore interface {
 	GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error)
 	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
+	AdminAgentStore
+	AdminWalletStore
 }
 
 type adminStore struct {
@@ -23,8 +25,8 @@ func NewAdminStore(db *pgxpool.Pool) AdminStore {
 
 func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error) {
 	var admin models.Admin
-	query := `SELECT id, name, username, password FROM admins WHERE username = $1`
-	err := s.db.QueryRow(ctx, query, username).Scan(&admin.ID, &admin.Name, &admin.Username, &admin.Password)
+	query := `SELECT id, name, username, password, sports_share FROM admins WHERE username = $1`
+	err := s.db.QueryRow(ctx, query, username).Scan(&admin.ID, &admin.Name, &admin.Username, &admin.Password, &admin.SportsShare)
 	if err != nil {
 		return nil, err
 	}
