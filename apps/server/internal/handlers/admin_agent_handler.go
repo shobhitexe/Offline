@@ -47,6 +47,7 @@ func (h *AdminHandler) CreateAgent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.CreateAgent(r.Context(), payload); err != nil {
+
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
 		return
 

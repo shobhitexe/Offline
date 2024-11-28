@@ -50,7 +50,9 @@ export default async function Navbar() {
             <DropdownMenuLabel>Stats</DropdownMenuLabel>
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem>Child Level: 0</DropdownMenuItem>
+            <DropdownMenuItem>
+              Child Level: {session?.user.childLevel}
+            </DropdownMenuItem>
             <DropdownMenuItem>Exposure: 0</DropdownMenuItem>
             <DropdownMenuItem>Balance : {balance}</DropdownMenuItem>
           </DropdownMenuContent>

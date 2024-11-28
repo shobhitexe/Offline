@@ -42,6 +42,7 @@ import {
 } from "./Select";
 import { Toaster } from "./Toast/toaster";
 import { useToast } from "./Toast/use-toast";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export {
   cn,
@@ -80,4 +81,5 @@ export {
   SelectValue,
   Toaster,
   useToast,
+  LoadingSpinner,
 };

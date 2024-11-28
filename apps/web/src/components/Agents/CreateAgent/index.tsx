@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, FormInput, useToast } from "@repo/ui";
-import { ReactNode } from "react";
+import { Button, FormInput, LoadingSpinner, useToast } from "@repo/ui";
+import { ReactNode, useRef, useState } from "react";
 import SelectChildLevel from "./SelectLevel";
 import { useSession } from "next-auth/react";
 import { createAgentAction } from "./createAgentAction";
@@ -9,13 +9,37 @@ import { createAgentAction } from "./createAgentAction";
 export default function CreateAgent() {
   const session = useSession();
 
+  const { update } = useSession();
   const { toast } = useToast();
+
+  const [loading, setLoading] = useState(false);
+
+  const ref = useRef<null | HTMLFormElement>(null);
 
   async function createAgentClientAction(formdata: FormData) {
     try {
+      setLoading(true);
+
       const res = await createAgentAction(formdata, session.data?.user.id!);
 
       if (res) {
+        await update({
+          sportsShare:
+            Number(session.data?.user.sportsShare) -
+            Number(formdata.get("sportsShare")),
+        });
+
+        await update({
+          ...session,
+          user: {
+            ...session.data?.user,
+            sportsShare:
+              Number(session.data?.user.sportsShare) -
+              Number(formdata.get("sportsShare")),
+          },
+        });
+
+        ref.current?.reset();
         toast({ description: "Agent Created successfully" });
         return;
       }
@@ -23,6 +47,8 @@ export default function CreateAgent() {
       toast({ variant: "destructive", description: "Failed to create agent" });
     } catch (error) {
       toast({ variant: "destructive", description: "Failed to create agent" });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -30,6 +56,7 @@ export default function CreateAgent() {
     <form
       className="flex flex-col sm:gap-10 gap-5"
       action={createAgentClientAction}
+      ref={ref}
     >
       <HeadingLabel>Personal Details</HeadingLabel>
       <div className="mt-5 flex flex-wrap items-center gap-5 w-full justify-center">
@@ -138,7 +165,9 @@ export default function CreateAgent() {
         />
       </div>
 
-      <Button className="w-fit">Create</Button>
+      <Button className="w-fit">
+        {loading ? <LoadingSpinner /> : "Create"}
+      </Button>
     </form>
   );
 }

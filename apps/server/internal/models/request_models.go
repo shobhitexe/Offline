@@ -21,13 +21,13 @@ type LoginHistory struct {
 
 // Agent
 type CreateAgent struct {
-	Name              string `json:"name" validate:"required"`
-	UserName          string `json:"username" validate:"required,min=3,max=50"`
-	Password          string `json:"password" validate:"required,min=6,max=100"`
-	Credit            int64  `json:"credit" validate:"required,gte=0"`
-	SportsShare       int64  `json:"sportsShare" validate:"required,gte=0,lte=100"`
-	MarketCommission  int64  `json:"marketCommission" validate:"required,gte=0,lte=100"`
-	SessionCommission int64  `json:"sessionCommission" validate:"required,gte=0,lte=100"`
-	ChildLevel        int64  `json:"childLevel" validate:"required,gte=1,lte=8"`
-	AddedBy           string `json:"addedBy" validate:"required"`
+	Name              string  `json:"name" validate:"required"`
+	UserName          string  `json:"username" validate:"required,min=3,max=50"`
+	Password          string  `json:"password" validate:"required,min=6,max=100"`
+	Credit            float64 `json:"credit" validate:"required,gte=0"`
+	SportsShare       int64   `json:"sportsShare" validate:"required,gte=0,lte=100"`
+	MarketCommission  int64   `json:"marketCommission" validate:"required,gte=0,lte=100"`
+	SessionCommission int64   `json:"sessionCommission" validate:"required,gte=0,lte=100"`
+	ChildLevel        int64   `json:"childLevel" validate:"required,gte=1,lte=8"`
+	AddedBy           string  `json:"addedBy" validate:"required"`
 }

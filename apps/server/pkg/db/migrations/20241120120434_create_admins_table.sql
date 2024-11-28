@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS admins (
   username TEXT NOT NULL UNIQUE, 
   name TEXT NOT NULL,
   password TEXT NOT NULL,
-  balance INT NOT NULL DEFAULT 0,
+  balance FLOAT NOT NULL DEFAULT 0.0,
   added_by INTEGER, 
   child_level INT CHECK (child_level IN (1,2,3,4,5,6,7,8)) NOT NULL,
-  sports_share INT NOT NULL CHECK (sports_share <= 100),
+  sports_share INT NOT NULL CHECK (sports_share <= 100) DEFAULT 0,
   market_commission INT NOT NULL,
   session_commission INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

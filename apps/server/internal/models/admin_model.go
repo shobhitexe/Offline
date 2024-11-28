@@ -6,6 +6,7 @@ type Admin struct {
 	Username    string `json:"username"`
 	Password    string `json:"-"`
 	Balance     string `json:"balance"`
-	SportsShare string `json:"sportsShare"`
+	SportsShare int64  `json:"sportsShare"`
+	ChildLevel  int64  `json:"childLevel"`
 	CreatedAt   string `json:"createdAt"`
 }

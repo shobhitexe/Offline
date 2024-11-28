@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"server/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
@@ -33,9 +34,40 @@ func (a *adminService) CreateAgent(ctx context.Context, payload models.CreateAge
 
 	payload.Password = string(hashedPassword)
 
-	if err := a.store.CreateAgent(ctx, payload); err != nil {
-		return err
+	tx, err := a.store.BeginTx(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
 
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback(ctx)
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	id, err := a.store.CreateAgent(ctx, tx, payload)
+
+	if err != nil {
+		return err
+	}
+
+	if len(id) == 0 || id == "" {
+		return fmt.Errorf("Empty id : %w", err)
+	}
+
+	if err := a.store.TransferBalance(ctx, tx, payload.AddedBy, id, payload.Credit); err != nil {
+		return err
+	}
+
+	if err := a.store.TransferSportsShare(ctx, tx, payload.AddedBy, id, payload.SportsShare); err != nil {
+		return err
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil

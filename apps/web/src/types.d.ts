@@ -6,6 +6,7 @@ type sessionUser = {
   username?: string;
   token?: string;
   sportsShare?: number;
+  childLevel?: number;
 };
 
 declare module "next-auth" {

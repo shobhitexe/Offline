@@ -3,14 +3,14 @@ package store
 import (
 	"context"
 	"fmt"
-	"server/internal/models"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type AdminStore interface {
-	GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error)
 	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
+	BeginTx(ctx context.Context) (pgx.Tx, error)
 	AdminAgentStore
 	AdminWalletStore
 }
@@ -23,14 +23,12 @@ func NewAdminStore(db *pgxpool.Pool) AdminStore {
 	return &adminStore{db: db}
 }
 
-func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error) {
-	var admin models.Admin
-	query := `SELECT id, name, username, password, sports_share FROM admins WHERE username = $1`
-	err := s.db.QueryRow(ctx, query, username).Scan(&admin.ID, &admin.Name, &admin.Username, &admin.Password, &admin.SportsShare)
+func (s *adminStore) BeginTx(ctx context.Context) (pgx.Tx, error) {
+	tx, err := s.db.Begin(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	return &admin, nil
+	return tx, nil
 }
 
 func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error {
