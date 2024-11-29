@@ -23,8 +23,13 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 		//agent
 		r.Route("/agent", func(r chi.Router) {
 			r.Get("/list", h.GetAgentList)
-
 			r.Post("/create", h.CreateAgent)
+		})
+
+		//user
+		r.Route("/user", func(r chi.Router) {
+			r.Get("/list", h.GetUsersList)
+			r.Post("/create", h.CreateUser)
 		})
 
 	})

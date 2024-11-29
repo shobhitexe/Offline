@@ -2,14 +2,11 @@
 
 import { Button, FormInput, LoadingSpinner, useToast } from "@repo/ui";
 import { ReactNode, useRef, useState } from "react";
-import SelectChildLevel from "./SelectLevel";
 import { useSession } from "next-auth/react";
-import { createAgentAction } from "./createAgentAction";
+import { createUserAction } from "./createUserAction";
 
-export default function CreateAgent() {
+export default function CreateUser() {
   const session = useSession();
-
-  const { update } = useSession();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
@@ -20,33 +17,17 @@ export default function CreateAgent() {
     try {
       setLoading(true);
 
-      const res = await createAgentAction(formdata, session.data?.user.id!);
+      const res = await createUserAction(formdata, session.data?.user.id!);
 
       if (res) {
-        await update({
-          sportsShare:
-            Number(session.data?.user.sportsShare) -
-            Number(formdata.get("sportsShare")),
-        });
-
-        await update({
-          ...session,
-          user: {
-            ...session.data?.user,
-            sportsShare:
-              Number(session.data?.user.sportsShare) -
-              Number(formdata.get("sportsShare")),
-          },
-        });
-
         ref.current?.reset();
-        toast({ description: "Agent Created successfully" });
+        toast({ description: "User Created successfully" });
         return;
       }
 
-      toast({ variant: "destructive", description: "Failed to create agent" });
+      toast({ variant: "destructive", description: "Failed to create user" });
     } catch (error) {
-      toast({ variant: "destructive", description: "Failed to create agent" });
+      toast({ variant: "destructive", description: "Failed to create user" });
     } finally {
       setLoading(false);
     }
@@ -76,7 +57,7 @@ export default function CreateAgent() {
           id="name"
           required
           placeholder={"Full Name"}
-          label="Agent Name"
+          label="Client Name"
         />
 
         <FormInput
@@ -114,33 +95,6 @@ export default function CreateAgent() {
           value={1}
           disabled
           label="Point"
-        />
-
-        <div className="grid w-full max-w-sm items-center">
-          <label className="text-sm">Child Level</label>
-          <SelectChildLevel />
-        </div>
-      </div>
-
-      <HeadingLabel>Sharing</HeadingLabel>
-
-      <div className="mt-5 flex flex-wrap items-center gap-5 w-full justify-center">
-        <FormInput
-          type="number"
-          id="sportsShare"
-          name="sportsShare"
-          placeholder={"Please Enter Sports Share"}
-          label="Sports Share"
-          required
-        />
-        <FormInput
-          type="number"
-          id="parentSportsShare"
-          name="parentSportsShare"
-          placeholder={"Sports Share"}
-          value={session.data?.user.sportsShare}
-          disabled
-          label="Parent Sports Share"
         />
       </div>
 

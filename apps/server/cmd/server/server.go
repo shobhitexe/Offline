@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"server/internal/routes"
 	"server/pkg/di"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -50,8 +51,11 @@ func (s *APIServer) mount() http.Handler {
 
 func (s *APIServer) run(mux http.Handler) error {
 	srv := http.Server{
-		Addr:    s.config.Addr,
-		Handler: mux,
+		Addr:         s.config.Addr,
+		Handler:      mux,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	log.Printf("API server started at port: %s", srv.Addr)

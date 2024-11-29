@@ -31,3 +31,15 @@ type CreateAgent struct {
 	ChildLevel        int64   `json:"childLevel" validate:"required,gte=1,lte=8"`
 	AddedBy           string  `json:"addedBy" validate:"required"`
 }
+
+// user
+type CreateUser struct {
+	ID                string  `json:"id"`
+	Name              string  `json:"name" validate:"required"`
+	Username          string  `json:"username" validate:"required"`
+	Password          string  `json:"password" validate:"required,min=6,max=100"`
+	Credit            float64 `json:"credit" validate:"required,gte=0"`
+	MarketCommission  int64   `json:"marketCommission" validate:"required,gte=0,lte=100"`
+	SessionCommission int64   `json:"sessionCommission" validate:"required,gte=0,lte=100"`
+	AddedBy           string  `json:"addedBy" validate:"required"`
+}

@@ -28,7 +28,7 @@ func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*
 func (s *adminStore) GetAgentsList(ctx context.Context) (*[]models.Admin, error) {
 	var admins []models.Admin
 
-	query := `SELECT id, name, username, password, balance, 
+	query := `SELECT id, name, username, balance, 
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM admins
 	ORDER BY created_at DESC;`
@@ -43,7 +43,7 @@ func (s *adminStore) GetAgentsList(ctx context.Context) (*[]models.Admin, error)
 
 	for rows.Next() {
 		var admin models.Admin
-		if err := rows.Scan(&admin.ID, &admin.Name, &admin.Username, &admin.Password, &admin.Balance, &admin.CreatedAt); err != nil {
+		if err := rows.Scan(&admin.ID, &admin.Name, &admin.Username, &admin.Balance, &admin.CreatedAt); err != nil {
 			return nil, err
 		}
 		admins = append(admins, admin)

@@ -13,6 +13,7 @@ type AdminStore interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
 	AdminAgentStore
 	AdminWalletStore
+	AdminUserStore
 }
 
 type adminStore struct {
@@ -33,7 +34,7 @@ func (s *adminStore) BeginTx(ctx context.Context) (pgx.Tx, error) {
 
 func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error {
 
-	query := `INSERT INTO login_histories (user_id, user_type, login_ip, user_agent)
+	query := `INSERT INTO login_histories (admin_id, user_type, login_ip, user_agent)
 	VALUES ($1, $2, $3, $4)`
 
 	_, err := s.db.Exec(ctx, query, userId, userType, loginIp, userAgent)
