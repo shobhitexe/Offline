@@ -13,18 +13,25 @@ import (
 type Container struct {
 	HealthHandler *handlers.HealthHandler
 	AdminHandler  *handlers.AdminHandler
+	SportsHandler *handlers.SportsHandler
 }
 
 func NewContainer(db *pgxpool.Pool, httpClient *http.Client) *Container {
 
 	utils := utils.NewUtils()
 
+	//admin
 	adminStore := store.NewAdminStore(db)
 	adminService := service.NewAdminService(adminStore, httpClient)
+
+	//sports
+	sportsStore := store.NewSportsStore(db)
+	sportsService := service.NewSportsService(sportsStore)
 
 	return &Container{
 		HealthHandler: handlers.NewHealthHandler(utils),
 		AdminHandler:  handlers.NewAdminHandler(adminService, utils),
+		SportsHandler: handlers.NewSportsHandler(sportsService),
 	}
 
 }
