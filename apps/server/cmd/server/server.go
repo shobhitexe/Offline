@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"server/internal/routes"
 	"server/pkg/di"
 	"time"
@@ -18,8 +19,9 @@ type APIServer struct {
 }
 
 type Config struct {
-	Addr     string
-	dbConfig DBConfig
+	Addr      string
+	dbConfig  DBConfig
+	ProxyAddr string
 }
 
 type DBConfig struct {
@@ -27,6 +29,24 @@ type DBConfig struct {
 	maxOpenConns int
 	maxIdleConns int
 	maxIdleTime  string
+}
+
+func NewHTTPClientWithProxy(proxyAddr string) (*http.Client, error) {
+	proxyURL, err := url.Parse(proxyAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	transport := &http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+	}
+
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   30 * time.Second,
+	}
+
+	return client, nil
 }
 
 func (s *APIServer) mount() http.Handler {
@@ -38,7 +58,12 @@ func (s *APIServer) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	container := di.NewContainer(s.db)
+	httpClient, err := NewHTTPClientWithProxy(s.config.ProxyAddr)
+	if err != nil {
+		log.Fatalf("Failed to create HTTP client with proxy: %v", err)
+	}
+
+	container := di.NewContainer(s.db, httpClient)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		routes.RegisterHealthRoutes(r, container.HealthHandler)

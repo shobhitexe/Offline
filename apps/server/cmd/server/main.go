@@ -24,8 +24,9 @@ func main() {
 	defer db.Close()
 
 	cfg := Config{
-		Addr:     env.GetString("PORT", ":8080"),
-		dbConfig: dbConfig,
+		Addr:      env.GetString("PORT", ":8080"),
+		dbConfig:  dbConfig,
+		ProxyAddr: env.GetString("PROXY_ADDR", "0.0.0.0"),
 	}
 
 	srv := APIServer{

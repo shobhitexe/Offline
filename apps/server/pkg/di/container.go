@@ -1,6 +1,7 @@
 package di
 
 import (
+	"net/http"
 	"server/internal/handlers"
 	"server/internal/service"
 	"server/internal/store"
@@ -14,12 +15,12 @@ type Container struct {
 	AdminHandler  *handlers.AdminHandler
 }
 
-func NewContainer(db *pgxpool.Pool) *Container {
+func NewContainer(db *pgxpool.Pool, httpClient *http.Client) *Container {
 
 	utils := utils.NewUtils()
 
 	adminStore := store.NewAdminStore(db)
-	adminService := service.NewAdminService(adminStore)
+	adminService := service.NewAdminService(adminStore, httpClient)
 
 	return &Container{
 		HealthHandler: handlers.NewHealthHandler(utils),

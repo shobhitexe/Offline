@@ -1,6 +1,8 @@
 package service
 
-import "context"
+import (
+	"context"
+)
 
 type AdminWalletService interface {
 	GetBalance(ctx context.Context, id string) (float64, error)
