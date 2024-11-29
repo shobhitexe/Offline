@@ -1,7 +1,6 @@
 package service
 
 import (
-	"net/http"
 	"server/internal/store"
 )
 
@@ -12,10 +11,9 @@ type AdminService interface {
 }
 
 type adminService struct {
-	store  store.AdminStore
-	client *http.Client
+	store store.AdminStore
 }
 
-func NewAdminService(store store.AdminStore, client *http.Client) AdminService {
-	return &adminService{store: store, client: client}
+func NewAdminService(store store.AdminStore) AdminService {
+	return &adminService{store: store}
 }

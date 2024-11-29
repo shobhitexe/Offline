@@ -22,16 +22,16 @@ func NewContainer(db *pgxpool.Pool, httpClient *http.Client) *Container {
 
 	//admin
 	adminStore := store.NewAdminStore(db)
-	adminService := service.NewAdminService(adminStore, httpClient)
+	adminService := service.NewAdminService(adminStore)
 
 	//sports
 	sportsStore := store.NewSportsStore(db)
-	sportsService := service.NewSportsService(sportsStore)
+	sportsService := service.NewSportsService(sportsStore, httpClient)
 
 	return &Container{
 		HealthHandler: handlers.NewHealthHandler(utils),
 		AdminHandler:  handlers.NewAdminHandler(adminService, utils),
-		SportsHandler: handlers.NewSportsHandler(sportsService),
+		SportsHandler: handlers.NewSportsHandler(sportsService, utils),
 	}
 
 }
