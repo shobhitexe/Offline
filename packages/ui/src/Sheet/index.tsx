@@ -31,7 +31,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  "ui-fixed ui-z-50 ui-gap-4 ui-bg-background ui-p-6 ui-shadow-lg ui-transition ui-ease-in-out ui-data-[state=open]:ui-animate-in ui-data-[state=closed]:ui-animate-out ui-data-[state=closed]:ui-duration-300 ui-data-[state=open]:ui-duration-500",
+  "ui-fixed ui-z-50 ui-gap-4 ui-bg-white ui-p-6 ui-shadow-lg ui-transition ui-ease-in-out ui-data-[state=open]:ui-animate-in ui-data-[state=closed]:ui-animate-out ui-data-[state=closed]:ui-duration-300 ui-data-[state=open]:ui-duration-500",
   {
     variants: {
       side: {
@@ -40,7 +40,7 @@ const sheetVariants = cva(
           "ui-inset-x-0 ui-bottom-0 ui-border-t ui-data-[state=closed]:ui-slide-out-to-bottom ui-data-[state=open]:ui-slide-in-from-bottom",
         left: "ui-inset-y-0 ui-left-0 ui-h-full ui-w-3/4 ui-border-r ui-data-[state=closed]:ui-slide-out-to-left ui-data-[state=open]:ui-slide-in-from-left ui-sm:ui-max-w-sm",
         right:
-          "ui-inset-y-0 ui-right-0 ui-h-full ui-w-3/4 ui-border-l ui-data-[state=closed]:ui-slide-out-to-right ui-data-[state=open]:ui-slide-in-from-right ui-sm:ui-max-w-sm",
+          "ui-inset-y-0 ui-right-0 ui-h-full ui-w-3/4 ui-border-l data-[state=closed]:ui-slide-out-to-right data-[state=open]:ui-slide-in-from-right sm:ui-max-w-sm",
       },
     },
     defaultVariants: {

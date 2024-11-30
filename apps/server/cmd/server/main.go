@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"server/pkg/db"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -23,6 +25,13 @@ func main() {
 	}
 	defer db.Close()
 
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     env.GetString("REDIS_ADDR", "localhost:6379"),
+		Username: env.GetString("REDIS_USERNAME", "default"),
+		Password: env.GetString("REDIS_PASSWORD", ""),
+		DB:       0,
+	})
+
 	cfg := Config{
 		Addr:      env.GetString("PORT", ":8080"),
 		dbConfig:  dbConfig,
@@ -32,6 +41,7 @@ func main() {
 	srv := APIServer{
 		config: cfg,
 		db:     db,
+		redis:  rdb,
 	}
 
 	mux := srv.mount()

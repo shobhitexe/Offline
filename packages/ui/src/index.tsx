@@ -5,7 +5,13 @@ import SearchIcon from "./Icons/SearchIcon";
 import { Input } from "./input/input";
 import { cn } from "./lib/utils";
 import { Separator } from "./Seperator";
-import { Sheet, SheetContent } from "./Sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./Sheet";
 import { Skeleton } from "./Skeleton";
 import {
   Tooltip,
@@ -43,6 +49,17 @@ import {
 import { Toaster } from "./Toast/toaster";
 import { useToast } from "./Toast/use-toast";
 import { LoadingSpinner } from "./LoadingSpinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./Table/table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
+import { ScrollArea, ScrollBar } from "./ScrollArea";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "./Card";
 
 export {
   cn,
@@ -52,6 +69,9 @@ export {
   Skeleton,
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
   Separator,
   Tooltip,
   TooltipTrigger,
@@ -82,4 +102,21 @@ export {
   Toaster,
   useToast,
   LoadingSpinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  ScrollArea,
+  ScrollBar,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
 };

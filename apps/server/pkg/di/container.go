@@ -8,6 +8,7 @@ import (
 	"server/pkg/utils"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 )
 
 type Container struct {
@@ -16,7 +17,7 @@ type Container struct {
 	SportsHandler *handlers.SportsHandler
 }
 
-func NewContainer(db *pgxpool.Pool, httpClient *http.Client) *Container {
+func NewContainer(db *pgxpool.Pool, httpClient *http.Client, redis *redis.Client) *Container {
 
 	utils := utils.NewUtils()
 
@@ -26,7 +27,7 @@ func NewContainer(db *pgxpool.Pool, httpClient *http.Client) *Container {
 
 	//sports
 	sportsStore := store.NewSportsStore(db)
-	sportsService := service.NewSportsService(sportsStore, httpClient)
+	sportsService := service.NewSportsService(sportsStore, httpClient, redis)
 
 	return &Container{
 		HealthHandler: handlers.NewHealthHandler(utils),

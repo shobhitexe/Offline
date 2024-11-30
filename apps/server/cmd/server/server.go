@@ -11,11 +11,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 )
 
 type APIServer struct {
 	config Config
 	db     *pgxpool.Pool
+	redis  *redis.Client
 }
 
 type Config struct {
@@ -63,7 +65,7 @@ func (s *APIServer) mount() http.Handler {
 		log.Fatalf("Failed to create HTTP client with proxy: %v", err)
 	}
 
-	container := di.NewContainer(s.db, httpClient)
+	container := di.NewContainer(s.db, httpClient, s.redis)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		routes.RegisterHealthRoutes(r, container.HealthHandler)
