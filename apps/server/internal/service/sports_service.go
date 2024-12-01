@@ -86,7 +86,7 @@ func (s *sportsService) ListEvents(sportsId, competitionId string) (interface{},
 	ctx := context.Background()
 	var jsonData interface{}
 
-	key := "sports:listevents:" + sportsId + competitionId
+	key := "sports:listevents:" + sportsId + ":" + competitionId
 
 	r, err := s.redis.Get(ctx, key).Result()
 

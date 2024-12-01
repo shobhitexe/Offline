@@ -13,6 +13,6 @@ type AdminHandler struct {
 	validator *validator.Validate
 }
 
-func NewAdminHandler(service service.AdminService, utils utils.Utils) *AdminHandler {
-	return &AdminHandler{service: service, utils: utils, validator: validator.New()}
+func NewAdminHandler(service service.AdminService, utils utils.Utils, validator *validator.Validate) *AdminHandler {
+	return &AdminHandler{service: service, utils: utils, validator: validator}
 }

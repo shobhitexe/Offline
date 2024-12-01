@@ -9,27 +9,19 @@ import (
 )
 
 type AdminStore interface {
-	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
 	BeginTx(ctx context.Context) (pgx.Tx, error)
+	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
 	AdminAgentStore
 	AdminWalletStore
 	AdminUserStore
 }
 
 type adminStore struct {
-	db *pgxpool.Pool
+	*BaseStore
 }
 
 func NewAdminStore(db *pgxpool.Pool) AdminStore {
-	return &adminStore{db: db}
-}
-
-func (s *adminStore) BeginTx(ctx context.Context) (pgx.Tx, error) {
-	tx, err := s.db.Begin(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to begin transaction: %w", err)
-	}
-	return tx, nil
+	return &adminStore{BaseStore: NewBaseStore(db)}
 }
 
 func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error {

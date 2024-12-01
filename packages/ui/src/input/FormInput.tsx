@@ -3,12 +3,15 @@ import { cn } from "../lib/utils";
 
 interface FormInputProps extends React.ComponentProps<"input"> {
   label?: string;
+  containerClassname?: string;
 }
 
 const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
-  ({ className, type, label, ...props }, ref) => {
+  ({ className, containerClassname, type, label, ...props }, ref) => {
     return (
-      <div className="grid w-full max-w-sm items-center">
+      <div
+        className={cn(`grid w-full max-w-sm items-center`, containerClassname)}
+      >
         <label className="text-sm" htmlFor={props.id}>
           {label}
         </label>

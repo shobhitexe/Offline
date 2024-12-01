@@ -7,6 +7,7 @@ import { SessionProviders } from "./providers";
 import { options } from "./api/auth/[...nextauth]/options";
 import { ViewLayout } from "@/components";
 import { Toaster } from "@repo/ui";
+import { GlobalProvider } from "@/context/GlobalContext";
 
 const fira = Fira_Sans({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -29,7 +30,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={fira.className}>
         <SessionProviders session={session}>
-          <ViewLayout>{children}</ViewLayout>
+          <GlobalProvider>
+            <ViewLayout>{children}</ViewLayout>
+          </GlobalProvider>
           <Toaster />
         </SessionProviders>
       </body>

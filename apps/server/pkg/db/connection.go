@@ -6,9 +6,16 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 )
 
-func ConnectToPostgres(dsn string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*pgxpool.Pool, error) {
+type Connection struct{}
+
+func NewConnection() *Connection {
+	return &Connection{}
+}
+
+func (c *Connection) ConnectToPostgres(dsn string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*pgxpool.Pool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -37,4 +44,26 @@ func ConnectToPostgres(dsn string, maxOpenConns, maxIdleConns int, maxIdleTime s
 	log.Println("Succesfully created database pool")
 
 	return pool, nil
+}
+
+func (c *Connection) ConnectToRedis(Addr, Username, Password string, DB int) (*redis.Client, error) {
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     Addr,
+		Username: Username,
+		Password: Password,
+		DB:       DB,
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if _, err := rdb.Ping(ctx).Result(); err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+		return nil, err
+	}
+
+	log.Println("Succesfully connected to redis")
+
+	return rdb, nil
+
 }

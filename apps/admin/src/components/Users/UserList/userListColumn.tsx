@@ -12,6 +12,15 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
+import dynamic from "next/dynamic";
+
+const DepositCredit = dynamic(
+  () => import("../UserActions/DepositCredit/DepositCredit"),
+  {
+    loading: () => <p className="ui-py-1.5 ui-text-sm ui-px-2">Loading...</p>,
+  }
+);
+
 export const userListColumn: ColumnDef<any>[] = [
   {
     accessorKey: "name",
@@ -52,7 +61,7 @@ export const userListColumn: ColumnDef<any>[] = [
     header: "Joining Date",
   },
   {
-    id: "actions",
+    accessorKey: "id",
     header: "Action",
     cell: ({ row }) => {
       return (
@@ -67,7 +76,9 @@ export const userListColumn: ColumnDef<any>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Deposit Credit</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <DepositCredit id={row.getValue("id")} />
+            </DropdownMenuItem>
             <DropdownMenuItem>Withdraw Credit</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Share</DropdownMenuItem>

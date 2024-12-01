@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 	"server/pkg/db"
-
-	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -18,24 +16,33 @@ func main() {
 		maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "10m"),
 	}
 
-	db, err := db.ConnectToPostgres(dbConfig.addr, dbConfig.maxOpenConns, dbConfig.maxIdleConns, dbConfig.maxIdleTime)
+	conn := db.NewConnection()
+
+	db, err := conn.ConnectToPostgres(dbConfig.addr, dbConfig.maxOpenConns, dbConfig.maxIdleConns, dbConfig.maxIdleTime)
 
 	if err != nil {
-		log.Fatalf("Failed to create database pool")
+		log.Fatalf("Failed to create database pool: %v", err)
 	}
 	defer db.Close()
 
-	rdb := redis.NewClient(&redis.Options{
+	redisConfig := RedisConfig{
 		Addr:     env.GetString("REDIS_ADDR", "localhost:6379"),
 		Username: env.GetString("REDIS_USERNAME", "default"),
 		Password: env.GetString("REDIS_PASSWORD", ""),
 		DB:       0,
-	})
+	}
+
+	rdb, err := conn.ConnectToRedis(redisConfig.Addr, redisConfig.Username, redisConfig.Password, redisConfig.DB)
+	if err != nil {
+		log.Fatalf("Failed to connect to redis: %v", err)
+	}
+	defer rdb.Close()
 
 	cfg := Config{
-		Addr:      env.GetString("PORT", ":8080"),
-		dbConfig:  dbConfig,
-		ProxyAddr: env.GetString("PROXY_ADDR", "0.0.0.0"),
+		Addr:        env.GetString("PORT", ":8080"),
+		dbConfig:    dbConfig,
+		redisConfig: redisConfig,
+		ProxyAddr:   env.GetString("PROXY_ADDR", "0.0.0.0"),
 	}
 
 	srv := APIServer{

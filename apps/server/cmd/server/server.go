@@ -21,9 +21,10 @@ type APIServer struct {
 }
 
 type Config struct {
-	Addr      string
-	dbConfig  DBConfig
-	ProxyAddr string
+	Addr        string
+	dbConfig    DBConfig
+	redisConfig RedisConfig
+	ProxyAddr   string
 }
 
 type DBConfig struct {
@@ -31,6 +32,13 @@ type DBConfig struct {
 	maxOpenConns int
 	maxIdleConns int
 	maxIdleTime  string
+}
+
+type RedisConfig struct {
+	Addr     string
+	Username string
+	Password string
+	DB       int
 }
 
 func NewHTTPClientWithProxy(proxyAddr string) (*http.Client, error) {
@@ -71,6 +79,7 @@ func (s *APIServer) mount() http.Handler {
 		routes.RegisterHealthRoutes(r, container.HealthHandler)
 		routes.RegisterAdminRoutes(r, container.AdminHandler)
 		routes.RegisterSportsRoutes(r, container.SportsHandler)
+		routes.RegisterUserRoutes(r, container.UserHandler)
 	})
 
 	return r

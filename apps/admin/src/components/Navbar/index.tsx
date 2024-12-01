@@ -14,6 +14,7 @@ import { getServerSession } from "next-auth";
 import Logout from "./Logout";
 import Profile from "./Profile";
 import { universalGET } from "@/lib/requests";
+import Balance from "./Balance";
 
 async function getBalance(id: string) {
   try {
@@ -36,7 +37,7 @@ async function getBalance(id: string) {
 export default async function Navbar() {
   const session = await getServerSession(options);
 
-  const balance = await getBalance(session?.user.id!);
+  const fetchedBalance = await getBalance(session?.user.id!);
 
   return (
     <div className="bg-[#04061b] sm:h-20 h-10 z-20 relative flex items-center justify-between px-5">
@@ -54,7 +55,7 @@ export default async function Navbar() {
               Child Level: {session?.user.childLevel}
             </DropdownMenuItem>
             <DropdownMenuItem>Exposure: 0</DropdownMenuItem>
-            <DropdownMenuItem>Balance : {balance}</DropdownMenuItem>
+            <Balance fetchedBalance={fetchedBalance} />
           </DropdownMenuContent>
         </DropdownMenu>
 
