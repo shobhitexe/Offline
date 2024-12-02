@@ -12,7 +12,7 @@ import (
 
 type AdminAgentService interface {
 	AdminLogin(payload models.AdminLoginRequest, ctx context.Context) (*models.Admin, error)
-	AgentsList(ctx context.Context) (*[]models.Admin, error)
+	AgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error)
 	CreateAgent(ctx context.Context, payload models.CreateAgent) error
 }
 
@@ -33,7 +33,6 @@ func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.
 	go func() {
 		backgroundCtx := context.Background()
 		if err := a.store.RecordLoginHistory(backgroundCtx, admin.ID, "admin", payload.LoginIP, payload.UserAgent); err != nil {
-
 			log.Printf("failed to record login history: %v", err)
 		}
 	}()
@@ -41,9 +40,9 @@ func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.
 	return admin, nil
 }
 
-func (a *adminService) AgentsList(ctx context.Context) (*[]models.Admin, error) {
+func (a *adminService) AgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error) {
 
-	list, err := a.store.GetAgentsList(ctx)
+	list, err := a.store.GetAgentsList(ctx, id, childLevel)
 
 	if err != nil {
 		return nil, err

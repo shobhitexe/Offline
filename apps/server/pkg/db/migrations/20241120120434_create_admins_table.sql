@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS admins (
   sports_share INT DEFAULT 0 CHECK (sports_share <= 100) NOT NULL,
   market_commission INT NOT NULL,
   session_commission INT NOT NULL,
+  blocked BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- +goose StatementEnd
@@ -30,6 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
   market_commission INT NOT NULL,
   session_commission INT NOT NULL,
   added_by INTEGER,   
+  blocked BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL
 );

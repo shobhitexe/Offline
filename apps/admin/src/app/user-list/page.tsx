@@ -1,11 +1,13 @@
 import { PageHeading, userListColumn } from "@/components";
 import { universalGET } from "@/lib/requests";
 import { buttonVariants, DataTable } from "@repo/ui";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { options } from "../api/auth/[...nextauth]/options";
 
-async function getUserList() {
+async function getUserList(id: string) {
   try {
-    const res = await universalGET("/admin/user/list");
+    const res = await universalGET(`/admin/user/list?id=${id}`);
 
     if (res.data) {
       return res.data;
@@ -18,7 +20,9 @@ async function getUserList() {
 }
 
 export default async function page() {
-  const list = await getUserList();
+  const session = await getServerSession(options);
+
+  const list = await getUserList(session?.user.id!);
 
   return (
     <div className="w-full flex flex-col gap-5">

@@ -77,7 +77,7 @@ func (a *adminService) DebitFromUser(ctx context.Context, payload models.Transfe
 		return err
 	}
 
-	if err := a.store.RecordUserTransaction(ctx, tx, payload.To, payload.From, payload.Remarks, "credit", payload.Amount); err != nil {
+	if err := a.store.RecordUserTransaction(ctx, tx, payload.To, payload.From, payload.Remarks, "debit", payload.Amount); err != nil {
 		return err
 	}
 

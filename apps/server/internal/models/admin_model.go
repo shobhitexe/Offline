@@ -8,5 +8,6 @@ type Admin struct {
 	Balance     string `json:"balance"`
 	SportsShare int64  `json:"sportsShare"`
 	ChildLevel  int64  `json:"childLevel"`
+	Blocked     bool   `json:"blocked"`
 	CreatedAt   string `json:"createdAt"`
 }

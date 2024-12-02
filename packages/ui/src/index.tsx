@@ -60,6 +60,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
 import { ScrollArea, ScrollBar } from "./ScrollArea";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "./Card";
+import { Switch } from "./Switch/Switch";
 
 export {
   cn,
@@ -119,4 +120,5 @@ export {
   CardHeader,
   CardTitle,
   CardFooter,
+  Switch,
 };

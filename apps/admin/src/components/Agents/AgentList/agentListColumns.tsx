@@ -13,6 +13,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import DepositCredit from "../AgentsActions/DepositCredit/DepositCredit";
 import WithdrawCredit from "../AgentsActions/WithdrawCredit/WithDrawCredit";
+import ProfileInfo from "../AgentsActions/ProfileInfo/ProfileInfo";
+import Permission from "../AgentsActions/Permissions/Permissions";
 
 export const agentListColumn: ColumnDef<any>[] = [
   {
@@ -78,11 +80,17 @@ export const agentListColumn: ColumnDef<any>[] = [
               </DropdownMenuItem>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Share</DropdownMenuItem>
-            <DropdownMenuItem>Report</DropdownMenuItem>
-            <DropdownMenuItem>Permission</DropdownMenuItem>
-            <DropdownMenuItem>Level - Supermaster</DropdownMenuItem>
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            {/* <DropdownMenuItem>Share</DropdownMenuItem> */}
+            <div className="flex flex-col items-start">
+              <DropdownMenuItem>Report</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Permission id={row.getValue("id")} />
+              </DropdownMenuItem>
+              {/* <DropdownMenuItem>Level - Supermaster</DropdownMenuItem> */}
+              <DropdownMenuItem asChild>
+                <ProfileInfo id={row.getValue("id")} />
+              </DropdownMenuItem>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       );

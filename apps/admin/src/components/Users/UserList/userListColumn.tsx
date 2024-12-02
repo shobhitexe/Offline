@@ -15,6 +15,8 @@ import { MoreHorizontal } from "lucide-react";
 import DepositCredit from "../UserActions/DepositCredit/DepositCredit";
 import WithdrawCredit from "../UserActions/WithdrawCredit/WithDrawCredit";
 import ProfileInfo from "../UserActions/ProfileInfo/ProfileInfo";
+import Permission from "../UserActions/Permissions/Permissions";
+import Link from "next/link";
 
 export const userListColumn: ColumnDef<any>[] = [
   {
@@ -69,7 +71,9 @@ export const userListColumn: ColumnDef<any>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/user-list/edit/${row.getValue("id")}`}>Edit</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <div className="flex flex-col items-start">
               <DropdownMenuItem asChild>
@@ -81,11 +85,16 @@ export const userListColumn: ColumnDef<any>[] = [
             </div>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Report</DropdownMenuItem>
-            <DropdownMenuItem>Permission</DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <ProfileInfo id={row.getValue("id")} />
-            </DropdownMenuItem>
+
+            <div className="flex flex-col items-start">
+              <DropdownMenuItem>Report</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Permission id={row.getValue("id")} />
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <ProfileInfo id={row.getValue("id")} />
+              </DropdownMenuItem>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       );

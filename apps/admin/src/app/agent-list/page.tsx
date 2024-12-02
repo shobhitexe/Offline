@@ -1,11 +1,15 @@
 import { agentListColumn, PageHeading } from "@/components";
 import { universalGET } from "@/lib/requests";
 import { buttonVariants, DataTable } from "@repo/ui";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { options } from "../api/auth/[...nextauth]/options";
 
-async function getAgentList() {
+async function getAgentList(id: string, childLevel: number) {
   try {
-    const res = await universalGET("/admin/agent/list");
+    const res = await universalGET(
+      `/admin/agent/list?id=${id}&childLevel=${childLevel}`
+    );
 
     if (res.data) {
       return res.data;
@@ -18,7 +22,9 @@ async function getAgentList() {
 }
 
 export default async function page() {
-  const list = await getAgentList();
+  const session = await getServerSession(options);
+
+  const list = await getAgentList(session?.user.id!, session?.user.childLevel!);
 
   return (
     <div className="w-full flex flex-col gap-5">

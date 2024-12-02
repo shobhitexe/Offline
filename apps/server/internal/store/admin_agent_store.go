@@ -10,14 +10,16 @@ import (
 
 type AdminAgentStore interface {
 	GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error)
-	GetAgentsList(ctx context.Context) (*[]models.Admin, error)
+	GetAgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error)
 	CreateAgent(ctx context.Context, tx pgx.Tx, payload models.CreateAgent) (string, error)
 	TransferSportsShare(ctx context.Context, tx pgx.Tx, from, to string, share int64) error
 }
 
 func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error) {
 	var admin models.Admin
-	query := `SELECT id, name, username, password, sports_share, child_level FROM admins WHERE username = $1`
+	query := `SELECT id, name, username, password, sports_share, child_level 
+	FROM admins 
+	WHERE username = $1 AND blocked = false`
 	err := s.db.QueryRow(ctx, query, username).Scan(&admin.ID, &admin.Name, &admin.Username, &admin.Password, &admin.SportsShare, &admin.ChildLevel)
 	if err != nil {
 		return nil, err
@@ -25,15 +27,16 @@ func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*
 	return &admin, nil
 }
 
-func (s *adminStore) GetAgentsList(ctx context.Context) (*[]models.Admin, error) {
+func (s *adminStore) GetAgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error) {
 	var admins []models.Admin
 
 	query := `SELECT id, name, username, balance, 
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM admins
+	WHERE child_level < $1 AND added_by = $2
 	ORDER BY created_at DESC;`
 
-	rows, err := s.db.Query(ctx, query)
+	rows, err := s.db.Query(ctx, query, childLevel, id)
 
 	if err != nil {
 

@@ -5,6 +5,7 @@ import PageHeading from "./PageHeading";
 import ViewLayout from "./RootLayout/ViewLayout";
 import { userListColumn } from "./Users/UserList/userListColumn";
 import CreateUser from "./Users/CreateUser";
+import EditUser from "./Users/EditUser/EditUser";
 
 export {
   Signin,
@@ -14,4 +15,5 @@ export {
   agentListColumn,
   CreateAgent,
   CreateUser,
+  EditUser,
 };

@@ -51,3 +51,10 @@ type TransferCredit struct {
 	To      string  `json:"to"`
 	Remarks string  `json:"remarks"`
 }
+
+// edit user
+type EditUser struct {
+	ID               string `json:"id"`
+	Name             string `json:"name" validate:"required"`
+	MarketCommission int64  `json:"marketCommission" validate:"required,gte=0,lte=100"`
+}

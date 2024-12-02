@@ -14,6 +14,10 @@ type AdminStore interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
 	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
 	AdminDetails(ctx context.Context, id string) (*models.Admin, error)
+	IsAdminBlocked(ctx context.Context, id string) (bool, error)
+	ChangeAdminBlockStatus(ctx context.Context, id string, val bool) error
+	IsUserBlocked(ctx context.Context, id string) (bool, error)
+	ChangeUserBlockStatus(ctx context.Context, id string, val bool) error
 	AdminAgentStore
 	AdminWalletStore
 	AdminUserStore
@@ -44,10 +48,18 @@ func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, l
 func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin, error) {
 	var admin models.Admin
 
-	query := `SELECT id, username, name, balance, 
+	query := `SELECT id, username, name, balance, child_level, sports_share, blocked,
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
 	FROM admins WHERE id = $1`
-	err := s.db.QueryRow(ctx, query, id).Scan(&admin.ID, &admin.Username, &admin.Name, &admin.Balance, &admin.CreatedAt)
+	err := s.db.QueryRow(ctx, query, id).Scan(
+		&admin.ID,
+		&admin.Username,
+		&admin.Name,
+		&admin.Balance,
+		&admin.ChildLevel,
+		&admin.SportsShare,
+		&admin.Blocked,
+		&admin.CreatedAt)
 
 	if err != nil {
 		log.Println(err)
@@ -55,4 +67,56 @@ func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin
 	}
 
 	return &admin, nil
+}
+
+func (s *adminStore) IsAdminBlocked(ctx context.Context, id string) (bool, error) {
+	var blocked bool
+
+	query := `SELECT blocked FROM admins WHERE id = $1`
+	err := s.db.QueryRow(ctx, query, id).Scan(&blocked)
+
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+
+	return blocked, nil
+}
+
+func (s *adminStore) ChangeAdminBlockStatus(ctx context.Context, id string, val bool) error {
+
+	query := `UPDATE admins SET blocked = $1 WHERE id = $2`
+
+	_, err := s.db.Exec(ctx, query, val, id)
+	if err != nil {
+		return fmt.Errorf("failed to update admin blocked status: %w", err)
+	}
+
+	return nil
+}
+
+func (s *adminStore) IsUserBlocked(ctx context.Context, id string) (bool, error) {
+	var blocked bool
+
+	query := `SELECT blocked FROM users WHERE id = $1`
+	err := s.db.QueryRow(ctx, query, id).Scan(&blocked)
+
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+
+	return blocked, nil
+}
+
+func (s *adminStore) ChangeUserBlockStatus(ctx context.Context, id string, val bool) error {
+
+	query := `UPDATE users SET blocked = $1 WHERE id = $2`
+
+	_, err := s.db.Exec(ctx, query, val, id)
+	if err != nil {
+		return fmt.Errorf("failed to update users blocked status: %w", err)
+	}
+
+	return nil
 }

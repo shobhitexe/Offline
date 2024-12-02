@@ -10,7 +10,8 @@ import (
 
 type AdminUserService interface {
 	CreateUser(ctx context.Context, payload models.CreateUser) error
-	UsersList(ctx context.Context) (*[]models.User, error)
+	UsersList(ctx context.Context, id int) (*[]models.User, error)
+	EditUser(ctx context.Context, payload models.EditUser) error
 }
 
 func (a *adminService) CreateUser(ctx context.Context, payload models.CreateUser) error {
@@ -53,13 +54,22 @@ func (a *adminService) CreateUser(ctx context.Context, payload models.CreateUser
 
 }
 
-func (a *adminService) UsersList(ctx context.Context) (*[]models.User, error) {
+func (a *adminService) UsersList(ctx context.Context, id int) (*[]models.User, error) {
 
-	list, err := a.store.GetUsersList(ctx)
+	list, err := a.store.GetUsersList(ctx, id)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return list, nil
+}
+
+func (a *adminService) EditUser(ctx context.Context, payload models.EditUser) error {
+
+	if err := a.store.EditUser(ctx, payload); err != nil {
+		return fmt.Errorf("failed to edit user: %w", err)
+	}
+
+	return nil
 }
