@@ -12,21 +12,9 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
-import dynamic from "next/dynamic";
-
-const DepositCredit = dynamic(
-  () => import("../UserActions/DepositCredit/DepositCredit"),
-  {
-    loading: () => <p className="ui-py-1.5 ui-text-sm ui-px-2">Loading...</p>,
-  }
-);
-
-const WithdrawCredit = dynamic(
-  () => import("../UserActions/WithdrawCredit/WithDrawCredit"),
-  {
-    loading: () => <p className="ui-py-1.5 ui-text-sm ui-px-2">Loading...</p>,
-  }
-);
+import DepositCredit from "../UserActions/DepositCredit/DepositCredit";
+import WithdrawCredit from "../UserActions/WithdrawCredit/WithDrawCredit";
+import ProfileInfo from "../UserActions/ProfileInfo/ProfileInfo";
 
 export const userListColumn: ColumnDef<any>[] = [
   {
@@ -93,11 +81,11 @@ export const userListColumn: ColumnDef<any>[] = [
             </div>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Share</DropdownMenuItem>
             <DropdownMenuItem>Report</DropdownMenuItem>
             <DropdownMenuItem>Permission</DropdownMenuItem>
-            <DropdownMenuItem>Level - Supermaster</DropdownMenuItem>
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <ProfileInfo id={row.getValue("id")} />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

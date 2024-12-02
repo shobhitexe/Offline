@@ -13,7 +13,7 @@ import {
   useToast,
 } from "@repo/ui";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { DepositCreditAction } from "./depositCreditAction";
 
@@ -22,12 +22,14 @@ export default function DepositCredit({ id }: { id: string }) {
 
   const { toast } = useToast();
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const ref = useRef<null | HTMLFormElement>(null);
 
   const { balance, setBalance } = useGlobalContext();
 
   const { data } = useSWR<{ data: string }>(
-    balance === "NaN"
+    balance === "NaN" && isOpen
       ? `/admin/wallet/balance?id=${session.data?.user.id}`
       : null,
     fetcher
@@ -41,7 +43,7 @@ export default function DepositCredit({ id }: { id: string }) {
 
   const { data: userData, mutate } = useSWR<{
     data: { name: string; username: string; balance: string };
-  }>(`/user?id=${id}`, fetcher);
+  }>(isOpen ? `/user?id=${id}` : null, fetcher);
 
   async function FormActionClient(formdata: FormData) {
     try {
@@ -84,7 +86,7 @@ export default function DepositCredit({ id }: { id: string }) {
   }
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2">
         Deposit Credit
       </DialogTrigger>

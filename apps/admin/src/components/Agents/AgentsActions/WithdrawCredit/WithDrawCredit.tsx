@@ -43,7 +43,7 @@ export default function WithdrawCredit({ id }: { id: string }) {
 
   const { data: userData, mutate } = useSWR<{
     data: { name: string; username: string; balance: string };
-  }>(isOpen ? `/user?id=${id}` : null, fetcher);
+  }>(isOpen ? `/admin?id=${id}` : null, fetcher);
 
   async function FormActionClient(formdata: FormData) {
     try {

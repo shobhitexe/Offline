@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 	"fmt"
+	"log"
+	"server/internal/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -11,6 +13,7 @@ import (
 type AdminStore interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
 	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
+	AdminDetails(ctx context.Context, id string) (*models.Admin, error)
 	AdminAgentStore
 	AdminWalletStore
 	AdminUserStore
@@ -36,4 +39,20 @@ func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, l
 
 	return nil
 
+}
+
+func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin, error) {
+	var admin models.Admin
+
+	query := `SELECT id, username, name, balance, 
+	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
+	FROM admins WHERE id = $1`
+	err := s.db.QueryRow(ctx, query, id).Scan(&admin.ID, &admin.Username, &admin.Name, &admin.Balance, &admin.CreatedAt)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &admin, nil
 }

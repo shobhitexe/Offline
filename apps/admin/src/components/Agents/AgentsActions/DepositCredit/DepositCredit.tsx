@@ -15,9 +15,9 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
-import { WithdrawCreditAction } from "./withdrawCreditAction";
+import { DepositCreditAction } from "./depositCreditAction";
 
-export default function WithdrawCredit({ id }: { id: string }) {
+export default function DepositCredit({ id }: { id: string }) {
   const session = useSession();
 
   const { toast } = useToast();
@@ -43,11 +43,11 @@ export default function WithdrawCredit({ id }: { id: string }) {
 
   const { data: userData, mutate } = useSWR<{
     data: { name: string; username: string; balance: string };
-  }>(isOpen ? `/user?id=${id}` : null, fetcher);
+  }>(isOpen ? `/admin?id=${id}` : null, fetcher);
 
   async function FormActionClient(formdata: FormData) {
     try {
-      if (Number(formdata.get("amount")) > Number(userData?.data.balance)) {
+      if (Number(formdata.get("amount")) > Number(balance)) {
         toast({
           title: "Can't Transfer",
           description: "Insufficient balance",
@@ -56,10 +56,10 @@ export default function WithdrawCredit({ id }: { id: string }) {
         return;
       }
 
-      const res = await WithdrawCreditAction(
+      const res = await DepositCreditAction(
         formdata,
-        id,
-        session.data?.user.id!
+        session.data?.user.id!,
+        id
       );
 
       if (res !== true) {
@@ -70,9 +70,9 @@ export default function WithdrawCredit({ id }: { id: string }) {
         return;
       }
 
-      toast({ description: "Amount debited" });
+      toast({ description: "Amount credited" });
 
-      setBalance(Number(balance) + Number(formdata.get("amount")));
+      setBalance(Number(balance) - Number(formdata.get("amount")));
 
       mutate();
 
@@ -88,7 +88,7 @@ export default function WithdrawCredit({ id }: { id: string }) {
   return (
     <Dialog onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2">
-        Withdraw Credit
+        Deposit Credit
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -105,7 +105,7 @@ export default function WithdrawCredit({ id }: { id: string }) {
               type="number"
               id="amount"
               placeholder={"Enter Chips"}
-              label="Withdraw Credit"
+              label="Deposit Credit"
               required
               containerClassname="max-w-full"
             />
@@ -138,7 +138,7 @@ export default function WithdrawCredit({ id }: { id: string }) {
               containerClassname="max-w-full"
             />
 
-            <Button>Withdraw</Button>
+            <Button>Deposit</Button>
           </form>
         </DialogHeader>
       </DialogContent>

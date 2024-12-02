@@ -11,6 +11,8 @@ import {
 } from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import DepositCredit from "../AgentsActions/DepositCredit/DepositCredit";
+import WithdrawCredit from "../AgentsActions/WithdrawCredit/WithDrawCredit";
 
 export const agentListColumn: ColumnDef<any>[] = [
   {
@@ -52,7 +54,7 @@ export const agentListColumn: ColumnDef<any>[] = [
     header: "Joining Date",
   },
   {
-    id: "actions",
+    accessorKey: "id",
     header: "Action",
     cell: ({ row }) => {
       return (
@@ -67,8 +69,14 @@ export const agentListColumn: ColumnDef<any>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Deposit Credit</DropdownMenuItem>
-            <DropdownMenuItem>Withdraw Credit</DropdownMenuItem>
+            <div className="flex flex-col items-start">
+              <DropdownMenuItem asChild>
+                <DepositCredit id={row.getValue("id")} />
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <WithdrawCredit id={row.getValue("id")} />
+              </DropdownMenuItem>
+            </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Share</DropdownMenuItem>
             <DropdownMenuItem>Report</DropdownMenuItem>

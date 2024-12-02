@@ -14,8 +14,8 @@ type AdminWalletStore interface {
 	DebitBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error
 	TransferBalance(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
 	TransferBalanceToUser(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
-	RecordCreditToUser(ctx context.Context, tx pgx.Tx, payload models.TransferCredit) error
-	RecordDebitToUser(ctx context.Context, tx pgx.Tx, payload models.TransferCredit) error
+	RecordUserTransaction(ctx context.Context, tx pgx.Tx, from, to, remarks, txnType string, amount float64) error
+	RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payload models.TransferCredit, txnType string) error
 	DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
 }
 
@@ -179,24 +179,24 @@ func (s *adminStore) DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID
 	return nil
 }
 
-func (s *adminStore) RecordCreditToUser(ctx context.Context, tx pgx.Tx, payload models.TransferCredit) error {
+func (s *adminStore) RecordUserTransaction(ctx context.Context, tx pgx.Tx, from, to, remarks, txnType string, amount float64) error {
 
-	query := `INSERT INTO user_credits (user_id, admin_id, amount, remarks, txn_type)
+	query := `INSERT INTO user_txns (user_id, admin_id, amount, remarks, txn_type)
 	VALUES ($1, $2, $3, $4, $5)`
 
-	if _, err := tx.Exec(ctx, query, payload.To, payload.From, payload.Amount, payload.Remarks, "credit"); err != nil {
+	if _, err := tx.Exec(ctx, query, to, from, amount, remarks, txnType); err != nil {
 		return fmt.Errorf("failed to record transaction : %w", err)
 	}
 
 	return nil
 }
 
-func (s *adminStore) RecordDebitToUser(ctx context.Context, tx pgx.Tx, payload models.TransferCredit) error {
+func (s *adminStore) RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payload models.TransferCredit, txnType string) error {
 
-	query := `INSERT INTO user_credits (user_id, admin_id, amount, remarks, txn_type)
+	query := `INSERT INTO admin_txns (from_id, to_id, amount, remarks, txn_type)
 	VALUES ($1, $2, $3, $4, $5)`
 
-	if _, err := tx.Exec(ctx, query, payload.From, payload.To, payload.Amount, payload.Remarks, "debit"); err != nil {
+	if _, err := tx.Exec(ctx, query, payload.From, payload.To, payload.Amount, payload.Remarks, txnType); err != nil {
 		return fmt.Errorf("failed to record transaction : %w", err)
 	}
 
