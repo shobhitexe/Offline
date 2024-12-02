@@ -2,10 +2,22 @@ import { ReactNode } from "react";
 import { SidebarProvider, SidebarTrigger } from "../Sidebar";
 import { AppSidebar } from "../Sidebar/app-sidebar";
 import Navbar from "../Navbar";
+import { getServerSession } from "next-auth";
+import { options } from "@/app/api/auth/[...nextauth]/options";
 
-export default function ViewLayout({ children }: { children: ReactNode }) {
+export default async function ViewLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const session = await getServerSession(options);
+
+  if (!session?.user.id) {
+    return <>{children}</>;
+  }
+
   return (
-    <div>
+    <>
       <Navbar />
       <SidebarProvider>
         <AppSidebar />
@@ -16,6 +28,6 @@ export default function ViewLayout({ children }: { children: ReactNode }) {
           </div>
         </main>
       </SidebarProvider>
-    </div>
+    </>
   );
 }
