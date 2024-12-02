@@ -43,3 +43,11 @@ type CreateUser struct {
 	SessionCommission int64   `json:"sessionCommission" validate:"required,gte=0,lte=100"`
 	AddedBy           string  `json:"addedBy" validate:"required"`
 }
+
+// transfer
+type TransferCredit struct {
+	Amount  float64 `json:"amount"`
+	From    string  `json:"from"`
+	To      string  `json:"to"`
+	Remarks string  `json:"remarks"`
+}

@@ -36,13 +36,28 @@ CREATE TABLE IF NOT EXISTS users (
 -- +goose StatementEnd
 
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS admin_login_histories (
+CREATE TABLE IF NOT EXISTS login_histories (
   id SERIAL PRIMARY KEY,             
   user_id INTEGER,
   admin_id INTEGER,  
   user_type TEXT CHECK (user_type IN ('admin', 'user')) NOT NULL, 
   login_ip TEXT NOT NULL,           
   user_agent TEXT NOT NULL,         
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_admin_id FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+);
+-- +goose StatementEnd
+
+
+-- +goose StatementBegin
+CREATE TABLE IF NOT EXISTS user_credits (
+  id SERIAL PRIMARY KEY,             
+  user_id INTEGER,
+  admin_id INTEGER,
+  amount NUMERIC NOT NULL,
+  remarks TEXT,
+  txn_type TEXT CHECK (txn_type IN ('debit', 'credit')) NOT NULL, 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE

@@ -21,6 +21,13 @@ const DepositCredit = dynamic(
   }
 );
 
+const WithdrawCredit = dynamic(
+  () => import("../UserActions/WithdrawCredit/WithDrawCredit"),
+  {
+    loading: () => <p className="ui-py-1.5 ui-text-sm ui-px-2">Loading...</p>,
+  }
+);
+
 export const userListColumn: ColumnDef<any>[] = [
   {
     accessorKey: "name",
@@ -76,10 +83,15 @@ export const userListColumn: ColumnDef<any>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <DepositCredit id={row.getValue("id")} />
-            </DropdownMenuItem>
-            <DropdownMenuItem>Withdraw Credit</DropdownMenuItem>
+            <div className="flex flex-col items-start">
+              <DropdownMenuItem asChild>
+                <DepositCredit id={row.getValue("id")} />
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <WithdrawCredit id={row.getValue("id")} />
+              </DropdownMenuItem>
+            </div>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem>Share</DropdownMenuItem>
             <DropdownMenuItem>Report</DropdownMenuItem>
