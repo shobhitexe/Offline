@@ -15,6 +15,7 @@ import DepositCredit from "../AgentsActions/DepositCredit/DepositCredit";
 import WithdrawCredit from "../AgentsActions/WithdrawCredit/WithDrawCredit";
 import ProfileInfo from "../AgentsActions/ProfileInfo/ProfileInfo";
 import Permission from "../AgentsActions/Permissions/Permissions";
+import Link from "next/link";
 
 export const agentListColumn: ColumnDef<any>[] = [
   {
@@ -69,7 +70,9 @@ export const agentListColumn: ColumnDef<any>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/agent-list/edit/${row.getValue("id")}`}>Edit</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <div className="flex flex-col items-start">
               <DropdownMenuItem asChild>

@@ -13,6 +13,7 @@ type AdminAgentStore interface {
 	GetAgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error)
 	CreateAgent(ctx context.Context, tx pgx.Tx, payload models.CreateAgent) (string, error)
 	TransferSportsShare(ctx context.Context, tx pgx.Tx, from, to string, share int64) error
+	EditAdmin(ctx context.Context, id, name string) error
 }
 
 func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error) {
@@ -110,4 +111,17 @@ func (s *adminStore) TransferSportsShare(ctx context.Context, tx pgx.Tx, from, t
 
 	return nil
 
+}
+
+func (s *adminStore) EditAdmin(ctx context.Context, id, name string) error {
+
+	query := `UPDATE admins SET name = $1 WHERE id = $2`
+
+	_, err := s.db.Exec(ctx, query, name, id)
+
+	if err != nil {
+		return fmt.Errorf("failed to update admin: %w", err)
+	}
+
+	return nil
 }

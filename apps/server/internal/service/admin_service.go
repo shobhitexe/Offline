@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"server/internal/models"
 	"server/internal/store"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AdminService interface {
@@ -12,6 +15,7 @@ type AdminService interface {
 	ChangeAdminBlockStatus(ctx context.Context, id string, val bool) error
 	IsUserBlocked(ctx context.Context, id string) (bool, error)
 	ChangeUserBlockStatus(ctx context.Context, id string, val bool) error
+	ChangePassword(ctx context.Context, payload models.ChangePassword) error
 	AdminAgentService
 	AdminWalletService
 	AdminUserService
@@ -71,6 +75,38 @@ func (s *adminService) IsUserBlocked(ctx context.Context, id string) (bool, erro
 func (s *adminService) ChangeUserBlockStatus(ctx context.Context, id string, val bool) error {
 
 	if err := s.store.ChangeUserBlockStatus(ctx, id, val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *adminService) ChangePassword(ctx context.Context, payload models.ChangePassword) error {
+
+	p, err := s.store.GetAdminPassword(ctx, payload.ID)
+
+	if err != nil {
+		return err
+	}
+
+	if len(p) == 0 {
+		return fmt.Errorf("Invalid Old Password")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(p), []byte(payload.OldPassword))
+	if err != nil {
+		return fmt.Errorf("Invalid Old Password")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.NewPassword), bcrypt.DefaultCost)
+
+	if err != nil {
+		return err
+	}
+
+	payload.NewPassword = string(hashedPassword)
+
+	if err := s.store.ChangePassword(ctx, payload); err != nil {
 		return err
 	}
 

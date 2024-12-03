@@ -18,6 +18,8 @@ type AdminStore interface {
 	ChangeAdminBlockStatus(ctx context.Context, id string, val bool) error
 	IsUserBlocked(ctx context.Context, id string) (bool, error)
 	ChangeUserBlockStatus(ctx context.Context, id string, val bool) error
+	ChangePassword(ctx context.Context, payload models.ChangePassword) error
+	GetAdminPassword(ctx context.Context, id string) (string, error)
 	AdminAgentStore
 	AdminWalletStore
 	AdminUserStore
@@ -48,7 +50,7 @@ func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, l
 func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin, error) {
 	var admin models.Admin
 
-	query := `SELECT id, username, name, balance, child_level, sports_share, blocked,
+	query := `SELECT id, username, name, balance, child_level, sports_share, blocked, market_commission, session_commission,
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
 	FROM admins WHERE id = $1`
 	err := s.db.QueryRow(ctx, query, id).Scan(
@@ -59,6 +61,8 @@ func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin
 		&admin.ChildLevel,
 		&admin.SportsShare,
 		&admin.Blocked,
+		&admin.MarketCommission,
+		&admin.SessionCommission,
 		&admin.CreatedAt)
 
 	if err != nil {
@@ -119,4 +123,30 @@ func (s *adminStore) ChangeUserBlockStatus(ctx context.Context, id string, val b
 	}
 
 	return nil
+}
+
+func (s *adminStore) ChangePassword(ctx context.Context, payload models.ChangePassword) error {
+
+	query := `UPDATE admins SET password = $1 WHERE id = $2`
+
+	_, err := s.db.Exec(ctx, query, payload.NewPassword, payload.ID)
+
+	if err != nil {
+		return fmt.Errorf("failed to change password: %w", err)
+	}
+
+	return nil
+}
+
+func (s *adminStore) GetAdminPassword(ctx context.Context, id string) (string, error) {
+
+	var password string
+
+	query := `SELECT password FROM admins WHERE id = $1`
+
+	if err := s.db.QueryRow(ctx, query, id).Scan(&password); err != nil {
+		return "", fmt.Errorf("failed to get value: %w", err)
+	}
+
+	return password, nil
 }

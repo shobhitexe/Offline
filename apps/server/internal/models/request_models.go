@@ -54,7 +54,20 @@ type TransferCredit struct {
 
 // edit user
 type EditUser struct {
-	ID               string `json:"id"`
+	ID               string `json:"id" validate:"required"`
 	Name             string `json:"name" validate:"required"`
 	MarketCommission int64  `json:"marketCommission" validate:"required,gte=0,lte=100"`
+}
+
+// edit admin
+type EditAdmin struct {
+	ID   string `json:"id" validate:"required"`
+	Name string `json:"name" validate:"required"`
+}
+
+// change password
+type ChangePassword struct {
+	ID          string `json:"id" validate:"required"`
+	OldPassword string `json:"oldPassword" validate:"required"`
+	NewPassword string `json:"newPassword" validate:"required"`
 }

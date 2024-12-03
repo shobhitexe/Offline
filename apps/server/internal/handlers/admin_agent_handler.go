@@ -183,3 +183,20 @@ func (h *AdminHandler) ChangeUserBlockStatus(w http.ResponseWriter, r *http.Requ
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "blocked status changed", Data: "Status changed"})
 }
+
+func (h *AdminHandler) EditAdmin(w http.ResponseWriter, r *http.Request) {
+
+	var payload models.EditAdmin
+
+	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	if err := h.service.EditAgent(r.Context(), payload.ID, payload.Name); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "User edited", Data: true})
+}

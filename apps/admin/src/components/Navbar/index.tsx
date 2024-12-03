@@ -15,6 +15,7 @@ import Logout from "./Logout";
 import Profile from "./Profile";
 import { universalGET } from "@/lib/requests";
 import Balance from "./Balance";
+import ChangePassword from "./ChangePass/ChangePassword";
 
 async function getBalance(id: string) {
   try {
@@ -71,7 +72,9 @@ export default async function Navbar() {
               <DropdownMenuLabel>{session?.user.name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <Profile />
-              <DropdownMenuItem>Change Password</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <ChangePassword />
+              </DropdownMenuItem>
               <DropdownMenuItem>Terms Condition</DropdownMenuItem>
               <Logout />
             </DropdownMenuContent>

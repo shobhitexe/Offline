@@ -11,6 +11,8 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 	r.Route("/admin", func(r chi.Router) {
 
 		r.Get("/", h.AdminDetails)
+		r.Post("/changepassword", h.ChangePassword)
+
 		r.Get("/block", h.IsAdminBlocked)
 		r.Post("/block", h.ChangeAdminBlockStatus)
 
@@ -36,6 +38,7 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 		r.Route("/agent", func(r chi.Router) {
 			r.Get("/list", h.GetAgentList)
 			r.Post("/create", h.CreateAgent)
+			r.Post("/edit", h.EditAdmin)
 		})
 
 		//user

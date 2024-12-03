@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
   FormInput,
+  Skeleton,
   useToast,
 } from "@repo/ui";
 import { useSession } from "next-auth/react";
@@ -41,7 +42,11 @@ export default function DepositCredit({ id }: { id: string }) {
     }
   }, [data, balance, setBalance]);
 
-  const { data: userData, mutate } = useSWR<{
+  const {
+    data: userData,
+    mutate,
+    isLoading,
+  } = useSWR<{
     data: { name: string; username: string; balance: string };
   }>(isOpen ? `/user?id=${id}` : null, fetcher);
 
@@ -92,7 +97,11 @@ export default function DepositCredit({ id }: { id: string }) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{`${userData?.data.name} [${userData?.data.username}]`}</DialogTitle>
+          {isLoading ? (
+            <Skeleton className="h-7" />
+          ) : (
+            <DialogTitle>{`${userData?.data.name} [${userData?.data.username}]`}</DialogTitle>
+          )}
 
           <form
             method="POST"
@@ -119,14 +128,18 @@ export default function DepositCredit({ id }: { id: string }) {
               label={`${session.data?.user.name} [${session.data?.user.username}]`}
             />
 
-            <FormInput
-              name="userName"
-              type="text"
-              id="userName"
-              value={userData?.data.balance}
-              disabled
-              label={`${userData?.data.name} [${userData?.data.username}]`}
-            />
+            {isLoading ? (
+              <Skeleton className="h-10" />
+            ) : (
+              <FormInput
+                name="userName"
+                type="text"
+                id="userName"
+                value={userData?.data.balance}
+                disabled
+                label={`${userData?.data.name} [${userData?.data.username}]`}
+              />
+            )}
 
             <FormInput
               name="remarks"

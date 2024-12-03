@@ -14,6 +14,7 @@ type AdminAgentService interface {
 	AdminLogin(payload models.AdminLoginRequest, ctx context.Context) (*models.Admin, error)
 	AgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error)
 	CreateAgent(ctx context.Context, payload models.CreateAgent) error
+	EditAgent(ctx context.Context, id, name string) error
 }
 
 func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.Context) (*models.Admin, error) {
@@ -26,7 +27,6 @@ func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.
 
 	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(payload.Password))
 	if err != nil {
-
 		return nil, errors.New("invalid credentials")
 	}
 
@@ -95,6 +95,15 @@ func (a *adminService) CreateAgent(ctx context.Context, payload models.CreateAge
 
 	if err = tx.Commit(ctx); err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}
+
+func (s *adminService) EditAgent(ctx context.Context, id, name string) error {
+
+	if err := s.store.EditAdmin(ctx, id, name); err != nil {
+		return fmt.Errorf("failed to edit user: %w", err)
 	}
 
 	return nil

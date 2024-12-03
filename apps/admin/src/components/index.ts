@@ -6,6 +6,7 @@ import ViewLayout from "./RootLayout/ViewLayout";
 import { userListColumn } from "./Users/UserList/userListColumn";
 import CreateUser from "./Users/CreateUser";
 import EditUser from "./Users/EditUser/EditUser";
+import EditAgent from "./Agents/EditAgent/EditAgent";
 
 export {
   Signin,
@@ -16,4 +17,5 @@ export {
   CreateAgent,
   CreateUser,
   EditUser,
+  EditAgent,
 };

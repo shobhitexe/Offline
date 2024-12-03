@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"server/internal/models"
 	"strconv"
@@ -25,8 +24,6 @@ func (h *AdminHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AdminHandler) EditUser(w http.ResponseWriter, r *http.Request) {
-
-	log.Println(r.URL.Query())
 
 	var payload models.EditUser
 

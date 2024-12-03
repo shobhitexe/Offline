@@ -3,45 +3,48 @@
 import { Button, FormInput, LoadingSpinner, useToast } from "@repo/ui";
 import { ReactNode, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
-import { editUserAction } from "./editUserAction";
+import { editAgentAction } from "./editAgentAction";
 import fetcher from "@/lib/setup";
 import useSWR from "swr";
 
-export default function EditUser({ id }: { id: string }) {
+export default function EditAgent({ id }: { id: string }) {
   const session = useSession();
+
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
+
+  const ref = useRef<null | HTMLFormElement>(null);
 
   const { data, mutate } = useSWR<{
     data: {
       name: string;
       username: string;
       balance: string;
+      sportsShare: string;
+      childLevel: string;
       marketCommission: string;
       sessionCommission: string;
       createdAt: string;
     };
-  }>(`/user?id=${id}`, fetcher);
-
-  const ref = useRef<null | HTMLFormElement>(null);
+  }>(`/admin?id=${id}`, fetcher);
 
   async function createAgentClientAction(formdata: FormData) {
     try {
       setLoading(true);
 
-      const res = await editUserAction(formdata, id);
+      const res = await editAgentAction(formdata, id);
 
       if (res) {
         mutate();
         ref.current?.reset();
-        toast({ description: "User Edited successfully" });
+        toast({ description: "Agent Edited successfully" });
         return;
       }
 
-      toast({ variant: "destructive", description: "Failed to edit user" });
+      toast({ variant: "destructive", description: "Failed to edit agent" });
     } catch (error) {
-      toast({ variant: "destructive", description: "Failed to edit user" });
+      toast({ variant: "destructive", description: "Failed to edit agent" });
     } finally {
       setLoading(false);
     }
@@ -72,7 +75,7 @@ export default function EditUser({ id }: { id: string }) {
           required
           defaultValue={data?.data.name}
           placeholder={"Full Name"}
-          label="Client Name"
+          label="Agent Name"
         />
 
         <FormInput
@@ -80,9 +83,9 @@ export default function EditUser({ id }: { id: string }) {
           id="username"
           name="username"
           placeholder={"Username"}
+          value={data?.data.username}
           label="Username"
           disabled
-          value={data?.data.username}
         />
 
         {/* <FormInput
@@ -91,8 +94,8 @@ export default function EditUser({ id }: { id: string }) {
           name="password"
           placeholder={"Enter Password"}
           label="Password"
-          required
-        />
+          disabled
+        /> */}
 
         <FormInput
           type="number"
@@ -101,8 +104,7 @@ export default function EditUser({ id }: { id: string }) {
           placeholder={"Opening Balance"}
           label="Credit Reference"
           disabled
-          required
-        /> */}
+        />
 
         <FormInput
           type="number"
@@ -112,6 +114,16 @@ export default function EditUser({ id }: { id: string }) {
           value={1}
           disabled
           label="Point"
+        />
+
+        <FormInput
+          type="text"
+          name="childLevel"
+          id="childLevel"
+          disabled
+          value={data?.data.childLevel}
+          placeholder={"Child Level"}
+          label="Child Level"
         />
       </div>
 
@@ -123,9 +135,9 @@ export default function EditUser({ id }: { id: string }) {
           id="marketCommission"
           name="marketCommission"
           placeholder={"Please Enter Market Commission"}
-          defaultValue={data?.data.marketCommission}
           label="Market Commission"
-          required
+          disabled
+          value={data?.data.marketCommission}
         />
         <FormInput
           type="number"
