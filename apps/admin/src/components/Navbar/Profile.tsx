@@ -20,7 +20,7 @@ export default async function Profile() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>User: {session?.user.id}</DialogTitle>
+          <DialogTitle>User: {session?.user.username}</DialogTitle>
           <DialogDescription>
             <table className="w-full border-collapse mt-5 text-black text-base">
               <tbody className="space-y-2">
@@ -31,6 +31,14 @@ export default async function Profile() {
                 <tr className="border-b">
                   <td className="pr-4">Username:</td>
                   <td>{session?.user.username}</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="pr-4">Sports share:</td>
+                  <td>{session?.user.sportsShare}</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="pr-4">Child Level:</td>
+                  <td>{session?.user.childLevel}</td>
                 </tr>
               </tbody>
             </table>

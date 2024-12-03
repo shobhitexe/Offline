@@ -61,6 +61,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
 import { ScrollArea, ScrollBar } from "./ScrollArea";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "./Card";
 import { Switch } from "./Switch/Switch";
+import { LoadingDataTable } from "./LoadingTable/LoadingDataTable";
 
 export {
   cn,
@@ -121,4 +122,5 @@ export {
   CardTitle,
   CardFooter,
   Switch,
+  LoadingDataTable,
 };

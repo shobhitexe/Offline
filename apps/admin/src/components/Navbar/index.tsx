@@ -16,6 +16,7 @@ import Profile from "./Profile";
 import { universalGET } from "@/lib/requests";
 import Balance from "./Balance";
 import ChangePassword from "./ChangePass/ChangePassword";
+import TermsCondition from "./Terms";
 
 async function getBalance(id: string) {
   try {
@@ -72,10 +73,16 @@ export default async function Navbar() {
               <DropdownMenuLabel>{session?.user.name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <Profile />
-              <DropdownMenuItem asChild>
-                <ChangePassword />
-              </DropdownMenuItem>
-              <DropdownMenuItem>Terms Condition</DropdownMenuItem>
+
+              <div className="flex flex-col items-start">
+                <DropdownMenuItem asChild>
+                  <ChangePassword />
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <TermsCondition />
+                </DropdownMenuItem>
+              </div>
+
               <Logout />
             </DropdownMenuContent>
           </DropdownMenu>

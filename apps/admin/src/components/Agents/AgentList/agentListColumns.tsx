@@ -85,7 +85,7 @@ export const agentListColumn: ColumnDef<any>[] = [
             <DropdownMenuSeparator />
             {/* <DropdownMenuItem>Share</DropdownMenuItem> */}
             <div className="flex flex-col items-start">
-              <DropdownMenuItem>Report</DropdownMenuItem>
+              <DropdownMenuItem>Reports</DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Permission id={row.getValue("id")} />
               </DropdownMenuItem>
