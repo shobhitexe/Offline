@@ -19,10 +19,20 @@ export default function AllCricket({ info }: { info: SportsData }) {
             >
               <div>{item.RunnerName}</div>
               <div>
-                Back: <Betslip rate={item.Back.Rate} price={item.Back.Price} />
+                Back:{" "}
+                <Betslip
+                  rate={item.Back.Rate}
+                  price={item.Back.Price}
+                  betType="back"
+                />
               </div>
               <div>
-                Lay: <Betslip rate={item.Lay.Rate} price={item.Lay.Price} />
+                Lay:{" "}
+                <Betslip
+                  rate={item.Lay.Rate}
+                  price={item.Lay.Price}
+                  betType="lay"
+                />
               </div>
             </div>
           ))}
@@ -41,17 +51,19 @@ export default function AllCricket({ info }: { info: SportsData }) {
               <div>{item.RunnerName}</div>
               <div>
                 Back:
-                <Button variant={"yellow"}>
-                  {item.Back.Rate} <br />
-                  {item.Back.Price}
-                </Button>
+                <Betslip
+                  rate={item.Back.Rate}
+                  price={item.Back.Price}
+                  betType="back"
+                />
               </div>
               <div>
                 Lay:
-                <Button variant={"yellow"}>
-                  {item.Lay.Rate} <br />
-                  {item.Back.Price}
-                </Button>
+                <Betslip
+                  rate={item.Lay.Rate}
+                  price={item.Lay.Price}
+                  betType="lay"
+                />
               </div>
             </div>
           ))}

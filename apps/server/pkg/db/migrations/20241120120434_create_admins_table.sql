@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS sport_bets (
   user_id INTEGER NOT NULL,
   odds_price NUMERIC(10, 2) NOT NULL,
   odds_rate NUMERIC(10, 2) NOT NULL,
+  bet_type TEXT CHECK (bet_type IN ('back', 'lay')) NOT NULL,
   bet NUMERIC(10, 2) NOT NULL CHECK (bet > 0), 
   win NUMERIC(10, 2) NOT NULL DEFAULT 0.0 CHECK (win >= 0), 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
