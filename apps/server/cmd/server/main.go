@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"server/internal/cron"
 	"server/pkg/db"
 )
 
@@ -42,7 +43,6 @@ func main() {
 		Addr:        env.GetString("PORT", ":8080"),
 		dbConfig:    dbConfig,
 		redisConfig: redisConfig,
-		ProxyAddr:   env.GetString("PROXY_ADDR", "0.0.0.0"),
 	}
 
 	srv := APIServer{
@@ -52,6 +52,9 @@ func main() {
 	}
 
 	mux := srv.mount()
+
+	c := cron.NewScheduler(db, rdb)
+	c.StartCron()
 
 	log.Fatal(srv.run(mux))
 

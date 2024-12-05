@@ -50,8 +50,6 @@ export default async function page({
 
   const data: SportsBettingCardProps[] = await getData(id);
 
-  console.log(data);
-
   return (
     <div className="flex items-center flex-wrap justify-center gap-5">
       {data.map((item) => (

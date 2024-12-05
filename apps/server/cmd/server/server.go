@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"net/url"
 	"server/internal/routes"
 	"server/pkg/di"
 	"time"
@@ -24,7 +23,6 @@ type Config struct {
 	Addr        string
 	dbConfig    DBConfig
 	redisConfig RedisConfig
-	ProxyAddr   string
 }
 
 type DBConfig struct {
@@ -41,24 +39,6 @@ type RedisConfig struct {
 	DB       int
 }
 
-func NewHTTPClientWithProxy(proxyAddr string) (*http.Client, error) {
-	proxyURL, err := url.Parse(proxyAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	transport := &http.Transport{
-		Proxy: http.ProxyURL(proxyURL),
-	}
-
-	client := &http.Client{
-		Transport: transport,
-		Timeout:   30 * time.Second,
-	}
-
-	return client, nil
-}
-
 func (s *APIServer) mount() http.Handler {
 
 	r := chi.NewRouter()
@@ -68,12 +48,7 @@ func (s *APIServer) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	httpClient, err := NewHTTPClientWithProxy(s.config.ProxyAddr)
-	if err != nil {
-		log.Fatalf("Failed to create HTTP client with proxy: %v", err)
-	}
-
-	container := di.NewContainer(s.db, httpClient, s.redis)
+	container := di.NewContainer(s.db, s.redis)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		routes.RegisterHealthRoutes(r, container.HealthHandler)

@@ -40,7 +40,6 @@ func (s *adminStore) GetAgentsList(ctx context.Context, id string, childLevel in
 	rows, err := s.db.Query(ctx, query, childLevel, id)
 
 	if err != nil {
-
 		return nil, err
 	}
 	defer rows.Close()

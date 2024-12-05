@@ -63,6 +63,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "./Card";
 import { Switch } from "./Switch/Switch";
 import { LoadingDataTable } from "./LoadingTable/LoadingDataTable";
 
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./Drawer";
+
 export {
   cn,
   Input,
@@ -123,4 +134,12 @@ export {
   CardFooter,
   Switch,
   LoadingDataTable,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
 };

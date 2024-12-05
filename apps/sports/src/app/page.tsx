@@ -21,6 +21,7 @@ import {
 import Soccer from "@/components/soccer";
 import Tennis from "@/components/tennis";
 import CricketComponent from "@/components/cricket";
+import CricketComponentV2 from "@/components/cricketv2";
 
 export default function SportsBettingApp() {
   return (
@@ -121,7 +122,7 @@ export default function SportsBettingApp() {
                 {/* <CardTitle>Premier League</CardTitle> */}
               </CardHeader>
               <CardContent>
-                <CricketComponent />
+                <CricketComponentV2 />
               </CardContent>
             </Card>
           </TabsContent>

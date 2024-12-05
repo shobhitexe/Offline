@@ -1,7 +1,6 @@
 package di
 
 import (
-	"net/http"
 	"server/internal/handlers"
 	"server/internal/service"
 	"server/internal/store"
@@ -19,7 +18,7 @@ type Container struct {
 	UserHandler   *handlers.UserHandler
 }
 
-func NewContainer(db *pgxpool.Pool, httpClient *http.Client, redis *redis.Client) *Container {
+func NewContainer(db *pgxpool.Pool, redis *redis.Client) *Container {
 
 	utils := utils.NewUtils()
 	validator := validator.New()
@@ -30,7 +29,7 @@ func NewContainer(db *pgxpool.Pool, httpClient *http.Client, redis *redis.Client
 
 	//sports
 	sportsStore := store.NewSportsStore(db)
-	sportsService := service.NewSportsService(sportsStore, httpClient, redis)
+	sportsService := service.NewSportsService(sportsStore, redis)
 
 	//user
 	userStore := store.NewUserStore(db)

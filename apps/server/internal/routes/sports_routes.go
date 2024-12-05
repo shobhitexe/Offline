@@ -10,13 +10,14 @@ func RegisterSportsRoutes(r chi.Router, h *handlers.SportsHandler) {
 
 	r.Route("/sports", func(r chi.Router) {
 
-		r.Get("/getList", h.GetList)
+		// r.Get("/getList", h.GetList)
+		// r.Get("/listEvents", h.ListEvents)
+		// r.Get("/getEventDetail", h.GetEventDetail)
+		// r.Get("/getMarketList", h.GetMarketList)
 
-		r.Get("/listEvents", h.ListEvents)
-
+		//frontend
+		r.Get("/getActiveEvents", h.GetActiveEvents)
 		r.Get("/getEventDetail", h.GetEventDetail)
-
-		r.Get("/getMarketList", h.GetMarketList)
 
 	})
 

@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS admins (
   name TEXT NOT NULL,
   password TEXT NOT NULL,
   balance NUMERIC NOT NULL DEFAULT 0.0,
+  exposure NUMERIC NOT NULL DEFAULT 0.0,
   added_by INTEGER, 
   child_level INT NOT NULL CHECK (child_level IN (1, 2, 3, 4, 5, 6, 7, 8)),
   sports_share INT DEFAULT 0 CHECK (sports_share <= 100) NOT NULL,
@@ -79,5 +80,35 @@ CREATE TABLE IF NOT EXISTS admin_txns (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_from_id FOREIGN KEY (from_id) REFERENCES admins(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (to_id) REFERENCES admins(id) ON DELETE CASCADE
+);
+-- +goose StatementEnd
+
+-- +goose StatementBegin
+CREATE TABLE IF NOT EXISTS sport_books (
+    id SERIAL PRIMARY KEY,
+    event_type INTEGER CHECK (event_type IN (4, 2, 1)) DEFAULT 4,
+    match_name TEXT NOT NULL,
+    event_id INTEGER NOT NULL,
+    match_type TEXT NOT NULL,
+    status TEXT CHECK (status IN ('pending', 'open', 'close', 'locked', 'active')) DEFAULT 'active',
+    is_declared BOOLEAN DEFAULT FALSE,
+    opening_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- +goose StatementEnd
+
+-- +goose StatementBegin
+CREATE TABLE IF NOT EXISTS sport_bets (
+  id SERIAL PRIMARY KEY,
+  match_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
+  odds_price NUMERIC(10, 2) NOT NULL,
+  odds_rate NUMERIC(10, 2) NOT NULL,
+  bet NUMERIC(10, 2) NOT NULL CHECK (bet > 0), 
+  win NUMERIC(10, 2) NOT NULL DEFAULT 0.0 CHECK (win >= 0), 
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_match_id FOREIGN KEY (match_id) REFERENCES sport_books(id) ON DELETE CASCADE,
+  CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd

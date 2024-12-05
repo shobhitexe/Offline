@@ -3,9 +3,8 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"log"
-	"net/http"
+	"server/internal/models"
 	"server/internal/store"
 	"time"
 
@@ -13,179 +12,236 @@ import (
 )
 
 type SportsService interface {
-	GetList(id string) (interface{}, error)
-	ListEvents(sportsId, competitionId string) (interface{}, error)
-	GetEventDetail(eventId string) (interface{}, error)
-	GetMarketList(id string) (interface{}, error)
+	// GetList(id string) (interface{}, error)
+	// ListEvents(sportsId, competitionId string) (interface{}, error)
+	// GetMarketList(id string) (interface{}, error)
+	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
+	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
 }
 
 type sportsService struct {
-	store  *store.SportsStore
-	client *http.Client
-	redis  *redis.Client
+	store store.SportsStore
+	redis *redis.Client
 }
 
-func NewSportsService(store store.SportsStore, client *http.Client, redis *redis.Client) SportsService {
+func NewSportsService(store store.SportsStore, redis *redis.Client) SportsService {
 	return &sportsService{
-		store:  &store,
-		client: client,
-		redis:  redis,
+		store: store,
+		redis: redis,
 	}
 }
 
-func (s *sportsService) GetList(id string) (interface{}, error) {
-	ctx := context.Background()
-	var jsonData interface{}
-
-	key := "sports:getlist:" + id
+func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
+	var jsonData []models.ActiveEvents
+	key := "sports:activeEvents:" + id
 
 	r, err := s.redis.Get(ctx, key).Result()
-
 	if err == nil {
 		if err := json.Unmarshal([]byte(r), &jsonData); err != nil {
-			log.Println("Error unmarshaling cached data from Redis:", err)
+			log.Printf("Error unmarshaling cached data from Redis: %v", err)
 			return nil, err
 		}
-		return jsonData, nil
-	} else if err != redis.Nil {
+		return &jsonData, nil
+	}
+
+	if err != redis.Nil {
 		log.Printf("Error retrieving from Redis: %v", err)
 	}
 
-	res, err := s.client.Get("https://leisurebuzz.in/api/v2/competition/getList/" + id)
-
+	events, err := s.store.GetActiveEvents(ctx, id)
 	if err != nil {
-		log.Println("Error fetching data from external API:", err)
+		log.Printf("Error retrieving events from the store: %v", err)
 		return nil, err
 	}
-	defer func() {
-		if cerr := res.Body.Close(); cerr != nil {
-			log.Printf("Error closing response body: %v", cerr)
-		}
-	}()
 
-	body, err := io.ReadAll(res.Body)
+	serializedEvents, err := json.Marshal(events)
 	if err != nil {
-		log.Println("Error reading response body:", err)
+		log.Printf("Error marshaling events for Redis: %v", err)
 		return nil, err
 	}
 
-	if err := json.Unmarshal(body, &jsonData); err != nil {
-		log.Println("Error unmarshaling response body:", err)
-		return nil, err
-	}
-
-	if err := s.redis.Set(ctx, key, body, 1*time.Hour).Err(); err != nil {
+	if err := s.redis.Set(ctx, key, serializedEvents, 1*time.Hour).Err(); err != nil {
 		log.Printf("Error storing data in Redis: %v", err)
 	}
 
-	return jsonData, nil
+	return events, nil
 }
 
-func (s *sportsService) ListEvents(sportsId, competitionId string) (interface{}, error) {
+func (s *sportsService) GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error) {
+	key := "sports:eventDetails:" + eventId
 
-	ctx := context.Background()
-	var jsonData interface{}
-
-	key := "sports:listevents:" + sportsId + ":" + competitionId
-
-	r, err := s.redis.Get(ctx, key).Result()
-
-	if err == nil {
-		if err := json.Unmarshal([]byte(r), &jsonData); err != nil {
-			log.Println("Error unmarshaling cached data from Redis:", err)
-			return nil, err
-		}
-		return jsonData, nil
-	} else if err != redis.Nil {
-		log.Printf("Error retrieving from Redis: %v", err)
+	ev, err := s.redis.Get(ctx, key).Result()
+	if err == redis.Nil {
+		log.Printf("Key not found in Redis: %s", key)
+		return nil, nil
 	}
-
-	res, err := s.client.Get("https://leisurebuzz.in/api/v2/competition/listEvents/" + sportsId + "/" + competitionId)
-
 	if err != nil {
-		log.Println("Error fetching data", err)
-		return nil, err
-	}
-	defer func() {
-		if cerr := res.Body.Close(); cerr != nil {
-			log.Printf("Error closing response body: %v", cerr)
-		}
-	}()
-
-	body, err := io.ReadAll(res.Body)
-
-	if err != nil {
-		log.Println("Error reading response body:", err)
+		log.Printf("Error fetching key from Redis: %s, error: %v", key, err)
 		return nil, err
 	}
 
-	if err := json.Unmarshal(body, &jsonData); err != nil {
-		log.Println("Error unmarshaling response body:", err)
-		return nil, err
-	}
-
-	if err := s.redis.Set(ctx, key, body, 1*time.Hour).Err(); err != nil {
-		log.Printf("Error storing data in Redis: %v", err)
-	}
-
-	return jsonData, nil
-
-}
-
-func (s *sportsService) GetEventDetail(eventId string) (interface{}, error) {
-
-	var jsonData interface{}
-
-	res, err := s.client.Get("https://leisurebuzz.in/api/v2/competition/getEventDetail/" + eventId)
-
-	if err != nil {
-		log.Println("Error fetching data", err)
-		return nil, err
-	}
-	defer func() {
-		if cerr := res.Body.Close(); cerr != nil {
-			log.Printf("Error closing response body: %v", cerr)
-		}
-	}()
-
-	body, err := io.ReadAll(res.Body)
-
-	if err != nil {
-		log.Println("Error reading response body:", err)
-		return nil, err
-	}
-
-	if err := json.Unmarshal(body, &jsonData); err != nil {
-		log.Println("Error unmarshaling response body:", err)
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal([]byte(ev), &jsonData); err != nil {
+		log.Printf("Error unmarshaling JSON for key: %s, error: %v", key, err)
 		return nil, err
 	}
 
 	return jsonData, nil
 }
 
-func (s *sportsService) GetMarketList(id string) (interface{}, error) {
+// func (s *sportsService) GetList(id string) (interface{}, error) {
+// 	ctx := context.Background()
+// 	var jsonData interface{}
 
-	var jsonData interface{}
+// 	key := "sports:getlist:" + id
 
-	res, err := s.client.Get("https://leisurebuzz.in/api/v2/competition/getMarketList/" + id)
+// 	r, err := s.redis.Get(ctx, key).Result()
 
-	if err != nil {
-		log.Println("Error fetching data", err)
-		return nil, err
-	}
-	defer res.Body.Close()
+// 	if err == nil {
+// 		if err := json.Unmarshal([]byte(r), &jsonData); err != nil {
+// 			log.Println("Error unmarshaling cached data from Redis:", err)
+// 			return nil, err
+// 		}
+// 		return jsonData, nil
+// 	} else if err != redis.Nil {
+// 		log.Printf("Error retrieving from Redis: %v", err)
+// 	}
 
-	body, err := io.ReadAll(res.Body)
+// 	res, err := http.Get("https://leisurebuzz.in/api/v2/competition/getList/" + id)
 
-	if err != nil {
-		log.Println("Error reading response body:", err)
-		return nil, err
-	}
+// 	if err != nil {
+// 		log.Println("Error fetching data from external API:", err)
+// 		return nil, err
+// 	}
+// 	defer func() {
+// 		if cerr := res.Body.Close(); cerr != nil {
+// 			log.Printf("Error closing response body: %v", cerr)
+// 		}
+// 	}()
 
-	if err := json.Unmarshal(body, &jsonData); err != nil {
-		log.Println("Error unmarshaling response body:", err)
-		return nil, err
-	}
+// 	body, err := io.ReadAll(res.Body)
+// 	if err != nil {
+// 		log.Println("Error reading response body:", err)
+// 		return nil, err
+// 	}
 
-	return jsonData, nil
-}
+// 	if err := json.Unmarshal(body, &jsonData); err != nil {
+// 		log.Println("Error unmarshaling response body:", err)
+// 		return nil, err
+// 	}
+
+// 	if err := s.redis.Set(ctx, key, body, 1*time.Hour).Err(); err != nil {
+// 		log.Printf("Error storing data in Redis: %v", err)
+// 	}
+
+// 	return jsonData, nil
+// }
+
+// func (s *sportsService) ListEvents(sportsId, competitionId string) (interface{}, error) {
+
+// 	ctx := context.Background()
+// 	var jsonData interface{}
+
+// 	key := "sports:listevents:" + sportsId + ":" + competitionId
+
+// 	r, err := s.redis.Get(ctx, key).Result()
+
+// 	if err == nil {
+// 		if err := json.Unmarshal([]byte(r), &jsonData); err != nil {
+// 			log.Println("Error unmarshaling cached data from Redis:", err)
+// 			return nil, err
+// 		}
+// 		return jsonData, nil
+// 	} else if err != redis.Nil {
+// 		log.Printf("Error retrieving from Redis: %v", err)
+// 	}
+
+// 	res, err := http.Get("https://leisurebuzz.in/api/v2/competition/listEvents/" + sportsId + "/" + competitionId)
+
+// 	if err != nil {
+// 		log.Println("Error fetching data", err)
+// 		return nil, err
+// 	}
+// 	defer func() {
+// 		if cerr := res.Body.Close(); cerr != nil {
+// 			log.Printf("Error closing response body: %v", cerr)
+// 		}
+// 	}()
+
+// 	body, err := io.ReadAll(res.Body)
+
+// 	if err != nil {
+// 		log.Println("Error reading response body:", err)
+// 		return nil, err
+// 	}
+
+// 	if err := json.Unmarshal(body, &jsonData); err != nil {
+// 		log.Println("Error unmarshaling response body:", err)
+// 		return nil, err
+// 	}
+
+// 	if err := s.redis.Set(ctx, key, body, 1*time.Hour).Err(); err != nil {
+// 		log.Printf("Error storing data in Redis: %v", err)
+// 	}
+
+// 	return jsonData, nil
+
+// }
+
+// func (s *sportsService) GetEventDetail(eventId string) (interface{}, error) {
+
+// 	var jsonData interface{}
+
+// 	res, err := http.Get("https://leisurebuzz.in/api/v2/competition/getEventDetail/" + eventId)
+
+// 	if err != nil {
+// 		log.Println("Error fetching data", err)
+// 		return nil, err
+// 	}
+// 	defer func() {
+// 		if cerr := res.Body.Close(); cerr != nil {
+// 			log.Printf("Error closing response body: %v", cerr)
+// 		}
+// 	}()
+
+// 	body, err := io.ReadAll(res.Body)
+
+// 	if err != nil {
+// 		log.Println("Error reading response body:", err)
+// 		return nil, err
+// 	}
+
+// 	if err := json.Unmarshal(body, &jsonData); err != nil {
+// 		log.Println("Error unmarshaling response body:", err)
+// 		return nil, err
+// 	}
+
+// 	return jsonData, nil
+// }
+
+// func (s *sportsService) GetMarketList(id string) (interface{}, error) {
+
+// 	var jsonData interface{}
+
+// 	res, err := http.Get("https://leisurebuzz.in/api/v2/competition/getMarketList/" + id)
+
+// 	if err != nil {
+// 		log.Println("Error fetching data", err)
+// 		return nil, err
+// 	}
+// 	defer res.Body.Close()
+
+// 	body, err := io.ReadAll(res.Body)
+
+// 	if err != nil {
+// 		log.Println("Error reading response body:", err)
+// 		return nil, err
+// 	}
+
+// 	if err := json.Unmarshal(body, &jsonData); err != nil {
+// 		log.Println("Error unmarshaling response body:", err)
+// 		return nil, err
+// 	}
+
+// 	return jsonData, nil
+// }

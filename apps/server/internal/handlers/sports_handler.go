@@ -16,8 +16,7 @@ func NewSportsHandler(service service.SportsService, utils utils.Utils) *SportsH
 	return &SportsHandler{service: service, utils: utils}
 }
 
-func (h *SportsHandler) GetList(w http.ResponseWriter, r *http.Request) {
-
+func (h *SportsHandler) GetActiveEvents(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
 	if len(id) == 0 || id == "" {
@@ -25,40 +24,15 @@ func (h *SportsHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := h.service.GetList(id)
+	event, err := h.service.GetActiveEvents(r.Context(), id)
 
 	if err != nil {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: false})
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: err.Error()})
 		return
 	}
 
-	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
-}
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: event})
 
-func (h *SportsHandler) ListEvents(w http.ResponseWriter, r *http.Request) {
-
-	sportsId := r.URL.Query().Get("sportsId")
-
-	if len(sportsId) == 0 || sportsId == "" {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No sports id provided", Data: false})
-		return
-	}
-
-	competitionId := r.URL.Query().Get("competitionId")
-
-	if len(competitionId) == 0 || competitionId == "" {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No competition id provided", Data: false})
-		return
-	}
-
-	data, err := h.service.ListEvents(sportsId, competitionId)
-
-	if err != nil {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: false})
-		return
-	}
-
-	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
 }
 
 func (h *SportsHandler) GetEventDetail(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +44,7 @@ func (h *SportsHandler) GetEventDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := h.service.GetEventDetail(eventId)
+	data, err := h.service.GetEventDetail(r.Context(), eventId)
 
 	if err != nil {
 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: false})
@@ -80,21 +54,66 @@ func (h *SportsHandler) GetEventDetail(w http.ResponseWriter, r *http.Request) {
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
 }
 
-func (h *SportsHandler) GetMarketList(w http.ResponseWriter, r *http.Request) {
+// func (h *SportsHandler) GetList(w http.ResponseWriter, r *http.Request) {
 
-	id := r.URL.Query().Get("id")
+// 	id := r.URL.Query().Get("id")
 
-	if len(id) == 0 || id == "" {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No id provided", Data: false})
-		return
-	}
+// 	if len(id) == 0 || id == "" {
+// 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No id provided", Data: false})
+// 		return
+// 	}
 
-	data, err := h.service.GetMarketList(id)
+// 	data, err := h.service.GetList(id)
 
-	if err != nil {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: false})
-		return
-	}
+// 	if err != nil {
+// 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: false})
+// 		return
+// 	}
 
-	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
-}
+// 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
+// }
+
+// func (h *SportsHandler) ListEvents(w http.ResponseWriter, r *http.Request) {
+
+// 	sportsId := r.URL.Query().Get("sportsId")
+
+// 	if len(sportsId) == 0 || sportsId == "" {
+// 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No sports id provided", Data: false})
+// 		return
+// 	}
+
+// 	competitionId := r.URL.Query().Get("competitionId")
+
+// 	if len(competitionId) == 0 || competitionId == "" {
+// 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No competition id provided", Data: false})
+// 		return
+// 	}
+
+// 	data, err := h.service.ListEvents(sportsId, competitionId)
+
+// 	if err != nil {
+// 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: false})
+// 		return
+// 	}
+
+// 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
+// }
+
+// func (h *SportsHandler) GetMarketList(w http.ResponseWriter, r *http.Request) {
+
+// 	id := r.URL.Query().Get("id")
+
+// 	if len(id) == 0 || id == "" {
+// 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No id provided", Data: false})
+// 		return
+// 	}
+
+// 	data, err := h.service.GetMarketList(id)
+
+// 	if err != nil {
+// 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: false})
+// 		return
+// 	}
+
+// 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
+// }
