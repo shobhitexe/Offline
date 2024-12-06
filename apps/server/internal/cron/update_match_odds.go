@@ -94,6 +94,7 @@ func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, event models.Activ
 	}
 
 	res, err := c.http.Do(req)
+
 	if err != nil {
 		log.Printf("Error fetching event details for %s: %v", event.EventId, err)
 		return err
@@ -112,7 +113,7 @@ func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, event models.Activ
 	}
 
 	setKey := "sports:eventDetails:" + event.EventId
-	err = c.redis.Set(ctx, setKey, body, 60*time.Minute).Err()
+	err = c.redis.Set(ctx, setKey, body, 24*time.Hour).Err()
 	if err != nil {
 		log.Printf("Error caching event details for %s: %v", event.EventId, err)
 		return err

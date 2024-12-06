@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"server/internal/cron"
 	"server/pkg/db"
 )
 
@@ -52,9 +51,6 @@ func main() {
 	}
 
 	mux := srv.mount()
-
-	c := cron.NewScheduler(db, rdb)
-	c.StartCron()
 
 	log.Fatal(srv.run(mux))
 

@@ -1,6 +1,7 @@
 package di
 
 import (
+	"server/internal/cron"
 	"server/internal/handlers"
 	"server/internal/service"
 	"server/internal/store"
@@ -35,10 +36,14 @@ func NewContainer(db *pgxpool.Pool, redis *redis.Client) *Container {
 	userStore := store.NewUserStore(db)
 	userService := service.NewUserService(userStore)
 
+	// cron jobs
+	c := cron.NewScheduler(sportsStore, redis)
+	c.StartCron()
+
 	return &Container{
 		HealthHandler: handlers.NewHealthHandler(utils),
 		AdminHandler:  handlers.NewAdminHandler(adminService, utils, validator),
-		SportsHandler: handlers.NewSportsHandler(sportsService, utils),
+		SportsHandler: handlers.NewSportsHandler(sportsService, utils, validator),
 		UserHandler:   handlers.NewUserHandler(utils, userService, validator),
 	}
 

@@ -1,11 +1,8 @@
 "use client";
 
-import { Button } from "@repo/ui";
 import Betslip from "./Betslip";
 
 export default function AllCricket({ info }: { info: SportsData }) {
-  console.log(info.data.MatchOdds.runners);
-
   return (
     <div className="flex flex-col">
       <div className="flex flex-col gap-5">
@@ -24,6 +21,11 @@ export default function AllCricket({ info }: { info: SportsData }) {
                   rate={item.Back.Rate}
                   price={item.Back.Price}
                   betType="back"
+                  matchId={info.data.EventId}
+                  marketName={info.data.MatchOdds.MarketName}
+                  marketId={info.data.MatchOdds.MarketId}
+                  runnerName={item.RunnerName}
+                  runnerID={item.RunnerId}
                 />
               </div>
               <div>
@@ -32,6 +34,11 @@ export default function AllCricket({ info }: { info: SportsData }) {
                   rate={item.Lay.Rate}
                   price={item.Lay.Price}
                   betType="lay"
+                  matchId={info.data.EventId}
+                  marketName={info.data.MatchOdds.MarketName}
+                  marketId={info.data.MatchOdds.MarketId}
+                  runnerName={item.RunnerName}
+                  runnerID={item.RunnerId}
                 />
               </div>
             </div>
@@ -55,6 +62,11 @@ export default function AllCricket({ info }: { info: SportsData }) {
                   rate={item.Back.Rate}
                   price={item.Back.Price}
                   betType="back"
+                  matchId={info.data.EventId}
+                  marketName={info.data.BookMaker.MarketName}
+                  marketId={info.data.BookMaker.MarketId}
+                  runnerName={item.RunnerName}
+                  runnerID={item.RunnerId}
                 />
               </div>
               <div>
@@ -63,6 +75,11 @@ export default function AllCricket({ info }: { info: SportsData }) {
                   rate={item.Lay.Rate}
                   price={item.Lay.Price}
                   betType="lay"
+                  matchId={info.data.EventId}
+                  marketName={info.data.BookMaker.MarketName}
+                  marketId={info.data.BookMaker.MarketId}
+                  runnerName={item.RunnerName}
+                  runnerID={item.RunnerId}
                 />
               </div>
             </div>

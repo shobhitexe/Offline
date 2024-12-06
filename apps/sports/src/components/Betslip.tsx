@@ -13,17 +13,54 @@ import {
   FormInput,
 } from "@repo/ui";
 import { useState } from "react";
+import { submitBetAction } from "./submitBetAction";
 
 export default function Betslip({
   rate,
   price,
   betType,
+  matchId,
+  marketName,
+  marketId,
+  runnerName,
+  runnerID,
 }: {
   rate: number;
   price: number;
   betType: "back" | "lay";
+  matchId: string;
+  marketName: string;
+  marketId: string;
+  runnerName: string;
+  runnerID: string;
 }) {
   const [amount, setAmount] = useState(0);
+
+  async function submitBetClient() {
+    try {
+      const res = await submitBetAction(
+        matchId,
+        "2",
+        price,
+        rate,
+        betType,
+        amount,
+        marketName,
+        marketId,
+        runnerName,
+        runnerID
+      );
+
+      if (res) {
+        alert("Bet placed");
+        return;
+      }
+
+      alert("Failed");
+    } catch (error) {
+      alert("Failed");
+    }
+  }
 
   return (
     <Drawer>
@@ -51,15 +88,16 @@ export default function Betslip({
           </DrawerTitle>
         </DrawerHeader>
 
-        <form method="POST">
+        <form method="POST" action={submitBetClient}>
           <FormInput
             name="amount"
             type="number"
             id="amount"
             label={"Amount"}
+            required
             onChange={(e) => setAmount(e.target.value as unknown as number)}
           />
-          <Button>Place Bet</Button>
+          <Button variant={"yellow"}>Place Bet</Button>
         </form>
 
         <DrawerFooter>

@@ -5,19 +5,19 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"server/internal/store"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 )
 
 type Cron struct {
-	db    *pgxpool.Pool
-	redis *redis.Client
-	http  *http.Client
+	sportsStore store.SportsStore
+	redis       *redis.Client
+	http        *http.Client
 }
 
-func NewScheduler(db *pgxpool.Pool, redis *redis.Client) *Cron {
+func NewScheduler(sportsStore store.SportsStore, redis *redis.Client) *Cron {
 
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
@@ -31,7 +31,7 @@ func NewScheduler(db *pgxpool.Pool, redis *redis.Client) *Cron {
 		},
 	}
 
-	return &Cron{db: db, redis: redis, http: httpClient}
+	return &Cron{sportsStore: sportsStore, redis: redis, http: httpClient}
 }
 
 func (c *Cron) StartCron() {
@@ -47,6 +47,12 @@ func (c *Cron) StartCron() {
 
 				if err := c.UpdateMatchOdds(ctx); err != nil {
 					log.Printf("Error updating match odds: %v", err)
+				}
+				if err := c.AutoDeclareResult(ctx); err != nil {
+					log.Printf("Error in auto declaring results: %v", err)
+				}
+				if err := c.GetMatchOddsResult(ctx); err != nil {
+					log.Printf("Error in auto declaring results: %v", err)
 				}
 			}
 		}

@@ -53,7 +53,14 @@ export default async function page({
   return (
     <div className="flex items-center flex-wrap justify-center gap-5">
       {data.map((item) => (
-        <SportsBettingCard key={item.marketId} {...item} />
+        <SportsBettingCard
+          matchName={""}
+          eventId={""}
+          matchType={""}
+          openingTime={""}
+          key={item.marketId}
+          {...item}
+        />
       ))}
     </div>
   );

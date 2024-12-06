@@ -5,15 +5,18 @@ import (
 	"server/internal/models"
 	"server/internal/service"
 	"server/pkg/utils"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type SportsHandler struct {
-	service service.SportsService
-	utils   utils.Utils
+	service   service.SportsService
+	utils     utils.Utils
+	validator *validator.Validate
 }
 
-func NewSportsHandler(service service.SportsService, utils utils.Utils) *SportsHandler {
-	return &SportsHandler{service: service, utils: utils}
+func NewSportsHandler(service service.SportsService, utils utils.Utils, validator *validator.Validate) *SportsHandler {
+	return &SportsHandler{service: service, utils: utils, validator: validator}
 }
 
 func (h *SportsHandler) GetActiveEvents(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +55,24 @@ func (h *SportsHandler) GetEventDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
+}
+
+func (h *SportsHandler) PlaceBet(w http.ResponseWriter, r *http.Request) {
+
+	var payload models.PlaceBet
+
+	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Validation Failed", Data: err.Error()})
+		return
+	}
+
+	if err := h.service.PlaceBet(r.Context(), payload); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to place bet", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Bet Placed", Data: true})
+
 }
 
 // func (h *SportsHandler) GetList(w http.ResponseWriter, r *http.Request) {

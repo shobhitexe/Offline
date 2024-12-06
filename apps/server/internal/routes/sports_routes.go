@@ -19,6 +19,8 @@ func RegisterSportsRoutes(r chi.Router, h *handlers.SportsHandler) {
 		r.Get("/getActiveEvents", h.GetActiveEvents)
 		r.Get("/getEventDetail", h.GetEventDetail)
 
+		r.Post("/placebet", h.PlaceBet)
+
 	})
 
 }

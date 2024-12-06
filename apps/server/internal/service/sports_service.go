@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"server/internal/models"
 	"server/internal/store"
@@ -17,6 +18,7 @@ type SportsService interface {
 	// GetMarketList(id string) (interface{}, error)
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
+	PlaceBet(ctx context.Context, payload models.PlaceBet) error
 }
 
 type sportsService struct {
@@ -60,7 +62,7 @@ func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]mode
 		return nil, err
 	}
 
-	if err := s.redis.Set(ctx, key, serializedEvents, 1*time.Hour).Err(); err != nil {
+	if err := s.redis.Set(ctx, key, serializedEvents, 24*time.Hour).Err(); err != nil {
 		log.Printf("Error storing data in Redis: %v", err)
 	}
 
@@ -87,6 +89,23 @@ func (s *sportsService) GetEventDetail(ctx context.Context, eventId string) (map
 	}
 
 	return jsonData, nil
+}
+
+func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) error {
+
+	id, err := s.store.FindMatchIDByEventID(ctx, payload.MatchId)
+
+	if err != nil {
+		return fmt.Errorf("Failed to find match id :%w", err)
+
+	}
+
+	if err := s.store.PlaceBet(ctx, payload, id); err != nil {
+
+		return fmt.Errorf("Failed to save bet :%w", err)
+	}
+
+	return nil
 }
 
 // func (s *sportsService) GetList(id string) (interface{}, error) {
