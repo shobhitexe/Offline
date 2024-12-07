@@ -2,13 +2,18 @@ package service
 
 import (
 	"context"
+	"errors"
+	"log"
 	"server/internal/models"
 	"server/internal/store"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
 	UserDetails(ctx context.Context, id string) (*models.User, error)
 	GetBalance(ctx context.Context, id string) (float64, error)
+	SignIn(ctx context.Context, payload models.SignInRequest) (*models.User, error)
 }
 
 type userService struct {
@@ -40,4 +45,27 @@ func (s *userService) GetBalance(ctx context.Context, id string) (float64, error
 
 	return bal, err
 
+}
+
+func (s *userService) SignIn(ctx context.Context, payload models.SignInRequest) (*models.User, error) {
+
+	user, err := s.store.GetUserFromUsername(ctx, payload.Username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
+	if err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	go func() {
+		backgroundCtx := context.Background()
+		if err := s.store.RecordLoginHistory(backgroundCtx, user.ID, "user", payload.LoginIP, payload.UserAgent); err != nil {
+			log.Printf("failed to record login history: %v", err)
+		}
+	}()
+
+	return user, nil
 }

@@ -94,6 +94,34 @@ const config: Omit<Config, "content"> = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("tailwindcss-themer")({
+      themes: [
+        {
+          name: "admin",
+          selectors: [".admin", '[data-theme="admin"]'],
+          extend: {
+            colors: {
+              main: "#1c1817",
+              cardBG: "#f5f5f4",
+              inputField: "#d6d3d1",
+            },
+          },
+        },
+        {
+          name: "offline",
+          selectors: [".offline", '[data-theme="offline"]'],
+          extend: {
+            colors: {
+              main: "#1c1817",
+              cardBG: "#f5f5f4",
+              inputField: "#d6d3d1",
+            },
+          },
+        },
+      ],
+    }),
+  ],
 };
 export default config;

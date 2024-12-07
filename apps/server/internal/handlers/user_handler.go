@@ -58,3 +58,23 @@ func (h *UserHandler) WalletBalance(w http.ResponseWriter, r *http.Request) {
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Balance fetched", Data: balance})
 
 }
+
+func (h *UserHandler) SignIn(w http.ResponseWriter, r *http.Request) {
+
+	var payload models.SignInRequest
+
+	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Validation Failed", Data: err.Error()})
+		return
+	}
+
+	user, err := h.service.SignIn(r.Context(), payload)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to sign in", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Logged in", Data: user})
+
+}

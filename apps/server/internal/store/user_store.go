@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"server/internal/models"
 
@@ -13,6 +14,8 @@ type UserStore interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
 	GetBalance(ctx context.Context, id string) (float64, error)
 	UserDetails(ctx context.Context, id string) (*models.User, error)
+	GetUserFromUsername(ctx context.Context, username string) (*models.User, error)
+	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
 }
 
 type userStore struct {
@@ -60,4 +63,34 @@ func (s *userStore) GetBalance(ctx context.Context, id string) (float64, error) 
 	}
 
 	return balance, nil
+}
+
+func (s userStore) GetUserFromUsername(ctx context.Context, username string) (*models.User, error) {
+
+	var user models.User
+
+	query := `SELECT id, username, name, password FROM users WHERE username = $1 AND blocked = false`
+
+	err := s.db.QueryRow(ctx, query, username).Scan(&user.ID, &user.Username, &user.Name, &user.Password)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (s *userStore) RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error {
+
+	query := `INSERT INTO login_histories (user_id, user_type, login_ip, user_agent)
+	VALUES ($1, $2, $3, $4)`
+
+	_, err := s.db.Exec(ctx, query, userId, userType, loginIp, userAgent)
+	if err != nil {
+		return fmt.Errorf("failed to record login history: %w", err)
+	}
+
+	return nil
+
 }

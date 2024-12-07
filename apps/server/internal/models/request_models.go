@@ -85,3 +85,12 @@ type PlaceBet struct {
 	RunnerName string  `json:"runnerName" validate:"required"`
 	RunnerID   string  `json:"runnerId" validate:"required"`
 }
+
+// user sign in
+type SignInRequest struct {
+	CsrfToken string `json:"csrfToken" validate:"required"`
+	LoginIP   string `json:"loginIP" validate:"required"`
+	Password  string `json:"password" validate:"required"`
+	UserAgent string `json:"userAgent" validate:"required"`
+	Username  string `json:"username" validate:"required"`
+}

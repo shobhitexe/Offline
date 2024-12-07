@@ -3,7 +3,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "dev:server":"go run ./apps/server/cmd/server/*.go",
+    "dev:server": "go run ./apps/server/cmd/server/*.go",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
@@ -22,5 +22,15 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@radix-ui/react-accordion": "^1.2.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.2",
+    "cmdk": "^1.0.4",
+    "embla-carousel-react": "^8.5.1",
+    "framer-motion": "^11.13.1",
+    "input-otp": "^1.4.1",
+    "react-day-picker": "^9.4.1"
+  }
 }

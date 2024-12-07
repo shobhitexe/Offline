@@ -12,6 +12,9 @@ func RegisterUserRoutes(r chi.Router, h *handlers.UserHandler) {
 
 		r.Get("/", h.UserDetails)
 
+		//auth
+		r.Post("/auth", h.SignIn)
+
 		//wallet
 		r.Route("/wallet", func(r chi.Router) {
 			r.Get("/balance", h.WalletBalance)
