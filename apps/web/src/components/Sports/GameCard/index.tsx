@@ -1,22 +1,20 @@
-import { EventType } from "@/types";
+import Link from "next/link";
 
 export default function GameCard({
   matchName,
   eventId,
-  matchType,
-  openingTime,
+  eventTime,
 }: {
   matchName: string;
   eventId: string;
-  matchType: string;
-  openingTime: string;
+  eventTime: string;
 }) {
   return (
-    <div className="py-5">
+    <Link href={`/sports/match/${eventId}/all`} className="py-5 cursor-pointer">
       <div>
         <div className="text-sm">{matchName}</div>
-        <div className="text-xs">{matchType}</div>
+        <div className="text-xs">{eventTime}</div>
       </div>
-    </div>
+    </Link>
   );
 }

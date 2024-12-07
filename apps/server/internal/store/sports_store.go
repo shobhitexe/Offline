@@ -14,6 +14,7 @@ type SportsStore interface {
 	PlaceBet(ctx context.Context, payload models.PlaceBet, id string) error
 	FindMatchIDByEventID(ctx context.Context, id string) (string, error)
 	FindActiveBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error)
+	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents) error
 }
 
 type sportsStore struct {
@@ -31,12 +32,11 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 	SELECT 
 		match_name, 
 		event_id, 
-		match_type, 
 		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
-		sport_books
+		active_events
 	WHERE 
-		event_type = $1 AND status = 'active'
+		sports_id = $1 AND status = 'active'
 `
 
 	rows, err := s.db.Query(ctx, query, id)
@@ -48,7 +48,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 
 	for rows.Next() {
 		var event models.ActiveEvents
-		if err := rows.Scan(&event.MatchName, &event.EventId, &event.MatchType, &event.OpeningTime); err != nil {
+		if err := rows.Scan(&event.EventName, &event.EventId, &event.EventTime); err != nil {
 			return nil, err
 		}
 		events = append(events, event)
@@ -139,4 +139,18 @@ func (s *sportsStore) FindActiveBetsByEventID(ctx context.Context, eventID, runn
 	}
 
 	return &allbets, nil
+}
+
+func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.ActiveEvents) error {
+
+	query := `INSERT INTO active_events (sports_id, match_name, event_id, competition_id, opening_time) 
+	VALUES ($1, $2, $3, $4, $5)`
+
+	_, err := s.db.Exec(ctx, query, 4, payload.EventName, payload.EventId, payload.CompetitionId, payload.EventTime)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

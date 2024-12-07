@@ -32,6 +32,10 @@ import ColorPrediction from "./ColorPrediction";
 import Tawkto from "./Chatbots/Tawkto";
 import SportsSidebar from "./Sports/Sidebar";
 import GameCard from "./Sports/GameCard";
+import Timer from "./Sports/Match/Timer";
+import MatchInfo from "./Sports/Match/MatchInfo";
+import MatchTabs from "./Sports/Match/MatchTabs";
+import MatchTable from "./Sports/Match/MatchTable";
 
 export {
   Navbar,
@@ -68,4 +72,8 @@ export {
   Tawkto,
   SportsSidebar,
   GameCard,
+  Timer,
+  MatchInfo,
+  MatchTabs,
+  MatchTable,
 };

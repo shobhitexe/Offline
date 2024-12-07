@@ -16,6 +16,9 @@ func RegisterSportsRoutes(r chi.Router, h *handlers.SportsHandler) {
 		// r.Get("/getMarketList", h.GetMarketList)
 
 		//frontend
+
+		r.Get("/saveActiveEvents", h.SaveActiveEvents)
+
 		r.Get("/getActiveEvents", h.GetActiveEvents)
 		r.Get("/getEventDetail", h.GetEventDetail)
 

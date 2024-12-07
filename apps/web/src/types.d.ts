@@ -19,6 +19,36 @@ declare module "next-auth" {
 type EventType = {
   matchName: string;
   eventId: string;
-  matchType: string;
-  openingTime: string;
+  eventTime: string;
+};
+
+type SportsData = {
+  BookMaker: Market;
+  CompetitionId: string;
+  EventId: string;
+  EventName: string;
+  EventTime: string;
+  Fancy: Market;
+  MatchOdds: Market;
+  SportsId: string;
+};
+
+type Runner = {
+  Back: {
+    Price: number;
+    Rate: number;
+  };
+  Lay: {
+    Price: number;
+    Rate: number;
+  };
+  RunnerId: string;
+  RunnerName: string;
+  Status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+};
+
+type Market = {
+  MarketId: string;
+  MarketName: string;
+  runners: Array<Runner>;
 };

@@ -84,12 +84,12 @@ CREATE TABLE IF NOT EXISTS admin_txns (
 -- +goose StatementEnd
 
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS sport_books (
+CREATE TABLE IF NOT EXISTS active_events (
     id SERIAL PRIMARY KEY,
-    event_type INTEGER CHECK (event_type IN (4, 2, 1)) DEFAULT 4,
+    sports_id INTEGER CHECK (sports_id IN (4, 2, 1)) DEFAULT 4,
     match_name TEXT NOT NULL,
     event_id INTEGER NOT NULL,
-    match_type TEXT NOT NULL,
+    competition_id TEXT NOT NULL,
     status TEXT CHECK (status IN ('pending', 'open', 'close', 'locked', 'active')) DEFAULT 'active',
     is_declared BOOLEAN DEFAULT FALSE,
     opening_time TIMESTAMP NOT NULL,

@@ -1,10 +1,10 @@
 package models
 
 type ActiveEvents struct {
-	MatchName   string `json:"matchName"`
-	EventId     string `json:"eventId"`
-	MatchType   string `json:"matchType"`
-	OpeningTime string `json:"openingTime"`
+	EventId       string `json:"eventId"`
+	CompetitionId string `json:"competitionId"`
+	EventName     string `json:"matchName"`
+	EventTime     string `json:"eventTime"`
 }
 
 type ActiveBet struct {

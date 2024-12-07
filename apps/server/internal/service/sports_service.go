@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"server/internal/models"
 	"server/internal/store"
 	"time"
@@ -18,6 +20,7 @@ type SportsService interface {
 	// GetMarketList(id string) (interface{}, error)
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
+	SaveActiveEvents(ctx context.Context) error
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
 }
 
@@ -67,6 +70,38 @@ func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]mode
 	}
 
 	return events, nil
+}
+
+func (s *sportsService) SaveActiveEvents(ctx context.Context) error {
+
+	r, err := http.Get("https://leisurebuzz.in/api/v2/competition/getMarketList/4")
+
+	if err != nil {
+		return err
+	}
+
+	defer r.Body.Close()
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error reading response body for event : %v", err)
+		return err
+	}
+
+	var events []models.ActiveEvents
+
+	if err := json.Unmarshal(body, &events); err != nil {
+		return err
+	}
+
+	for _, event := range events {
+		if err := s.store.SaveActiveEvents(ctx, event); err != nil {
+			log.Printf("Failed to save event : %v", err)
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *sportsService) GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error) {
