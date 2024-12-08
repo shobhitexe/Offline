@@ -107,15 +107,16 @@ CREATE TABLE IF NOT EXISTS sport_bets (
   market_id TEXT NOT NULL,
   runner_name TEXT NOT NULL,
   runner_id TEXT NOT NULL,
+  market_type TEXT CHECK (market_type IN ('Bookmaker', 'Match Odds','Fancy')) NOT NULL,
   odds_price NUMERIC(10, 2) NOT NULL,
   odds_rate NUMERIC(10, 2) NOT NULL,
-  bet_type TEXT CHECK (bet_type IN ('back', 'lay')) NOT NULL,
-  bet NUMERIC(10, 2) NOT NULL CHECK (bet > 0), 
-  win NUMERIC(10, 2) NOT NULL DEFAULT 0.0 CHECK (win >= 0),
+  bet_type TEXT CHECK (bet_type IN ('back', 'lay','no','yes')) NOT NULL,
+  profit NUMERIC(12, 2) NOT NULL CHECK (profit > 0), 
+  exposure NUMERIC(12, 2) NOT NULL DEFAULT 0.0 CHECK (exposure >= 0),
   settled BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-  CONSTRAINT fk_match_id FOREIGN KEY (match_id) REFERENCES sport_books(id) ON DELETE CASCADE,
+  CONSTRAINT fk_match_id FOREIGN KEY (match_id) REFERENCES active_events(id) ON DELETE CASCADE,
   CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd

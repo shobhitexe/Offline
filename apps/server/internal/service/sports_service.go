@@ -128,16 +128,46 @@ func (s *sportsService) GetEventDetail(ctx context.Context, eventId string) (map
 
 func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) error {
 
-	id, err := s.store.FindMatchIDByEventID(ctx, payload.MatchId)
+	tx, err := s.store.BeginTx(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback(ctx)
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	id, err := s.store.FindMatchIDByEventID(ctx, tx, payload.MatchId)
 
 	if err != nil {
 		return fmt.Errorf("Failed to find match id :%w", err)
-
 	}
 
-	if err := s.store.PlaceBet(ctx, payload, id); err != nil {
+	var profit, exposure float64
 
+	if payload.BetType == "back" || payload.BetType == "yes" {
+		profit = (payload.OddsRate - 1) * float64(payload.Amount)
+		exposure = float64(payload.Amount)
+	} else {
+		profit = float64(payload.Amount)
+		exposure = (payload.OddsRate - 1) * float64(payload.Amount)
+	}
+
+	if err := s.store.TransferUserBalanceToExposure(ctx, tx, payload.UserId, exposure); err != nil {
+		return fmt.Errorf("Failed to transfer user balance :%w", err)
+	}
+
+	if err := s.store.PlaceBet(ctx, tx, payload, id, profit, exposure); err != nil {
 		return fmt.Errorf("Failed to save bet :%w", err)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil

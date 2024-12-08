@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Search from "../Search";
 
 import { ArrowRight } from "lucide-react";
@@ -13,11 +14,11 @@ export default function SportsSidebar() {
         </div>
       </div>
 
-      <div className="mt-2">
+      <Link href={"/sports/cricket"} className="mt-2">
         <div className="bg-[#232325] p-3 rounded-md cursor-pointer flex items-center justify-between">
           Cricket <ArrowRight />
         </div>
-      </div>
+      </Link>
     </nav>
   );
 }

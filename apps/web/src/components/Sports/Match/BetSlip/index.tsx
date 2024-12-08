@@ -12,9 +12,14 @@ import {
   DrawerTrigger,
   FormInput,
   Input,
+  LoadingSpinner,
+  useToast,
 } from "@repo/ui";
 import { useState } from "react";
 import { submitBetAction } from "./submitBetAction";
+import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/root-reducer";
 
 const amountsList = [100, 200, 500, 1000, 5000, 10000, 20000, 50000, 100000];
 
@@ -22,28 +27,52 @@ export default function Betslip({
   rate,
   price,
   betType,
-  matchId,
+  eventId,
   marketName,
   marketId,
   runnerName,
   runnerID,
+  marketType,
 }: {
   rate: number;
   price: number;
-  betType: "back" | "lay";
-  matchId: string;
+  betType: "back" | "lay" | "no" | "yes";
+  eventId: string;
   marketName: string;
   marketId: string;
   runnerName: string;
   runnerID: string;
+  marketType: string;
 }) {
+  const { toast } = useToast();
+
+  const session = useSession();
+
+  const [loading, setIsLoading] = useState(false);
+
+  const balance = useSelector(
+    (state: RootState) => state.walletBalance.balance
+  );
+
   const [amount, setAmount] = useState(0);
 
   async function submitBetClient() {
     try {
+      const exposure =
+        betType === "back" || betType === "yes" ? amount : (rate - 1) * amount;
+
+      if (exposure > balance) {
+        toast({
+          title: "Failed to place bet",
+          description: "insufficient balance",
+          variant: "destructive",
+        });
+        return;
+      }
+      setIsLoading(true);
       const res = await submitBetAction(
-        matchId,
-        "2",
+        eventId,
+        session.data?.user._id!,
         price,
         rate,
         betType,
@@ -51,17 +80,22 @@ export default function Betslip({
         marketName,
         marketId,
         runnerName,
-        runnerID
+        runnerID,
+        marketType
       );
 
+      setIsLoading(false);
+
       if (res) {
-        alert("Bet placed");
+        setAmount(0);
+        toast({ description: "Bet placed successfully" });
         return;
       }
 
-      alert("Failed");
+      toast({ description: "Failed to place bet", variant: "destructive" });
     } catch (error) {
-      alert("Failed");
+      setIsLoading(false);
+      toast({ description: "Failed to place bet", variant: "destructive" });
     }
   }
 
@@ -70,7 +104,8 @@ export default function Betslip({
       <DrawerTrigger
         className="bg-[#72bbef] text-black hover:bg-white h-10 px-4 py-2 flex flex-col items-center justify-center text-sm rounded-md font-medium border border-white"
         style={{
-          backgroundColor: betType === "back" ? "#72bbef" : "#faa9ba",
+          backgroundColor:
+            betType === "back" || betType === "yes" ? "#72bbef" : "#faa9ba",
           gap: 0,
         }}
       >
@@ -83,17 +118,20 @@ export default function Betslip({
       >
         <DrawerHeader>
           <DrawerTitle>
-            {betType === "back" ? (
-              <>
+            <div className="flex items-center justify-center gap-5">
+              <div className="text-green-400">
                 {"Profit: "}
-                {((rate - 1) * amount).toFixed(2)}
-              </>
-            ) : (
-              <>
+                {betType === "back" || betType === "yes"
+                  ? ((rate - 1) * amount).toFixed(2)
+                  : amount}
+              </div>
+              <div className="text-red-400">
                 {"Exposure: "}
-                {((rate - 1) * amount - amount).toFixed(2)}
-              </>
-            )}
+                {betType === "back" || betType === "yes"
+                  ? amount
+                  : ((rate - 1) * amount).toFixed(2)}
+              </div>
+            </div>
           </DrawerTitle>
         </DrawerHeader>
 
@@ -125,7 +163,7 @@ export default function Betslip({
               onChange={(e) => setAmount(e.target.value as unknown as number)}
             />
             <Button variant={"yellow"} className="w-fit">
-              Place Bet
+              {loading ? <LoadingSpinner /> : <span>Place Bet</span>}
             </Button>
           </form>
         </div>

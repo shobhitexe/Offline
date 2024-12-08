@@ -70,7 +70,7 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 			continue
 		}
 
-		// log.Println(bets)
+		log.Println(bets)
 
 		// if result.Status == "WINNER" {
 		// 	bets, err := c.sportsStore.FindActiveBetsByEventID(ctx, result.EventID, result.RunnerID)

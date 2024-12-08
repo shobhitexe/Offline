@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "ui-bg-primary ui-text-primary-foreground ui-hover:ui-bg-primary/90",
+          "ui-bg-primary ui-text-primary-foreground hover:ui-bg-primary/90",
         yellow:
           "ui-bg-[#ffd733] ui-text-black ui-hover:ui-bg-[#ffd733]/90 ui-font-semibold",
         destructive:
@@ -20,6 +20,7 @@ const buttonVariants = cva(
           "ui-bg-secondary ui-text-secondary-foreground ui-hover:ui-bg-secondary/80",
         ghost: "ui-hover:ui-bg-accent ui-hover:ui-text-accent-foreground",
         link: "ui-text-primary ui-underline-offset-4 ui-hover:ui-underline",
+        main: "ui-bg-main ui-text-inputField hover:ui-bg-main/90",
       },
       size: {
         default: "ui-h-10 ui-px-4 ui-py-2",

@@ -10,3 +10,8 @@ type User struct {
 	SessionCommission int64  `json:"sessionCommission"`
 	CreatedAt         string `json:"createdAt"`
 }
+
+type UserWallet struct {
+	Balance  float64 `json:"balance"`
+	Exposure float64 `json:"exposure"`
+}

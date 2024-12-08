@@ -35,7 +35,7 @@ import GameCard from "./Sports/GameCard";
 import Timer from "./Sports/Match/Timer";
 import MatchInfo from "./Sports/Match/MatchInfo";
 import MatchTabs from "./Sports/Match/MatchTabs";
-import MatchTable from "./Sports/Match/MatchTable";
+import MatchTable from "./Sports/Match/MatchTable/MatchTable";
 
 export {
   Navbar,

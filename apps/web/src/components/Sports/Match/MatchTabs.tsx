@@ -1,52 +1,36 @@
-import { Tabs, TabsList, TabsTrigger } from "@repo/ui";
+"use client";
+
+import { buttonVariants } from "@repo/ui";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const TabsArr = [
+  { title: "All", value: "all" },
+  { title: "Market", value: "market" },
+  { title: "Fancy", value: "fancy" },
+  { title: "Only Over", value: "onlyover" },
+  { title: "Player Run", value: "playerrun" },
+  { title: "Boundaries", value: "boundaries" },
+  { title: "Wicket", value: "wicket" },
+];
 
 export default function MatchTabs() {
+  const pathname = usePathname();
+
   return (
-    <Tabs defaultValue="all">
-      <TabsList className="">
-        <TabsTrigger
-          value="all"
-          className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+    <div className="flex items-center gap-5 justify-around bg-inputField rounded-md p-1 overflow-x-auto">
+      {TabsArr.map((item) => (
+        <Link
+          href={`${item.value}`}
+          className={buttonVariants({
+            variant: `${pathname.includes(item.value) ? "yellow" : "main"}`,
+            size: "sm",
+            className: "w-full",
+          })}
         >
-          All
-        </TabsTrigger>
-        <TabsTrigger
-          value="market"
-          className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-        >
-          Market
-        </TabsTrigger>
-        <TabsTrigger
-          value="fancy"
-          className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-        >
-          Fancy
-        </TabsTrigger>
-        <TabsTrigger
-          value="only-over"
-          className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-        >
-          Only Over
-        </TabsTrigger>
-        <TabsTrigger
-          value="player-run"
-          className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-        >
-          Player Run
-        </TabsTrigger>
-        <TabsTrigger
-          value="boundaries"
-          className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-        >
-          Boundaries
-        </TabsTrigger>
-        <TabsTrigger
-          value="wicket"
-          className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-        >
-          Wicket
-        </TabsTrigger>
-      </TabsList>
-    </Tabs>
+          {item.title}
+        </Link>
+      ))}
+    </div>
   );
 }

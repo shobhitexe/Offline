@@ -79,11 +79,12 @@ type PlaceBet struct {
 	OddsPrice  float64 `json:"oddsPrice" validate:"required"`
 	OddsRate   float64 `json:"oddsRate" validate:"required"`
 	BetType    string  `json:"betType" validate:"required"`
-	Amount     int64   `json:"amount" validate:"required,gte=0"`
+	Amount     float64 `json:"amount" validate:"required,gte=0"`
 	MarketName string  `json:"marketName" validate:"required"`
 	MarketId   string  `json:"marketId" validate:"required"`
 	RunnerName string  `json:"runnerName" validate:"required"`
 	RunnerID   string  `json:"runnerId" validate:"required"`
+	MarketType string  `json:"marketType" validate:"required"`
 }
 
 // user sign in

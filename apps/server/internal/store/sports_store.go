@@ -6,23 +6,26 @@ import (
 	"log"
 	"server/internal/models"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type SportsStore interface {
+	BeginTx(ctx context.Context) (pgx.Tx, error)
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
-	PlaceBet(ctx context.Context, payload models.PlaceBet, id string) error
-	FindMatchIDByEventID(ctx context.Context, id string) (string, error)
+	PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error
+	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
 	FindActiveBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error)
 	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents) error
+	TransferUserBalanceToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
 }
 
 type sportsStore struct {
-	db *pgxpool.Pool
+	*BaseStore
 }
 
 func NewSportsStore(db *pgxpool.Pool) SportsStore {
-	return &sportsStore{db: db}
+	return &sportsStore{BaseStore: NewBaseStore(db)}
 }
 
 func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -57,13 +60,13 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 	return &events, nil
 }
 
-func (s *sportsStore) FindMatchIDByEventID(ctx context.Context, id string) (string, error) {
+func (s *sportsStore) FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error) {
 
 	var Eventid string
 
-	query := `SELECT id from sport_books WHERE event_id = $1`
+	query := `SELECT id from active_events WHERE event_id = $1`
 
-	err := s.db.QueryRow(ctx, query, id).Scan(&Eventid)
+	err := tx.QueryRow(ctx, query, id).Scan(&Eventid)
 
 	if err != nil {
 		return "", fmt.Errorf("Failed to find match :%w", err)
@@ -72,10 +75,34 @@ func (s *sportsStore) FindMatchIDByEventID(ctx context.Context, id string) (stri
 	return Eventid, nil
 }
 
-func (s *sportsStore) PlaceBet(ctx context.Context, payload models.PlaceBet, id string) error {
+func (s *sportsStore) TransferUserBalanceToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error {
 
-	query := `INSERT INTO sport_bets (match_id, event_id, user_id, odds_price, odds_rate, bet_type, bet, market_name, market_id, runner_name, runner_id)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
+	query := `
+	UPDATE users 
+	SET balance = balance - $1, exposure = exposure + $1 
+	WHERE id = $2 AND balance >= $1
+`
+
+	result, err := tx.Exec(ctx, query, amount, id)
+	if err != nil {
+		return fmt.Errorf("failed to debit balance: %w", err)
+	}
+
+	rowsAffected := result.RowsAffected()
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("insufficient balance for debit operation")
+	}
+
+	return nil
+
+}
+
+func (s *sportsStore) PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error {
+
+	query := `INSERT INTO sport_bets 
+	(match_id, event_id, user_id, odds_price, odds_rate, bet_type, market_name, market_id, runner_name, runner_id, market_type, profit, exposure)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
 
 	_, err := s.db.Exec(ctx, query, id,
 		payload.MatchId,
@@ -83,14 +110,19 @@ func (s *sportsStore) PlaceBet(ctx context.Context, payload models.PlaceBet, id 
 		payload.OddsPrice,
 		payload.OddsRate,
 		payload.BetType,
-		payload.Amount,
 		payload.MarketName,
 		payload.MarketId,
 		payload.RunnerName,
 		payload.RunnerID,
+		payload.MarketType,
+		profit,
+		exposure,
 	)
 
 	if err != nil {
+
+		log.Println(err)
+
 		return fmt.Errorf("Failed to save bet :%w", err)
 	}
 

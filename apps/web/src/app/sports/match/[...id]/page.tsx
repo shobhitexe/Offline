@@ -34,7 +34,15 @@ export default async function Match({ params }: { params: { id: string[] } }) {
 
       <MatchTabs />
 
-      <MatchTable matchOdds={info.MatchOdds} matchId={info.EventId} />
+      <MatchTable
+        matchOdds={info.MatchOdds}
+        Bookmaker={info.BookMaker}
+        Fancy={info.Fancy}
+        eventId={info.EventId}
+        matchName={info.EventName}
+        marketId={info.MatchOdds.MarketId}
+        tabType={params.id[1]}
+      />
     </div>
   );
 }

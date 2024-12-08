@@ -1,6 +1,7 @@
 package di
 
 import (
+	"context"
 	"server/internal/cron"
 	"server/internal/handlers"
 	"server/internal/service"
@@ -17,6 +18,7 @@ type Container struct {
 	AdminHandler  *handlers.AdminHandler
 	SportsHandler *handlers.SportsHandler
 	UserHandler   *handlers.UserHandler
+	CronScheduler *cron.Cron
 }
 
 func NewContainer(db *pgxpool.Pool, redis *redis.Client) *Container {
@@ -37,14 +39,16 @@ func NewContainer(db *pgxpool.Pool, redis *redis.Client) *Container {
 	userService := service.NewUserService(userStore)
 
 	// cron jobs
+	ctx := context.Background()
 	c := cron.NewScheduler(sportsStore, redis)
-	c.StartCron()
+	c.StartCron(ctx)
 
 	return &Container{
 		HealthHandler: handlers.NewHealthHandler(utils),
 		AdminHandler:  handlers.NewAdminHandler(adminService, utils, validator),
 		SportsHandler: handlers.NewSportsHandler(sportsService, utils, validator),
 		UserHandler:   handlers.NewUserHandler(utils, userService, validator),
+		CronScheduler: c,
 	}
 
 }

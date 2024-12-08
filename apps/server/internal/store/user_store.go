@@ -12,7 +12,7 @@ import (
 
 type UserStore interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
-	GetBalance(ctx context.Context, id string) (float64, error)
+	GetBalance(ctx context.Context, id string) (*models.UserWallet, error)
 	UserDetails(ctx context.Context, id string) (*models.User, error)
 	GetUserFromUsername(ctx context.Context, username string) (*models.User, error)
 	RecordLoginHistory(ctx context.Context, userId, userType, loginIp, userAgent string) error
@@ -51,18 +51,18 @@ func (s *userStore) UserDetails(ctx context.Context, id string) (*models.User, e
 
 }
 
-func (s *userStore) GetBalance(ctx context.Context, id string) (float64, error) {
+func (s *userStore) GetBalance(ctx context.Context, id string) (*models.UserWallet, error) {
 
-	var balance float64
+	var wallet models.UserWallet
 
-	query := `SELECT balance FROM users WHERE id = $1`
-	err := s.db.QueryRow(ctx, query, id).Scan(&balance)
+	query := `SELECT balance, exposure FROM users WHERE id = $1`
+	err := s.db.QueryRow(ctx, query, id).Scan(&wallet.Balance, &wallet.Exposure)
 
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return balance, nil
+	return &wallet, nil
 }
 
 func (s userStore) GetUserFromUsername(ctx context.Context, username string) (*models.User, error) {

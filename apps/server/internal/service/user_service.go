@@ -12,7 +12,7 @@ import (
 
 type UserService interface {
 	UserDetails(ctx context.Context, id string) (*models.User, error)
-	GetBalance(ctx context.Context, id string) (float64, error)
+	GetBalance(ctx context.Context, id string) (*models.UserWallet, error)
 	SignIn(ctx context.Context, payload models.SignInRequest) (*models.User, error)
 }
 
@@ -35,12 +35,12 @@ func (s *userService) UserDetails(ctx context.Context, id string) (*models.User,
 	return user, nil
 }
 
-func (s *userService) GetBalance(ctx context.Context, id string) (float64, error) {
+func (s *userService) GetBalance(ctx context.Context, id string) (*models.UserWallet, error) {
 
 	bal, err := s.store.GetBalance(ctx, id)
 
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	return bal, err

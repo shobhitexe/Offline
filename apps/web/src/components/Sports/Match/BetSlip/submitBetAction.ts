@@ -10,7 +10,8 @@ export async function submitBetAction(
   marketName: string,
   marketId: string,
   runnerName: string,
-  runnerID: string
+  runnerID: string,
+  marketType: string
 ) {
   try {
     const res = await fetch(`http://localhost:8080/api/v1/sports/placebet`, {
@@ -26,6 +27,7 @@ export async function submitBetAction(
         marketId,
         runnerName,
         runnerID,
+        marketType,
       }),
     });
 

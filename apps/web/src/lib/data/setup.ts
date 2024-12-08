@@ -7,7 +7,7 @@ export default async function fetcher<JSON = any>(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<JSON> {
-  const session = await getServerSession(options);
+  // const session = await getServerSession(options);
 
   const res = await fetch(input, init);
   return res.json();

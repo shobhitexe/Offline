@@ -5,8 +5,8 @@ import { SeperatorIcon } from "@repo/ui";
 import { useSelector } from "react-redux";
 
 const data = [
-  { title: "Real Wallet", value: "cash" },
-  { title: "Bonus Wallet", value: "bonus" },
+  { title: "Balance", value: "balance" },
+  { title: "Exposure", value: "exposure" },
 ];
 
 export default function NavWalletData() {
@@ -21,7 +21,11 @@ export default function NavWalletData() {
             <div className="flex flex-col items-center">
               <div className="text-main text-xs font-medium">{item.title}</div>
               <div className="font-medium">
-                {wallet[item.value as keyof { cash: string; bonus: string }]}
+                {
+                  wallet[
+                    item.value as keyof { balance: string; exposure: string }
+                  ]
+                }
               </div>
             </div>
             {idx === 0 && <Divide />}

@@ -1,6 +1,6 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-const initialState = { cash: 0, bonus: 0 };
+const initialState = { balance: 0, exposure: 0 };
 
 export const walletBalanceSlice = createSlice({
   name: "walletbalance",
@@ -8,11 +8,11 @@ export const walletBalanceSlice = createSlice({
   reducers: {
     setWalletBalance: (
       state,
-      action: PayloadAction<{ cash: number; bonus: number }>
+      action: PayloadAction<{ balance: number; exposure: number }>
     ) => {
       return {
-        cash: Number(action.payload.cash.toFixed(2)),
-        bonus: Number(action.payload.bonus.toFixed(2)),
+        balance: Number(action.payload.balance.toFixed(2)),
+        exposure: Number(action.payload.exposure.toFixed(2)),
       };
     },
   },
