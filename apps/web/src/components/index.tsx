@@ -36,6 +36,7 @@ import Timer from "./Sports/Match/Timer";
 import MatchInfo from "./Sports/Match/MatchInfo";
 import MatchTabs from "./Sports/Match/MatchTabs";
 import MatchTable from "./Sports/Match/MatchTable/MatchTable";
+import MobileSidebarSports from "./Sports/Sidebar/MobileSidebar";
 
 export {
   Navbar,
@@ -76,4 +77,5 @@ export {
   MatchInfo,
   MatchTabs,
   MatchTable,
+  MobileSidebarSports,
 };

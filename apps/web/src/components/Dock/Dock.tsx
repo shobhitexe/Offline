@@ -20,9 +20,9 @@ const DockOptions = [
     target: "_self",
   },
   {
-    title: "Offers",
+    title: "Sports",
     image: "/images/dock/offers.svg",
-    link: "/bonus/casinobonus",
+    link: "/sports/cricket",
     target: "_self",
   },
   {

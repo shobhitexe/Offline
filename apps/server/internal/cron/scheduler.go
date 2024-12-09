@@ -53,7 +53,7 @@ func (c *Cron) StartCron(ctx context.Context) {
 					log.Printf("Error in auto declaring results: %v", err)
 				}
 			case <-ctx.Done():
-				log.Println("Stopping 60-second cron tasks...")
+				log.Println("Stopping 600-second cron tasks...")
 				return
 
 			}

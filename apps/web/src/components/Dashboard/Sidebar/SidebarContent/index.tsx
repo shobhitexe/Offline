@@ -24,7 +24,6 @@ import NavSearch from "@/components/Navbar/NavSerach";
 import { useDispatch, useSelector } from "react-redux";
 import { setSideBarOpen } from "@/store/slices/Sidebar/sidebar-open";
 import { RootState } from "@/store/root-reducer";
-import LoginModal from "@/components/Auth/LoginModal";
 
 export const sidebarArr = [
   {
@@ -79,7 +78,7 @@ export default function SidebarContent({
 
   return (
     <div
-      className={` text-white font-medium w-full xs:p-5 p-2 ${isButton && "max-sm:hidden"} flex flex-col justify-start sm:gap-20 gap-5`}
+      className={` text-white font-medium w-full xs:p-5 p-0 ${isButton && "max-sm:hidden"} flex flex-col justify-start sm:gap-20 gap-5`}
     >
       <div className="flex flex-col text-left">
         <div className="flex flex-col">
@@ -117,13 +116,13 @@ export default function SidebarContent({
             <div className="bg-cardBG px-3 py-1 mt-3 rounded-sm shadow-md flex items-center justify-around text-center font-medium">
               <div>
                 {" "}
-                <div className="capitalize text-black/80 text-xs">Cash</div>
-                <div className="text-sm text-black">{wallet.cash}</div>
+                <div className="capitalize text-black/80 text-xs">Balance</div>
+                <div className="text-sm text-black">{wallet.balance}</div>
               </div>
               <div className="h-5 min-h-full w-px bg-black" />
               <div>
-                <div className="capitalize text-black/80 text-xs">Bonus</div>
-                <div className="text-sm text-black">{wallet.bonus}</div>
+                <div className="capitalize text-black/80 text-xs">Exposue</div>
+                <div className="text-sm text-black">{wallet.exposure}</div>
               </div>
             </div>
 
@@ -215,7 +214,7 @@ export default function SidebarContent({
           </div>
         )}
 
-        <ScrollArea
+        {/* <ScrollArea
           className={`sm:hidden ui-bg-cardBG flex flex-col mt-4 gap-2 text-black font-medium p-2 rounded-lg overflow-auto ${session.status === "authenticated" ? "h-[160px]" : " h-[450px]"}`}
         >
           {sidebarArrMobile.map((item, idx) => {
@@ -233,7 +232,7 @@ export default function SidebarContent({
               </Link>
             );
           })}{" "}
-        </ScrollArea>
+        </ScrollArea> */}
 
         {session.status === "authenticated" && (
           <div className="pb-2 mt-3 text-black" autoFocus={false}>

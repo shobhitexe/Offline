@@ -3,7 +3,6 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTrigger,
   SheetClose,
@@ -34,7 +33,6 @@ export default function MobileSidebar(): JSX.Element {
         <div className="text-white text-xs font-medium">Menu</div>
       </SheetTrigger>
       <SheetContent
-        stroke="white"
         className="ui-w-full ui-bg-main border-none"
         side={"bottom"}
       >

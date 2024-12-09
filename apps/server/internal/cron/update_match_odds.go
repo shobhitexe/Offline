@@ -119,6 +119,6 @@ func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, event models.Activ
 		return err
 	}
 
-	log.Printf("Successfully cached details for event %s", event.EventId)
+	// log.Printf("Successfully cached details for event %s", event.EventId)
 	return nil
 }

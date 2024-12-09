@@ -69,18 +69,33 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 		}
 
 		for _, bet := range *bets {
+
+			tx, err := c.sportsStore.BeginTx(ctx)
+			if err != nil {
+				return fmt.Errorf("failed to begin transaction: %w", err)
+			}
+
+			defer func() {
+				if p := recover(); p != nil {
+					_ = tx.Rollback(ctx)
+					panic(p)
+				} else if err != nil {
+					_ = tx.Rollback(ctx)
+				}
+			}()
+
 			switch result.Status {
 			case "WINNER":
 				if bet.BetType == "back" {
-					err = c.sportsStore.BetResultWin(ctx, bet.Profit, bet.Exposure, bet.UserId)
+					err = c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
 				} else if bet.BetType == "lay" {
-					err = c.sportsStore.BetResultLose(ctx, bet.Exposure, bet.UserId)
+					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
 				}
 			case "LOSER":
 				if bet.BetType == "back" {
-					err = c.sportsStore.BetResultLose(ctx, bet.Exposure, bet.UserId)
+					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
 				} else if bet.BetType == "lay" {
-					err = c.sportsStore.BetResultWin(ctx, bet.Profit, bet.Exposure, bet.UserId)
+					err = c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
 				}
 			default:
 				log.Printf("Unrecognized result status: %s for event %s", result.Status, result.EventID)
@@ -93,6 +108,10 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 
 			if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID); err != nil {
 				return err
+			}
+
+			if err = tx.Commit(ctx); err != nil {
+				return fmt.Errorf("failed to commit transaction: %w", err)
 			}
 		}
 	}

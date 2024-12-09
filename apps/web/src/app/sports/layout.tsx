@@ -1,5 +1,4 @@
-import { SportsSidebar } from "@/components";
-import Link from "next/link";
+import { MobileSidebarSports, SportsSidebar } from "@/components";
 import { ReactNode } from "react";
 
 export default function layout({ children }: { children: ReactNode }) {
@@ -25,6 +24,10 @@ export default function layout({ children }: { children: ReactNode }) {
       </div>
       <div className="flex flex-col">
         <div className="flex flex-1 flex-col gap-4 py-5 sm:px-4 px-2 lg:gap-6 overflow-auto max-h-screen pb-40 bg-[#18181A] rounded-md">
+          <div className="md:hidden">
+            <MobileSidebarSports />
+          </div>
+
           {children}
         </div>
       </div>
