@@ -1,41 +1,92 @@
 "use client";
 
-import { BackendURL } from "@/config/env";
-import fetcher from "@/lib/data/setup";
 import { RootState } from "@/store/root-reducer";
 import { setWalletBalance } from "@/store/slices/Wallet/wallet-balance";
-import { DepositIcon } from "@repo/ui";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import useSWR from "swr";
 
 export default function NavWallet() {
   const { data: session, status } = useSession();
   const dispatch = useDispatch();
   const balance = useSelector((state: RootState) => state.walletBalance);
 
-  const { data } = useSWR<{ data: { balance: number; exposure: number } }>(
-    status === "authenticated"
-      ? `${BackendURL}/api/v1/user/wallet/balance?id=${session?.user._id}`
-      : null,
-    fetcher,
-    {
-      refreshInterval: 10000,
-    }
-  );
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [connId, setConnId] = useState<string>("");
+
+  const socketInitialized = useRef(false);
 
   useEffect(() => {
-    if (data) {
-      dispatch(
-        setWalletBalance({
-          balance: data.data.balance,
-          exposure: data.data.exposure,
+    if (status === "unauthenticated") {
+      return;
+    }
+
+    if (socketInitialized.current) {
+      return;
+    }
+
+    const newSocket = new WebSocket("ws://localhost:8080/ws");
+
+    newSocket.onopen = () => {
+      console.log("Connected to the WebSocket server!");
+    };
+
+    newSocket.onmessage = (event) => {
+      const eventData = JSON.parse(event.data);
+      const { type } = eventData;
+
+      if (type === "send_id") {
+        setConnId(eventData.payload.connectionId);
+      } else if (type === "wallet_balance") {
+        if (eventData.payload.to) {
+          dispatch(
+            setWalletBalance({
+              balance: eventData.payload.balance,
+              exposure: eventData.payload.exposure,
+            })
+          );
+        }
+      }
+    };
+
+    newSocket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    newSocket.onclose = () => {
+      console.log("Disconnected from the WebSocket server!");
+    };
+
+    setSocket(newSocket);
+    socketInitialized.current = true;
+
+    return () => {
+      if (newSocket.readyState === WebSocket.OPEN) {
+        // newSocket.close();
+      }
+    };
+  }, [status, dispatch]);
+
+  useEffect(() => {
+    if (connId && socket && session?.user._id) {
+      socket.send(
+        JSON.stringify({
+          type: "wallet",
+          payload: { id: session?.user._id, connectionId: connId },
         })
       );
+
+      setInterval(() => {
+        socket.send(
+          JSON.stringify({
+            type: "wallet",
+            payload: { id: session?.user._id, connectionId: connId },
+          })
+        );
+      }, 5000);
     }
-  }, [data]);
+  }, [connId, socket, session?.user._id]);
 
   return (
     <div className="relative md:text-xs text-[10px] flex items-center text-white bg-cardBG/10 sm:px-14 px-3 py-1 sm:rounded-full rounded-md whitespace-nowrap">

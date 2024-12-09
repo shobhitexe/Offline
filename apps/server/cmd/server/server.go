@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"server/internal/routes"
+	"server/internal/websocket"
 	"server/pkg/di"
 	"time"
 
@@ -56,6 +57,9 @@ func (s *APIServer) mount() http.Handler {
 		routes.RegisterSportsRoutes(r, container.SportsHandler)
 		routes.RegisterUserRoutes(r, container.UserHandler)
 	})
+
+	manager := websocket.NewManager(s.db, s.redis)
+	r.HandleFunc("/ws", manager.ServerWs)
 
 	return r
 

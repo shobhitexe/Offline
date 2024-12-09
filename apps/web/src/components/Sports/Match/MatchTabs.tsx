@@ -22,6 +22,7 @@ export default function MatchTabs() {
       {TabsArr.map((item) => (
         <Link
           href={`${item.value}`}
+          key={item.title}
           className={buttonVariants({
             variant: `${pathname.includes(item.value) ? "yellow" : "main"}`,
             size: "sm",

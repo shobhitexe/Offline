@@ -27,12 +27,10 @@ export default function FancyTableComponent({
           className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,60px)] gap-2 items-center"
         >
           <div className="flex items-center gap-2">
-            <span className="font-semibold">
+            {/* <span className="font-semibold">
               {item.RunnerName.slice(0, 2).toUpperCase()}
-            </span>
-            <span className="text-white whitespace-nowrap">
-              {item.RunnerName}
-            </span>
+            </span> */}
+            <span className="text-white">{item.RunnerName}</span>
             {/* <span className="text-green-500">{item.Status}</span> */}
           </div>
           <div className="col-span-3 max-ss:hidden"></div>

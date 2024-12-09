@@ -15,7 +15,7 @@ export default function MarketTableComponent({
   type: string;
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 ">
       <div className="flex items-center gap-2 text-sm text-purple-600">
         <span className="inline-block w-3 h-3 bg-green-400 rounded-full"></span>
         {data.MarketName}

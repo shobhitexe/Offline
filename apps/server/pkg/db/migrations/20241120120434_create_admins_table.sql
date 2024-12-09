@@ -36,6 +36,23 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL
 );
+
+CREATE OR REPLACE FUNCTION notify_balance_update() 
+RETURNS trigger AS $$
+BEGIN
+  IF NEW.balance <> OLD.balance THEN
+    PERFORM pg_notify('balance_update', 
+                      'User ID: ' || NEW.id || ', New Balance: ' || NEW.balance);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER balance_update_trigger
+AFTER UPDATE OF balance ON users
+FOR EACH ROW
+EXECUTE FUNCTION notify_balance_update();
 -- +goose StatementEnd
 
 -- +goose StatementBegin
