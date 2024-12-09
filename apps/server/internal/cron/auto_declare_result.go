@@ -3,6 +3,7 @@ package cron
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"server/internal/models"
 
@@ -57,31 +58,43 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 	if err := json.Unmarshal([]byte(result), &resultMap); err != nil {
 		return err
 	}
-
 	for _, result := range resultMap {
-
-		bets, err := c.sportsStore.FindActiveBetsByEventID(ctx, result.EventID, result.RunnerID)
-
+		bets, err := c.sportsStore.FindMarketOddsBetsByEventID(ctx, result.EventID, result.RunnerID)
 		if err != nil {
-			return err
+			return fmt.Errorf("error fetching bets for event %s and runner %s: %w", result.EventID, result.RunnerID, err)
 		}
 
 		if bets == nil || len(*bets) == 0 {
 			continue
 		}
 
-		log.Println(bets)
+		for _, bet := range *bets {
+			switch result.Status {
+			case "WINNER":
+				if bet.BetType == "back" {
+					err = c.sportsStore.BetResultWin(ctx, bet.Profit, bet.Exposure, bet.UserId)
+				} else if bet.BetType == "lay" {
+					err = c.sportsStore.BetResultLose(ctx, bet.Exposure, bet.UserId)
+				}
+			case "LOSER":
+				if bet.BetType == "back" {
+					err = c.sportsStore.BetResultLose(ctx, bet.Exposure, bet.UserId)
+				} else if bet.BetType == "lay" {
+					err = c.sportsStore.BetResultWin(ctx, bet.Profit, bet.Exposure, bet.UserId)
+				}
+			default:
+				log.Printf("Unrecognized result status: %s for event %s", result.Status, result.EventID)
+				continue
+			}
 
-		// if result.Status == "WINNER" {
-		// 	bets, err := c.sportsStore.FindActiveBetsByEventID(ctx, result.EventID, result.RunnerID)
+			if err != nil {
+				return err
+			}
 
-		// 	if err != nil {
-		// 		return err
-		// 	}
-
-		// }
-
+			if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID); err != nil {
+				return err
+			}
+		}
 	}
-
 	return nil
 }

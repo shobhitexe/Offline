@@ -30,6 +30,7 @@ func (c *Cron) GetMatchOddsResult(ctx context.Context) error {
 			}
 
 			res, err := c.http.Do(req)
+
 			if err != nil {
 				log.Printf("Error fetching event details for %s: %v", key, err)
 				return

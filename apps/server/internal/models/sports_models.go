@@ -15,7 +15,8 @@ type ActiveBet struct {
 	OddsPrice  float64
 	OddsRate   float64
 	BetType    string
-	Amount     int64
+	Profit     float64
+	Exposure   float64
 	MarketName string
 	MarketId   string
 	RunnerName string

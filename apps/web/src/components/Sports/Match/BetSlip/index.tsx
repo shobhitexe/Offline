@@ -61,6 +61,14 @@ export default function Betslip({
       const exposure =
         betType === "back" || betType === "yes" ? amount : (rate - 1) * amount;
 
+      if (exposure <= 0) {
+        toast({
+          title: "Failed to place bet",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (exposure > balance) {
         toast({
           title: "Failed to place bet",

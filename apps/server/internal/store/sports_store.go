@@ -15,9 +15,12 @@ type SportsStore interface {
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error
 	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
-	FindActiveBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error)
+	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error)
 	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents) error
 	TransferUserBalanceToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
+	BetResultWin(ctx context.Context, profit, exposure float64, id string) error
+	BetResultLose(ctx context.Context, exposure float64, userID string) error
+	ChangeActiveBetStatus(ctx context.Context, id string) error
 }
 
 type sportsStore struct {
@@ -129,12 +132,14 @@ func (s *sportsStore) PlaceBet(ctx context.Context, tx pgx.Tx, payload models.Pl
 	return nil
 }
 
-func (s *sportsStore) FindActiveBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error) {
+func (s *sportsStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error) {
 
 	var allbets []models.ActiveBet
 
-	query := `SELECT id, match_id, event_id, user_id, odds_price, odds_rate, bet_type, bet, market_name, market_id, runner_name, runner_id from sport_bets
-	WHERE event_id = $1 AND runner_id = $2 AND settled = false`
+	query := `SELECT 
+	id, match_id, event_id, user_id, odds_price, odds_rate, bet_type, market_name, market_id, runner_name, runner_id, profit, exposure 
+	from sport_bets
+	WHERE event_id = $1 AND runner_id = $2 AND settled = false AND market_type = 'Match Odds'`
 
 	bets, err := s.db.Query(ctx, query, eventID, runnerID)
 
@@ -155,11 +160,12 @@ func (s *sportsStore) FindActiveBetsByEventID(ctx context.Context, eventID, runn
 			&bet.OddsPrice,
 			&bet.OddsRate,
 			&bet.BetType,
-			&bet.Amount,
 			&bet.MarketName,
 			&bet.MarketId,
 			&bet.RunnerName,
 			&bet.RunnerID,
+			&bet.Profit,
+			&bet.Exposure,
 		); err != nil {
 			log.Println(err)
 
@@ -182,6 +188,34 @@ func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.Activ
 
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *sportsStore) BetResultWin(ctx context.Context, profit, exposure float64, userID string) error {
+	query := `UPDATE users SET balance = balance + $1, exposure = exposure - $2 WHERE id = $3`
+	if _, err := s.db.Exec(ctx, query, profit, exposure, userID); err != nil {
+		return fmt.Errorf("failed to update balance and exposure for user %s: %w", userID, err)
+	}
+	return nil
+}
+
+func (s *sportsStore) BetResultLose(ctx context.Context, exposure float64, userID string) error {
+	query := `UPDATE users SET exposure = exposure - $1 WHERE id = $2`
+	if _, err := s.db.Exec(ctx, query, exposure, userID); err != nil {
+		return fmt.Errorf("failed to update balance and exposure for user %s: %w", userID, err)
+	}
+	return nil
+}
+
+func (s *sportsStore) ChangeActiveBetStatus(ctx context.Context, id string) error {
+
+	query := `UPDATE sport_bets SET settled = true WHERE id = $1`
+
+	if _, err := s.db.Exec(ctx, query, id); err != nil {
+		return fmt.Errorf("failed to status for bet %s: %w", id, err)
+
 	}
 
 	return nil
