@@ -59,7 +59,7 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 		return err
 	}
 	for _, result := range resultMap {
-		bets, err := c.sportsStore.FindMarketOddsBetsByEventID(ctx, result.EventID, result.RunnerID)
+		bets, err := c.sportsStore.FindMarketOddsBetsByEventID(ctx, result.EventID, result.RunnerID, result.MarketID)
 		if err != nil {
 			return fmt.Errorf("error fetching bets for event %s and runner %s: %w", result.EventID, result.RunnerID, err)
 		}

@@ -57,6 +57,8 @@ export default function Betslip({
   const [amount, setAmount] = useState(0);
 
   async function submitBetClient() {
+    setIsLoading(true);
+
     try {
       const exposure =
         betType === "back" || betType === "yes" ? amount : (rate - 1) * amount;
@@ -77,7 +79,7 @@ export default function Betslip({
         });
         return;
       }
-      setIsLoading(true);
+
       const res = await submitBetAction(
         eventId,
         session.data?.user.id!,
@@ -92,18 +94,21 @@ export default function Betslip({
         marketType
       );
 
-      setIsLoading(false);
-
-      if (res) {
+      if (res === true) {
         setAmount(0);
         toast({ description: "Bet placed successfully" });
         return;
       }
 
-      toast({ description: "Failed to place bet", variant: "destructive" });
+      toast({
+        title: "Failed to place bet",
+        description: res,
+        variant: "destructive",
+      });
     } catch (error) {
-      setIsLoading(false);
       toast({ description: "Failed to place bet", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -111,7 +116,7 @@ export default function Betslip({
     <Drawer>
       <DrawerTrigger
         disabled={price === 0 || rate === 0 ? true : false}
-        className="bg-[#72bbef] text-black hover:bg-white text-sm rounded-md font-medium border border-white"
+        className="bg-[#72bbef] text-black hover:bg-white text-xs rounded-md font-medium border border-white"
         style={{
           backgroundColor:
             betType === "back" || betType === "yes" ? "#72bbef" : "#faa9ba",
@@ -133,6 +138,12 @@ export default function Betslip({
         className="ui-bg-[#232325]"
         style={{ backgroundColor: "#232325", border: "#232325" }}
       >
+        {loading && (
+          <div className="fixed w-full h-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/40">
+            <LoadingSpinner className="w-1/2 h-1/2 mx-auto" />
+          </div>
+        )}
+
         <DrawerHeader>
           <DrawerTitle>
             <div className="flex items-center justify-center gap-5">

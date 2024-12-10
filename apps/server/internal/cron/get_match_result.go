@@ -20,7 +20,7 @@ func (c *Cron) GetMatchOddsResult(ctx context.Context) error {
 		go func(key string) {
 			defer wg.Done()
 
-			url := "https://leisurebuzz.in/api/v2/competition/getMarketList/" + key
+			url := "https://alp.playunlimited9.co.in/api/v2/competition/getMarketList/" + key
 			redisKey := "sports:results:" + key
 
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

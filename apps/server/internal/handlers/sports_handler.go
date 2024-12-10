@@ -111,14 +111,17 @@ func (h *SportsHandler) BetHistoryPerGame(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data, err := h.service.BetHistoryPerGame(r.Context(), userId, eventId)
+	data, grouped, err := h.service.BetHistoryPerGame(r.Context(), userId, eventId)
 
 	if err != nil {
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch bets", Data: err.Error()})
 		return
 	}
 
-	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: data})
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: map[string]any{
+		"history": data,
+		"grouped": grouped,
+	}})
 }
 
 // func (h *SportsHandler) GetList(w http.ResponseWriter, r *http.Request) {

@@ -31,8 +31,10 @@ export async function submitBetAction(
       }),
     });
 
+    const _res = await res.json();
+
     if (res.status !== 200) {
-      return false;
+      return _res.data;
     }
 
     return true;

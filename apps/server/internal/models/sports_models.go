@@ -26,47 +26,45 @@ type ActiveBet struct {
 
 // ///
 type Odds struct {
-	BookMaker     BookMakerInfo
-	CompetitionId string
-	EventId       string
-	EventName     string
-	EventTime     string
-	Fancy         FancyInfo
-	MatchOdds     MarketInfo
-	SportsId      string
-	Version       string
-	ID            string
+	BookMaker     BookMakerInfo `json:"BookMaker"`
+	CompetitionId string        `json:"CompetitionId"`
+	EventId       string        `json:"EventId"`
+	EventName     string        `json:"EventName"`
+	EventTime     string        `json:"EventTime"`
+	Fancy         FancyInfo     `json:"Fancy"`
+	MatchOdds     MarketInfo    `json:"MatchOdds"`
+	SportsId      string        `json:"SportsId"`
 }
 
 type BookMakerInfo struct {
-	MarketId   string
-	MarketName string
-	Runners    []Runner
+	MarketId   string   `json:"MarketId"`
+	MarketName string   `json:"MarketName"`
+	Runners    []Runner `json:"runners"`
 }
 
 type FancyInfo struct {
-	MarketId   string
-	MarketName string
-	Runners    []Runner
+	MarketId   string   `json:"MarketId"`
+	MarketName string   `json:"MarketName"`
+	Runners    []Runner `json:"runners"`
 }
 
 type MarketInfo struct {
-	MarketId   string
-	MarketName string
-	Runners    []Runner
+	MarketId   string   `json:"MarketId"`
+	MarketName string   `json:"MarketName"`
+	Runners    []Runner `json:"runners"`
 }
 
 type Runner struct {
-	Back       PriceRate
-	Lay        PriceRate
-	RunnerId   string
-	RunnerName string
-	Status     string
+	Back       PriceRate `json:"Back"`
+	Lay        PriceRate `json:"Lay"`
+	RunnerId   string    `json:"RunnerId"`
+	RunnerName string    `json:"RunnerName"`
+	Status     string    `json:"Status"`
 }
 
 type PriceRate struct {
-	Price float64
-	Rate  float64
+	Price float64 `json:"Price"`
+	Rate  float64 `json:"Rate"`
 }
 
 /////
@@ -101,9 +99,16 @@ type ActiveExposureByTeam struct {
 }
 
 type BetHistoryPerGame struct {
-	Selection string  `json:"selection"`
-	Odds      float64 `json:"odds"`
-	Stake     float64 `json:"stake"`
-	PNL       float64 `json:"pnl"`
-	BetType   string  `json:"betType"`
+	Selection  string  `json:"selection"`
+	Odds       float64 `json:"odds"`
+	Stake      float64 `json:"stake"`
+	PNL        float64 `json:"pnl"`
+	BetType    string  `json:"betType"`
+	MarketName string  `json:"marketName"`
+	RunnerId   string  `json:"runnerId"`
+}
+
+type SelectionData struct {
+	TotalPNL   float64 `json:"totalPnl"`
+	TotalStake float64 `json:"totalStake"`
 }

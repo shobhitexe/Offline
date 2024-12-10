@@ -12,18 +12,23 @@ export default function MatchInfo({
 }) {
   return (
     <Card className="pt-20 bg-white">
-      <CardContent className="sm:ui-p-6 ui-p-2 flex flex-col items-stretch justify-between w-full">
-        <div className="flex ss:flex-row flex-col items-center justify-between sm:gap-5 gap-1">
+      <CardContent
+        style={{ padding: 0 }}
+        className="flex flex-col items-stretch justify-between w-full "
+      >
+        <div className="flex flex-row items-center justify-between sm:gap-5 gap-1 sm:px-6 px-0">
           <div className="flex items-center max-ss:justify-center gap-4">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold">
+            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center sm:text-xl text-base font-bold">
               {firstTeam.slice(0, 2).toUpperCase()}
             </div>
-            <div className="text-lg">{firstTeam}</div>
+            <div className="sm:text-lg text-sm">{firstTeam}</div>
           </div>
-          <div className="text-lg font-bold max-ss:text-center">VS</div>
+          <div className="sm:text-lg text-sm font-bold max-ss:text-center">
+            VS
+          </div>
           <div className="flex items-center gap-4 max-ss:justify-center">
-            <div className="text-lg">{secondTeam}</div>
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold">
+            <div className="sm:text-lg text-sm">{secondTeam}</div>
+            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center sm:text-xl text-base font-bold">
               {secondTeam.slice(0, 2).toUpperCase()}
             </div>
           </div>

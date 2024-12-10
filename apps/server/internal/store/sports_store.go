@@ -15,7 +15,7 @@ type SportsStore interface {
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error
 	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
-	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error)
+	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error)
 	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents, id string) error
 	TransferUserBalanceToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
 	BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, id string) error
@@ -136,16 +136,16 @@ func (s *sportsStore) PlaceBet(ctx context.Context, tx pgx.Tx, payload models.Pl
 	return nil
 }
 
-func (s *sportsStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error) {
+func (s *sportsStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error) {
 
 	var allbets []models.ActiveBet
 
 	query := `SELECT 
 	id, match_id, event_id, user_id, odds_price, odds_rate, bet_type, market_name, market_id, runner_name, runner_id, profit, exposure 
 	from sport_bets
-	WHERE event_id = $1 AND runner_id = $2 AND settled = false AND market_type = 'Match Odds'`
+	WHERE event_id = $1 AND runner_id = $2 AND market_id = $3 AND settled = false AND market_type = 'Match Odds'`
 
-	bets, err := s.db.Query(ctx, query, eventID, runnerID)
+	bets, err := s.db.Query(ctx, query, eventID, runnerID, marketId)
 
 	if err != nil {
 		log.Println(err)
@@ -237,8 +237,8 @@ func (s *sportsStore) BetHistoryPerGame(ctx context.Context, userId, eventId str
 	var history []models.BetHistoryPerGame
 
 	query := `SELECT 
-	runner_name, odds_rate, exposure, profit, bet_type 
-	FROM sport_bets WHERE user_id = $1 AND event_id = $2
+	runner_name, odds_rate, exposure, profit, bet_type, market_type, runner_id 
+	FROM sport_bets WHERE user_id = $1 AND event_id = $2 AND settled = false
 	ORDER BY created_at DESC`
 
 	rows, err := s.db.Query(ctx, query, userId, eventId)
@@ -249,7 +249,7 @@ func (s *sportsStore) BetHistoryPerGame(ctx context.Context, userId, eventId str
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
-		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType)
+		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId)
 
 		history = append(history, row)
 	}

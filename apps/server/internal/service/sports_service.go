@@ -22,7 +22,7 @@ type SportsService interface {
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
 	SaveActiveEvents(ctx context.Context, id string) error
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
-	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
+	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, map[string]map[string]models.SelectionData, error)
 }
 
 type sportsService struct {
@@ -149,6 +149,12 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 		return fmt.Errorf("Failed to find match id :%w", err)
 	}
 
+	// price, rate, err := getPriceAndOdds(payload.MatchId, payload.RunnerID, payload.MarketType, payload.BetType)
+
+	if payload.OddsPrice == 0 || payload.OddsRate == 0 {
+		return fmt.Errorf("Price or Rate can't be zero")
+	}
+
 	var profit, exposure float64
 
 	if payload.BetType == "back" || payload.BetType == "yes" {
@@ -174,16 +180,116 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 	return nil
 }
 
-func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error) {
+func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, map[string]map[string]models.SelectionData, error) {
 
 	d, err := s.store.BetHistoryPerGame(ctx, userId, eventId)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return d, nil
+	selectionData := make(map[string]map[string]models.SelectionData)
+	groupedBets := make(map[string]map[string][]models.BetHistoryPerGame)
+
+	for _, bet := range *d {
+		if _, exists := groupedBets[bet.MarketName]; !exists {
+			groupedBets[bet.MarketName] = make(map[string][]models.BetHistoryPerGame)
+		}
+
+		if _, exists := groupedBets[bet.MarketName][bet.RunnerId]; !exists {
+			groupedBets[bet.MarketName][bet.RunnerId] = make([]models.BetHistoryPerGame, 0)
+		}
+
+		groupedBets[bet.MarketName][bet.RunnerId] = append(groupedBets[bet.MarketName][bet.RunnerId], bet)
+
+		if _, exists := selectionData[bet.MarketName]; !exists {
+			selectionData[bet.MarketName] = make(map[string]models.SelectionData)
+		}
+
+		data := selectionData[bet.MarketName][bet.RunnerId]
+
+		selectionData[bet.MarketName][bet.RunnerId] = models.SelectionData{
+			TotalPNL:   data.TotalPNL + bet.PNL,
+			TotalStake: data.TotalStake + bet.Stake,
+		}
+	}
+
+	return d, selectionData, nil
 }
+
+// func getPriceAndOdds(eventId, runnerId, marketName, betType string) (price, rate float64, err error) {
+// 	url := "https://alp.playunlimited9.co.in/api/v2/competition/getEventDetail/" + eventId
+
+// 	res, err := http.Get(url)
+// 	if err != nil {
+// 		log.Printf("Error making HTTP GET request: %v", err)
+// 		return 0, 0, err
+// 	}
+// 	defer res.Body.Close()
+
+// 	if res.StatusCode != http.StatusOK {
+// 		log.Printf("Unexpected status code %d for event %s", res.StatusCode, eventId)
+// 		return 0, 0, fmt.Errorf("unexpected status code: %d", res.StatusCode)
+// 	}
+
+// 	body, err := io.ReadAll(res.Body)
+// 	if err != nil {
+// 		log.Printf("Error reading response body for event %s: %v", eventId, err)
+// 		return 0, 0, err
+// 	}
+
+// 	var data models.Odds
+// 	if err := json.Unmarshal(body, &data); err != nil {
+// 		log.Printf("Error unmarshalling JSON: %v", err)
+// 		return 0, 0, err
+// 	}
+
+// 	switch marketName {
+// 	case "Bookmaker":
+// 		for _, runner := range data.BookMaker.Runners {
+// 			if runner.RunnerId == runnerId {
+// 				switch betType {
+// 				case "back":
+// 					price, rate = runner.Back.Price, runner.Back.Rate
+// 					return price, rate, nil
+// 				case "lay":
+// 					price, rate = runner.Lay.Price, runner.Lay.Rate
+// 					return price, rate, nil
+// 				}
+// 			}
+// 		}
+
+// 	case "Fancy":
+// 		for _, runner := range data.Fancy.Runners {
+// 			if runner.RunnerId == runnerId {
+// 				switch betType {
+// 				case "no":
+// 					price, rate = runner.Lay.Price, runner.Lay.Rate
+// 					return price, rate, nil
+// 				case "yes":
+// 					price, rate = runner.Back.Price, runner.Back.Rate
+// 					return price, rate, nil
+// 				}
+// 			}
+// 		}
+
+// 	case "Match Odds":
+// 		for _, runner := range data.MatchOdds.Runners {
+// 			if runner.RunnerId == runnerId {
+// 				switch betType {
+// 				case "back":
+// 					price, rate = runner.Back.Price, runner.Back.Rate
+// 					return price, rate, nil
+// 				case "lay":
+// 					price, rate = runner.Lay.Price, runner.Lay.Rate
+// 					return price, rate, nil
+// 				}
+// 			}
+// 		}
+// 	}
+
+// 	return 0, 0, fmt.Errorf("runner %s not found in market %s", runnerId, marketName)
+// }
 
 // func (s *sportsService) GetList(id string) (interface{}, error) {
 // 	ctx := context.Background()

@@ -1,8 +1,12 @@
-import { Market } from "@/types";
+import { BetHistoryPerGame, GroupedBetHistoryPerGame, Market } from "@/types";
 import { Button } from "@repo/ui";
 import MarketTableComponent from "./MarketTable";
 import FancyTableComponent from "./FancyTable";
 import BetHistory from "../BetHistory";
+import { useSession } from "next-auth/react";
+import useSWR from "swr";
+import { BackendURL } from "@/config/env";
+import fetcher from "@/lib/data/setup";
 
 export default function MatchTable({
   matchOdds,
@@ -21,9 +25,18 @@ export default function MatchTable({
   marketId: string;
   tabType: string;
 }) {
+  const session = useSession();
+
+  const { data, mutate } = useSWR<{
+    data: { history: BetHistoryPerGame[]; grouped: GroupedBetHistoryPerGame };
+  }>(
+    `${BackendURL}/api/v1/sports/bethistory/pergame?userId=${session.data?.user.id}&eventId=${eventId}`,
+    fetcher
+  );
+
   return (
     <div className="flex flex-col gap-5 w-full relative">
-      <div className="space-y-4">
+      <div className="space-y-4 sm:text-base text-sm">
         {(tabType === "all" || tabType === "market") && (
           <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-2">
             <div></div>
@@ -54,6 +67,7 @@ export default function MatchTable({
             matchName={matchName}
             marketId={marketId}
             type="Match Odds"
+            bets={data?.data.grouped["Match Odds"]}
           />
         )}
 
@@ -66,6 +80,7 @@ export default function MatchTable({
             matchName={matchName}
             marketId={marketId}
             type="Bookmaker"
+            bets={data?.data.grouped.Bookmaker}
           />
         )}
 
@@ -76,7 +91,7 @@ export default function MatchTable({
         {(tabType === "all" || tabType === "fancy") &&
           Fancy &&
           Fancy.runners.length !== 0 && (
-            <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-2">
+            <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-2 sm:text-base text-sm">
               <div></div>
               <div className="col-span-3"></div>
               <Button
@@ -105,11 +120,14 @@ export default function MatchTable({
               matchName={matchName}
               marketId={marketId}
               type="Fancy"
+              bets={data?.data.grouped.Fancy}
             />
           )}
       </div>
 
-      <BetHistory eventId={eventId} />
+      {data?.data.history && (
+        <BetHistory data={data?.data.history} mutate={mutate} />
+      )}
     </div>
   );
 }

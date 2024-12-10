@@ -52,3 +52,22 @@ type Market = {
   MarketName: string;
   runners: Array<Runner>;
 };
+
+type BetHistoryPerGame = {
+  selection: string;
+  odds: number;
+  stake: number;
+  pnl: number;
+  betType: string;
+};
+
+type GroupedStats = {
+  totalPnl: number;
+  totalStake: number;
+};
+
+type GroupedBetHistoryPerGame = {
+  Bookmaker: Record<string, GroupedStats>;
+  Fancy: Record<string, GroupedStats>;
+  "Match Odds": Record<string, GroupedStats>;
+};

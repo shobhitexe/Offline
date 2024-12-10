@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@repo/ui";
 
-type Bet = {
+type BetHistoryPerGame = {
   selection: string;
   odds: number;
   stake: number;
@@ -16,47 +16,23 @@ type Bet = {
 };
 
 import { Menu, RefreshCcw } from "lucide-react";
-import { betHistoryColumns } from "./betHistoryColumns";
-import useSWR from "swr";
-import { BackendURL } from "@/config/env";
-import fetcher from "@/lib/data/setup";
-import { useSession } from "next-auth/react";
 
-export default function BetHistory({ eventId }: { eventId: string }) {
-  const session = useSession();
+import { KeyedMutator } from "swr";
 
-  const { data, mutate } = useSWR<{ data: Bet[] }>(
-    `${BackendURL}/api/v1/sports/bethistory/pergame?userId=${session.data?.user.id}&eventId=${eventId}`,
-    fetcher
-  );
-
-  if (!data?.data) {
-    return (
-      <Dialog>
-        <DialogTrigger className="fixed sm:bottom-5 bottom-16 sm:right-10 right-5 bg-white p-3 rounded-full">
-          <div className="relative">
-            <Menu className="text-black" />{" "}
-            <div className="absolute bg-black -top-4 -right-2 px-2 rounded-full text-sm"></div>
-          </div>
-        </DialogTrigger>
-        <DialogContent className="ui-text-black overflow-x-auto">
-          <DialogHeader>
-            <DialogTitle className="text-black text-center flex items-center justify-center gap-3">
-              No Bets <RefreshCcw onClick={() => mutate()} />
-            </DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
+export default function BetHistory({
+  data,
+  mutate,
+}: {
+  data: BetHistoryPerGame[];
+  mutate: KeyedMutator<any>;
+}) {
   return (
     <Dialog>
       <DialogTrigger className="fixed sm:bottom-5 bottom-16 sm:right-10 right-5 bg-white p-3 rounded-full">
         <div className="relative">
           <Menu className="text-black" />{" "}
           <div className="absolute bg-black -top-4 -right-2 px-2 rounded-full text-sm">
-            {data?.data && data?.data.length}
+            {data && data.length}
           </div>
         </div>
       </DialogTrigger>
@@ -67,7 +43,7 @@ export default function BetHistory({ eventId }: { eventId: string }) {
           </DialogTitle>
           {/* <DataTable columns={betHistoryColumns} data={data?.data || []} /> */}
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[500px]">
             <table className="min-w-full border-collapse border border-gray-300 text-left text-sm">
               <thead className="bg-gray-100">
                 <tr>
@@ -80,7 +56,7 @@ export default function BetHistory({ eventId }: { eventId: string }) {
                 </tr>
               </thead>
               <tbody>
-                {data?.data.map((bet, index) => (
+                {data.map((bet, index) => (
                   <tr
                     key={index}
                     className={`${
