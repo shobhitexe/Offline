@@ -17,7 +17,7 @@ declare module "next-auth" {
 }
 
 type EventType = {
-  matchName: string;
+  eventName: string;
   eventId: string;
   eventTime: string;
 };

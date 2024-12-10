@@ -7,6 +7,10 @@ import { userListColumn } from "./Users/UserList/userListColumn";
 import CreateUser from "./Users/CreateUser";
 import EditUser from "./Users/EditUser/EditUser";
 import EditAgent from "./Agents/EditAgent/EditAgent";
+import RiskAnalysis from "./RiskAnalysis";
+import MatchInfo from "./RiskAnalysis/Match/MatchInfo";
+import MatchTable from "./RiskAnalysis/Match/MatchTable/MatchTable";
+import Timer from "./RiskAnalysis/Match/Timer";
 
 export {
   Signin,
@@ -18,4 +22,8 @@ export {
   CreateUser,
   EditUser,
   EditAgent,
+  RiskAnalysis,
+  MatchInfo,
+  MatchTable,
+  Timer,
 };

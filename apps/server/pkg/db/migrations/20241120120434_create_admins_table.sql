@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS active_events (
     status TEXT CHECK (status IN ('pending', 'open', 'close', 'locked', 'active')) DEFAULT 'active',
     is_declared BOOLEAN DEFAULT FALSE,
     opening_time TIMESTAMP NOT NULL,
+    match_odds_runners JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- +goose StatementEnd

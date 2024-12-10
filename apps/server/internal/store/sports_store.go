@@ -38,7 +38,8 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 	SELECT 
 		match_name, 
 		event_id,
-		competition_id, 
+		competition_id,
+		match_odds_runners, 
 		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
@@ -55,7 +56,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 
 	for rows.Next() {
 		var event models.ActiveEvents
-		if err := rows.Scan(&event.EventName, &event.EventId, &event.CompetitionId, &event.EventTime); err != nil {
+		if err := rows.Scan(&event.EventName, &event.EventId, &event.CompetitionId, &event.MatchOdds.Runners, &event.EventTime); err != nil {
 			return nil, err
 		}
 		events = append(events, event)
@@ -182,10 +183,17 @@ func (s *sportsStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, 
 
 func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.ActiveEvents) error {
 
-	query := `INSERT INTO active_events (sports_id, match_name, event_id, competition_id, opening_time) 
-	VALUES ($1, $2, $3, $4, $5)`
+	query := `INSERT INTO active_events 
+	(sports_id, match_name, event_id, competition_id, match_odds_runners, opening_time) 
+	VALUES ($1, $2, $3, $4, $5, $6)`
 
-	_, err := s.db.Exec(ctx, query, 4, payload.EventName, payload.EventId, payload.CompetitionId, payload.EventTime)
+	_, err := s.db.Exec(ctx, query, 4,
+		payload.EventName,
+		payload.EventId,
+		payload.CompetitionId,
+		payload.MatchOdds.Runners,
+		payload.EventTime,
+	)
 
 	if err != nil {
 		return err
