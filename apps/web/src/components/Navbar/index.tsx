@@ -52,7 +52,7 @@ export default async function Navbar() {
 
         <div className="flex items-center gap-5">
           <NavSearch position="navbar" />
-          {session?.user._id ? (
+          {session?.user.id ? (
             <div className="flex items-center md:gap-10 gap-2">
               <div className="flex items-center gap-5">
                 <div className="sm:flex hidden">

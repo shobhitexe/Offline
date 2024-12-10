@@ -63,7 +63,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
   }, [status]);
 
   useEffect(() => {
-    if (connId && socket && session?.user._id) {
+    if (connId && socket && session?.user.id) {
       socket.send(
         JSON.stringify({
           type: "event_data",
@@ -84,7 +84,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
         clearInterval(intervalId);
       };
     }
-  }, [connId, socket, session?.user._id]);
+  }, [connId, socket, session?.user.id]);
 
   if (info === null) {
     return <div>Loading....</div>;

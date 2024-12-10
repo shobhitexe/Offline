@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
 } from "./index";
 import { usePathname } from "next/navigation";
-import { Gauge, User, Users } from "lucide-react";
+import { Gauge, Layers, User, Users } from "lucide-react";
 
 const items = [
   {
@@ -31,6 +31,11 @@ const items = [
     title: "Agents List",
     icon: Users,
     url: "/agent-list",
+  },
+  {
+    title: "Risk Analysis",
+    icon: Layers,
+    url: "/risk-analysis/in-play",
   },
 ];
 

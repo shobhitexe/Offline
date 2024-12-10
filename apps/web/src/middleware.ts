@@ -4,7 +4,7 @@ import { checkToken } from "./lib/apis/checkToken";
 
 export default withAuth(
   async function middleware(req, token) {
-    const userId: string | unknown = req.nextauth.token?._id;
+    const userId: string | unknown = req.nextauth.token?.id;
 
     const check = await checkToken(userId);
 

@@ -26,7 +26,7 @@ async function getBonusHistory(id: string) {
 export default async function page() {
   const session = await getServerSession(options);
   const history: BonusHistoryTableType[] = await getBonusHistory(
-    session?.user._id || ""
+    session?.user.id || ""
   );
 
   return (

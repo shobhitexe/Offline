@@ -69,11 +69,11 @@ export default function NavWallet() {
   }, [status, dispatch]);
 
   useEffect(() => {
-    if (connId && socket && session?.user._id) {
+    if (connId && socket && session?.user.id) {
       socket.send(
         JSON.stringify({
           type: "wallet",
-          payload: { id: session?.user._id, connectionId: connId },
+          payload: { id: session?.user.id, connectionId: connId },
         })
       );
 
@@ -81,12 +81,12 @@ export default function NavWallet() {
         socket.send(
           JSON.stringify({
             type: "wallet",
-            payload: { id: session?.user._id, connectionId: connId },
+            payload: { id: session?.user.id, connectionId: connId },
           })
         );
       }, 5000);
     }
-  }, [connId, socket, session?.user._id]);
+  }, [connId, socket, session?.user.id]);
 
   return (
     <div className="relative md:text-xs text-[10px] flex items-center text-white bg-cardBG/10 sm:px-14 px-3 py-1 sm:rounded-full rounded-md whitespace-nowrap">

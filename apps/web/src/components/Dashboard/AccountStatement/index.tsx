@@ -56,7 +56,7 @@ export default function Statement() {
           }
 
           const res = await fetchAccountStatement(
-            session.data?.user._id!,
+            session.data?.user.id!,
             statementParams.type,
             statementParams.startDate,
             statementParams.endDate,

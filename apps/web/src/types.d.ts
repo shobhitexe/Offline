@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 
 type sessionUser = {
-  _id?: string;
+  id?: string;
   username?: string;
   name?: string | null | undefined;
   // token?: string;

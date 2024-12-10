@@ -12,7 +12,7 @@ export default function page() {
   const session = useSession();
 
   const { data } = useSWR<{ data: BonusType[] }>(
-    `${BackendURL}/api/bonus/mybonuses?id=${session.data?.user._id}`,
+    `${BackendURL}/api/bonus/mybonuses?id=${session.data?.user.id}`,
     fetcher
   );
 

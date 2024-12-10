@@ -23,7 +23,7 @@ async function fetchReferraldata(id: string) {
 export default async function page() {
   const session = await getServerSession(options);
 
-  const data = await fetchReferraldata(session?.user._id!);
+  const data = await fetchReferraldata(session?.user.id!);
 
   // console.log(data);
 

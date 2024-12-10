@@ -30,7 +30,7 @@ func (s *adminStore) CreateUser(ctx context.Context, tx pgx.Tx, payload models.C
 func (s *adminStore) GetUsersList(ctx context.Context, id int) (*[]models.User, error) {
 	var users []models.User
 
-	query := `SELECT id, name, username, balance, 
+	query := `SELECT id, name, username, balance, exposure, 
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM users
 	WHERE added_by = $1
@@ -46,7 +46,7 @@ func (s *adminStore) GetUsersList(ctx context.Context, id int) (*[]models.User, 
 
 	for rows.Next() {
 		var user models.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Balance, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Balance, &user.Exposure, &user.CreatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)

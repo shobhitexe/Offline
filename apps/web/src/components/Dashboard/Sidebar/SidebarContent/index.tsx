@@ -127,46 +127,6 @@ export default function SidebarContent({
             </div>
 
             <div className="sm:hidden flex flex-col gap-2">
-              <div className="flex items-center justify-between text-sm gap-2">
-                <Link
-                  onClick={() => dispatch(setSideBarOpen(false))}
-                  href={"/dashboard/wallet/deposit"}
-                  className="flex items-center justify-center gap-3 bg-sidebarButtons p-2 w-full rounded-lg bg-cardBG text-black"
-                >
-                  <DepositIcon height={25} width={25} stroke="black" />
-                  Deposit
-                </Link>
-
-                <Link
-                  href={"/dashboard/wallet/withdrawal"}
-                  onClick={() => dispatch(setSideBarOpen(false))}
-                  className="flex items-center justify-center gap-2 bg-sidebarButtons p-2 w-full rounded-lg bg-cardBG text-black"
-                >
-                  <WithdrawIcon height={25} width={25} stroke="black" />
-                  Withdrawal
-                </Link>
-              </div>
-
-              <div className="flex items-center justify-between text-sm gap-2">
-                <Link
-                  href={"/bonus/casinobonus"}
-                  onClick={() => dispatch(setSideBarOpen(false))}
-                  className="flex items-center justify-center gap-1 bg-sidebarButtons p-2 w-full rounded-lg mt-2 bg-cardBG text-black"
-                >
-                  <BonusIcon height={25} width={25} stroke="black" />
-                  Bonus
-                </Link>
-
-                <Link
-                  href={"/dashboard/referral"}
-                  onClick={() => dispatch(setSideBarOpen(false))}
-                  className="flex items-center justify-center gap-1 bg-sidebarButtons p-2 w-full rounded-lg mt-2 bg-cardBG text-black"
-                >
-                  <BonusIcon height={25} width={25} stroke="black" />
-                  Referral
-                </Link>
-              </div>
-
               <div className="flex flex-col divide-y divide-[#483B32] bg-cardBG rounded-lg text-black text-sm mt-2">
                 <Link
                   href={"/dashboard/account/settings"}

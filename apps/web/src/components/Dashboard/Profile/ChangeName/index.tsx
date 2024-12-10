@@ -15,7 +15,7 @@ export default function ChangeName() {
     <form
       onSubmit={async (e) => {
         e.preventDefault();
-        const res = await changeName(name!, session?.user._id!);
+        const res = await changeName(name!, session?.user.id!);
 
         if (res === true) {
           toast({

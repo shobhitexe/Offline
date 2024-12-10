@@ -77,10 +77,10 @@ export default function Hero() {
             </CarouselItem>
           )}
           {data?.data.map((item) => (
-            <CarouselItem key={item._id} className="relative h-full">
+            <CarouselItem key={item.id} className="relative h-full">
               <Image
                 src={item.banner}
-                alt={item._id}
+                alt={item.id}
                 width={1280}
                 height={480}
                 className={`w-full ${casinoName === "pridegains" && "min-h-[170px]"} relative max-sm:border max-sm:border-white/10 backdrop-filter backdrop-blur-md shadow-2xl rounded-xl justify-center sm:mt-3 mt-2`}

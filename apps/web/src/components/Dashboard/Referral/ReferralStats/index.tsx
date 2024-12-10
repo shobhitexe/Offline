@@ -11,7 +11,7 @@ export default function ReferralStats() {
   const { data } = useSWR<{
     data: { referred: number; totalLinkViews: number };
   }>(
-    `${BackendURL}/api/referral/total/referred?id=${session.data?.user._id}`,
+    `${BackendURL}/api/referral/total/referred?id=${session.data?.user.id}`,
     fetcher
   );
 

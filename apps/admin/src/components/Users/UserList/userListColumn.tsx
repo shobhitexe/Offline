@@ -46,7 +46,7 @@ export const userListColumn: ColumnDef<any>[] = [
     header: "Settlement(P|L)",
   },
   {
-    accessorKey: "Exposure",
+    accessorKey: "exposure",
     header: "Exposure",
   },
   {

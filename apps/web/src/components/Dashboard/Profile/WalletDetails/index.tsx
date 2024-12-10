@@ -12,7 +12,7 @@ export default function WalletDetails() {
   const session = useSession();
 
   const { data } = useSWR<{ data: InputWalletDetailsType }>(
-    `${BackendURL}/api/wallet/check/details/present?id=${session.data?.user._id}`,
+    `${BackendURL}/api/wallet/check/details/present?id=${session.data?.user.id}`,
     fetcher
   );
 

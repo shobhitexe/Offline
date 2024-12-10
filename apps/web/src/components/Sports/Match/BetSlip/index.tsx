@@ -80,7 +80,7 @@ export default function Betslip({
       setIsLoading(true);
       const res = await submitBetAction(
         eventId,
-        session.data?.user._id!,
+        session.data?.user.id!,
         price,
         rate,
         betType,

@@ -33,7 +33,7 @@ async function getGameData(providerName: string, gameId: string) {
   const isDesktop = agent?.includes("Windows");
   const session = await getServerSession(options);
 
-  const balance = await getBalance(session?.user._id!);
+  const balance = await getBalance(session?.user.id!);
 
   const data = {
     providerName,

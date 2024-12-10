@@ -54,7 +54,7 @@ export default function PlaceBet() {
             }
 
             const res = await placeBet(
-              session.data?.user._id!,
+              session.data?.user.id!,
               Number(amount),
               betType,
               walletType
