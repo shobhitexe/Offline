@@ -50,6 +50,13 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 			r.Post("/block", h.ChangeUserBlockStatus)
 		})
 
+		// sports
+		r.Route("/sports", func(r chi.Router) {
+
+			r.Get("/list/activebets", h.GetActiveBetsListByMarketID)
+
+		})
+
 	})
 
 }

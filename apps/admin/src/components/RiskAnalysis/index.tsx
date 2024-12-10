@@ -67,7 +67,10 @@ export default function RiskAnalysis({ events }: { events: EventType[] }) {
                 </div>
               </div>
               {expandedMatches.includes(event.eventId) && event.MatchOdds && (
-                <ExpandedRiskAnalysis />
+                <ExpandedRiskAnalysis
+                  eventId={event.eventId}
+                  marketId={event.MatchOdds.MarketId}
+                />
               )}
             </div>
           ))}

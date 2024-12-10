@@ -56,7 +56,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 
 	for rows.Next() {
 		var event models.ActiveEvents
-		if err := rows.Scan(&event.EventName, &event.EventId, &event.CompetitionId, &event.MatchOdds.Runners, &event.EventTime); err != nil {
+		if err := rows.Scan(&event.EventName, &event.EventId, &event.CompetitionId, &event.MatchOdds, &event.EventTime); err != nil {
 			return nil, err
 		}
 		events = append(events, event)
@@ -191,7 +191,7 @@ func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.Activ
 		payload.EventName,
 		payload.EventId,
 		payload.CompetitionId,
-		payload.MatchOdds.Runners,
+		payload.MatchOdds,
 		payload.EventTime,
 	)
 

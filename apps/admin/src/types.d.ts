@@ -37,6 +37,7 @@ type EventType = {
   eventId: string;
   eventTime: string;
   MatchOdds: {
+    MarketId: string;
     Runners: Array<Runner>;
   };
 };

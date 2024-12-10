@@ -23,6 +23,7 @@ type AdminStore interface {
 	AdminAgentStore
 	AdminWalletStore
 	AdminUserStore
+	AdminSportsStore
 }
 
 type adminStore struct {

@@ -92,3 +92,10 @@ type RunnerResult struct {
 	MarketName string
 	Status     string
 }
+
+type ActiveExposureByTeam struct {
+	Team       string  `json:"team"`
+	Exposure   float64 `json:"exposure"`
+	BetType    string  `json:"betType"`
+	MarketType string  `json:"marketType"`
+}
