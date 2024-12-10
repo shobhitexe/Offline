@@ -24,6 +24,8 @@ func RegisterSportsRoutes(r chi.Router, h *handlers.SportsHandler) {
 
 		r.Post("/placebet", h.PlaceBet)
 
+		r.Get("/bethistory/pergame", h.BetHistoryPerGame)
+
 	})
 
 }

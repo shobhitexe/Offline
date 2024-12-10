@@ -4,7 +4,7 @@ import { EventType } from "@/types";
 
 async function getData() {
   try {
-    const res = await fetch(`${BackendURL}/api/v1/sports/getActiveEvents?id=4`);
+    const res = await fetch(`${BackendURL}/api/v1/sports/getActiveEvents?id=2`);
 
     if (res.status !== 200) {
       return [];
@@ -23,7 +23,7 @@ export default async function page() {
 
   return (
     <div>
-      <div className="text-lg font-bold">Cricket</div>
+      <div className="text-lg font-bold">Tennis</div>
 
       <div>Featured Matches</div>
 

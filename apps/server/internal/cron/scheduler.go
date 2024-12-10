@@ -67,7 +67,7 @@ func (c *Cron) StartCron(ctx context.Context) {
 		for {
 			select {
 			case <-ticker.C:
-				taskCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+				taskCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 				defer cancel()
 
 				if err := c.UpdateMatchOdds(taskCtx); err != nil {

@@ -2,6 +2,7 @@ import { Market } from "@/types";
 import { Button } from "@repo/ui";
 import MarketTableComponent from "./MarketTable";
 import FancyTableComponent from "./FancyTable";
+import BetHistory from "../BetHistory";
 
 export default function MatchTable({
   matchOdds,
@@ -21,7 +22,7 @@ export default function MatchTable({
   tabType: string;
 }) {
   return (
-    <div className="flex flex-col gap-5 w-full">
+    <div className="flex flex-col gap-5 w-full relative">
       <div className="space-y-4">
         {(tabType === "all" || tabType === "market") && (
           <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-2">
@@ -58,7 +59,7 @@ export default function MatchTable({
 
         {(tabType === "all" || tabType === "market") && <BreakLine />}
 
-        {(tabType === "all" || tabType === "market") && (
+        {(tabType === "all" || tabType === "market") && Bookmaker && (
           <MarketTableComponent
             data={Bookmaker}
             eventId={eventId}
@@ -68,9 +69,12 @@ export default function MatchTable({
           />
         )}
 
-        {tabType === "all" && Fancy.runners.length !== 0 && <BreakLine />}
+        {tabType === "all" && Fancy && Fancy.runners.length !== 0 && (
+          <BreakLine />
+        )}
 
         {(tabType === "all" || tabType === "fancy") &&
+          Fancy &&
           Fancy.runners.length !== 0 && (
             <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-2">
               <div></div>
@@ -93,6 +97,7 @@ export default function MatchTable({
           )}
 
         {(tabType === "all" || tabType === "fancy") &&
+          Fancy &&
           Fancy.runners.length !== 0 && (
             <FancyTableComponent
               data={Fancy}
@@ -103,6 +108,8 @@ export default function MatchTable({
             />
           )}
       </div>
+
+      <BetHistory eventId={eventId} />
     </div>
   );
 }

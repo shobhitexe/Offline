@@ -19,6 +19,18 @@ export default function SportsSidebar() {
           Cricket <ArrowRight />
         </div>
       </Link>
+
+      <Link href={"/sports/tennis"} className="mt-2">
+        <div className="bg-[#232325] p-3 rounded-md cursor-pointer flex items-center justify-between">
+          Tennis <ArrowRight />
+        </div>
+      </Link>
+
+      <Link href={"/sports/football"} className="mt-2">
+        <div className="bg-[#232325] p-3 rounded-md cursor-pointer flex items-center justify-between">
+          Football <ArrowRight />
+        </div>
+      </Link>
     </nav>
   );
 }

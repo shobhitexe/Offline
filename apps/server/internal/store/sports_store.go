@@ -16,11 +16,12 @@ type SportsStore interface {
 	PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error
 	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
 	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID string) (*[]models.ActiveBet, error)
-	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents) error
+	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents, id string) error
 	TransferUserBalanceToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
 	BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, id string) error
 	BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error
 	ChangeActiveBetStatus(ctx context.Context, id string) error
+	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
 }
 
 type sportsStore struct {
@@ -44,12 +45,13 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 	FROM 
 		active_events
 	WHERE 
-		sports_id = $1 AND status = 'active'
-`
+		sports_id = $1 AND status = 'active' AND is_declared = false`
 
 	rows, err := s.db.Query(ctx, query, id)
 
 	if err != nil {
+
+		log.Println(err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -181,13 +183,13 @@ func (s *sportsStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, 
 	return &allbets, nil
 }
 
-func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.ActiveEvents) error {
+func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.ActiveEvents, id string) error {
 
 	query := `INSERT INTO active_events 
 	(sports_id, match_name, event_id, competition_id, match_odds_runners, opening_time) 
 	VALUES ($1, $2, $3, $4, $5, $6)`
 
-	_, err := s.db.Exec(ctx, query, 4,
+	_, err := s.db.Exec(ctx, query, id,
 		payload.EventName,
 		payload.EventId,
 		payload.CompetitionId,
@@ -228,4 +230,29 @@ func (s *sportsStore) ChangeActiveBetStatus(ctx context.Context, id string) erro
 	}
 
 	return nil
+}
+
+func (s *sportsStore) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error) {
+
+	var history []models.BetHistoryPerGame
+
+	query := `SELECT 
+	runner_name, odds_rate, exposure, profit, bet_type 
+	FROM sport_bets WHERE user_id = $1 AND event_id = $2
+	ORDER BY created_at DESC`
+
+	rows, err := s.db.Query(ctx, query, userId, eventId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var row models.BetHistoryPerGame
+		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType)
+
+		history = append(history, row)
+	}
+
+	return &history, nil
 }

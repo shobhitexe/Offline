@@ -99,3 +99,11 @@ type ActiveExposureByTeam struct {
 	BetType    string  `json:"betType"`
 	MarketType string  `json:"marketType"`
 }
+
+type BetHistoryPerGame struct {
+	Selection string  `json:"selection"`
+	Odds      float64 `json:"odds"`
+	Stake     float64 `json:"stake"`
+	PNL       float64 `json:"pnl"`
+	BetType   string  `json:"betType"`
+}

@@ -1,6 +1,8 @@
 import { Market } from "@/types";
 import Betslip from "../BetSlip";
 
+import { ArrowRight } from "lucide-react";
+
 export default function MarketTableComponent({
   data,
   eventId,
@@ -33,7 +35,9 @@ export default function MarketTableComponent({
             <span className="text-white whitespace-nowrap">
               {item.RunnerName}
             </span>
-            <span className="text-green-500">{item.Status}</span>
+            <span className="text-green-500 flex items-center gap-2 text-sm">
+              <ArrowRight className="w-4 h-4" /> 0
+            </span>
           </div>
           <div className="col-span-3 max-ss:hidden"></div>
 

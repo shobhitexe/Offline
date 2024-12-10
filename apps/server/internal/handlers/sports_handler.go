@@ -59,7 +59,14 @@ func (h *SportsHandler) GetEventDetail(w http.ResponseWriter, r *http.Request) {
 
 func (h *SportsHandler) SaveActiveEvents(w http.ResponseWriter, r *http.Request) {
 
-	if err := h.service.SaveActiveEvents(r.Context()); err != nil {
+	id := r.URL.Query().Get("id")
+
+	if len(id) == 0 || id == "" {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch id provided", Data: false})
+		return
+	}
+
+	if err := h.service.SaveActiveEvents(r.Context(), id); err != nil {
 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: err.Error()})
 		return
 	}
@@ -84,6 +91,34 @@ func (h *SportsHandler) PlaceBet(w http.ResponseWriter, r *http.Request) {
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Bet Placed", Data: true})
 
+}
+
+func (h *SportsHandler) BetHistoryPerGame(w http.ResponseWriter, r *http.Request) {
+
+	params := r.URL.Query()
+
+	userId := params.Get("userId")
+
+	if len(userId) == 0 || userId == "" {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "No user id provided", Data: false})
+		return
+	}
+
+	eventId := params.Get("eventId")
+
+	if len(eventId) == 0 || eventId == "" {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "No event id provided", Data: false})
+		return
+	}
+
+	data, err := h.service.BetHistoryPerGame(r.Context(), userId, eventId)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch bets", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: data})
 }
 
 // func (h *SportsHandler) GetList(w http.ResponseWriter, r *http.Request) {

@@ -57,42 +57,6 @@ export default async function Navbar() {
               <div className="flex items-center gap-5">
                 <div className="sm:flex hidden">
                   {" "}
-                  <Link
-                    href={
-                      chatSupportEnabled.includes(
-                        process.env.NEXT_PUBLIC_CASINO_NAME as string
-                      )
-                        ? `javascript:void(Tawk_API.toggle())`
-                        : `https://wa.me/+91${process.env.NEXT_PUBLIC_SUPPORT_NUMBER}`
-                    }
-                    target={
-                      chatSupportEnabled.includes(
-                        process.env.NEXT_PUBLIC_CASINO_NAME as string
-                      )
-                        ? "_self"
-                        : "_blank"
-                    }
-                    rel="noopener noreferrer"
-                    className="px-2 py-1 rounded-lg flex items-center gap-2"
-                  >
-                    <SupportIcon />
-                    <div className="text-sm text-white">Support</div>
-                  </Link>
-                </div>
-                <Link
-                  href={"/bonus/casinobonus"}
-                  className="items-center gap-2 sm:flex hidden cursor-pointer"
-                >
-                  <Image
-                    src={"/images/navbar/bonus.png"}
-                    alt={"promotion"}
-                    width={24}
-                    height={24}
-                  />
-                  <div className="text-sm">Bonus</div>
-                </Link>
-                <div className="sm:flex hidden">
-                  {" "}
                   <Link href="/sports" className="px-2 py-1 rounded-lg">
                     <div className="flex items-center gap-2">
                       <SportsIcon />

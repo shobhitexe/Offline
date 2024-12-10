@@ -26,16 +26,16 @@ export const DropDownItems = [
     icon: SettingsIcon,
     link: "/dashboard/account/settings",
   },
-  {
-    title: "Bonus",
-    icon: BonusIcon,
-    link: "/bonus/casinobonus",
-  },
-  {
-    title: "Referral",
-    icon: BonusIcon,
-    link: "/dashboard/referral",
-  },
+  // {
+  //   title: "Bonus",
+  //   icon: BonusIcon,
+  //   link: "/bonus/casinobonus",
+  // },
+  // {
+  //   title: "Referral",
+  //   icon: BonusIcon,
+  //   link: "/dashboard/referral",
+  // },
   // {
   //   title: "Deposit",
   //   icon: DepositIcon,

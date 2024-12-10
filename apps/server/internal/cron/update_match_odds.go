@@ -16,8 +16,8 @@ import (
 
 func (c *Cron) UpdateMatchOdds(ctx context.Context) error {
 	keys := []string{
-		// "sports:activeEvents:1",
-		// "sports:activeEvents:2",
+		"sports:activeEvents:1",
+		"sports:activeEvents:2",
 		"sports:activeEvents:4",
 	}
 
@@ -85,7 +85,8 @@ func (c *Cron) processEventsForKey(ctx context.Context, key string) error {
 	return nil
 }
 func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, event models.ActiveEvents) error {
-	url := "https://leisurebuzz.in/api/v2/competition/getEventDetail/" + event.EventId
+
+	url := "https://alp.playunlimited9.co.in/api/v2/competition/getEventDetail/" + event.EventId
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -113,12 +114,13 @@ func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, event models.Activ
 	}
 
 	setKey := "sports:eventDetails:" + event.EventId
-	err = c.redis.Set(ctx, setKey, body, 24*time.Hour).Err()
+	err = c.redis.Set(ctx, setKey, string(body), 24*time.Hour).Err()
 	if err != nil {
 		log.Printf("Error caching event details for %s: %v", event.EventId, err)
 		return err
 	}
 
 	// log.Printf("Successfully cached details for event %s", event.EventId)
+
 	return nil
 }

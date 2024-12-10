@@ -20,8 +20,9 @@ type SportsService interface {
 	// GetMarketList(id string) (interface{}, error)
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
-	SaveActiveEvents(ctx context.Context) error
+	SaveActiveEvents(ctx context.Context, id string) error
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
+	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
 }
 
 type sportsService struct {
@@ -72,9 +73,9 @@ func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]mode
 	return events, nil
 }
 
-func (s *sportsService) SaveActiveEvents(ctx context.Context) error {
+func (s *sportsService) SaveActiveEvents(ctx context.Context, id string) error {
 
-	r, err := http.Get("https://leisurebuzz.in/api/v2/competition/getMarketList/4")
+	r, err := http.Get("https://alp.playunlimited9.co.in/api/v2/competition/getMarketList/" + id)
 
 	if err != nil {
 		return err
@@ -95,7 +96,7 @@ func (s *sportsService) SaveActiveEvents(ctx context.Context) error {
 	}
 
 	for _, event := range events {
-		if err := s.store.SaveActiveEvents(ctx, event); err != nil {
+		if err := s.store.SaveActiveEvents(ctx, event, id); err != nil {
 			log.Printf("Failed to save event : %v", err)
 			return err
 		}
@@ -171,6 +172,17 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 	}
 
 	return nil
+}
+
+func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error) {
+
+	d, err := s.store.BetHistoryPerGame(ctx, userId, eventId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
 }
 
 // func (s *sportsService) GetList(id string) (interface{}, error) {

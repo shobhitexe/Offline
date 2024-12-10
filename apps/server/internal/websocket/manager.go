@@ -69,12 +69,12 @@ func sendMatchDetails(event Event, c *Client) error {
 		return err
 	}
 
-	broadMessage := models.Response{
+	broadcastMessage := models.Response{
 		Message: "Details Fetched",
 		Data:    d,
 	}
 
-	data, err := json.Marshal(broadMessage)
+	data, err := json.Marshal(broadcastMessage)
 
 	if err != nil {
 		return fmt.Errorf("failed to marshal broadcast message: %v", err)
