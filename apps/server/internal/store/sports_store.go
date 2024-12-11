@@ -125,7 +125,7 @@ func (s *sportsStore) TransferBetValueToExposure(ctx context.Context, tx pgx.Tx,
 
 	query := `
 	UPDATE users 
-	exposure = exposure + $1
+	SET exposure = exposure + $1
 	WHERE id = $2 AND balance >= $1
 `
 
