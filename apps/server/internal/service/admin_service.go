@@ -20,6 +20,7 @@ type AdminService interface {
 	AdminWalletService
 	AdminUserService
 	AdminSportsService
+	AdminReportsService
 }
 
 type adminService struct {

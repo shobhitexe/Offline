@@ -1,4 +1,4 @@
-import { BetHistoryPerGame, GroupedBetHistoryPerGame, Market } from "@/types";
+import { BetHistoryPerGame, GroupedBetHistoryPerGame } from "@repo/types";
 import { Button } from "@repo/ui";
 import MarketTableComponent from "./MarketTable";
 import FancyTableComponent from "./FancyTable";
@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { BackendURL } from "@/config/env";
 import fetcher from "@/lib/data/setup";
 import useSWR from "swr";
+import { Market } from "@/types";
 
 export default function MatchTable({
   matchOdds,

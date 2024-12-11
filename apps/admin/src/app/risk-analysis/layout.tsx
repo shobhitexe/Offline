@@ -1,7 +1,6 @@
 import { PageHeading } from "@/components";
 
 import { ReactNode } from "react";
-import Tabs from "./Tabs";
 
 export default function layout({ children }: { children: ReactNode }) {
   return (

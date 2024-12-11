@@ -5,7 +5,7 @@ import Tabs from "../Tabs";
 
 async function getData() {
   try {
-    const res = await universalGET("/sports/getActiveEvents?id=4");
+    const res = await universalGET("/sports/inplay");
 
     if (!res.data) {
       return [];
@@ -18,13 +18,19 @@ async function getData() {
 }
 
 export default async function page() {
-  const data: EventType[] = await getData();
+  const data: {
+    cricket: EventType[];
+    tennis: EventType[];
+    football: EventType[];
+  } = await getData();
 
   return (
     <div className="w-full flex flex-col gap-5">
       <Tabs />
 
-      <RiskAnalysis events={data} />
+      <RiskAnalysis events={data.cricket} heading="Cricket" />
+      <RiskAnalysis events={data.tennis} heading="Tennis" />
+      <RiskAnalysis events={data.football} heading="Football" />
     </div>
   );
 }

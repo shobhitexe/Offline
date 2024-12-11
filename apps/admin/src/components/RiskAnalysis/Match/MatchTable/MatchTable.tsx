@@ -2,6 +2,11 @@ import { Market } from "@/types";
 import { Button } from "@repo/ui";
 import MarketTableComponent from "./MarketTable";
 import FancyTableComponent from "./FancyTable";
+import useSWR from "swr";
+import fetcher from "@/lib/setup";
+
+import { BetHistoryPerGame, GroupedBetHistoryPerGame } from "@repo/types";
+import { da } from "react-day-picker/locale";
 
 export default function MatchTable({
   matchOdds,
@@ -20,6 +25,10 @@ export default function MatchTable({
   marketId: string;
   tabType: string;
 }) {
+  const { data } = useSWR<{
+    data: { history: BetHistoryPerGame[]; grouped: GroupedBetHistoryPerGame };
+  }>(`/admin/sports/bethistory/pergame?eventId=${eventId}`, fetcher);
+
   return (
     <div className="flex flex-col gap-5 w-full">
       <div className="space-y-4">
@@ -52,6 +61,7 @@ export default function MatchTable({
           matchName={matchName}
           marketId={marketId}
           type="Match Odds"
+          bets={data?.data.grouped.MatchOdds}
         />
         <BreakLine />
         <MarketTableComponent

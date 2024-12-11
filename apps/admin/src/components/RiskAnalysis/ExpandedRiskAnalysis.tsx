@@ -1,72 +1,107 @@
 import fetcher from "@/lib/setup";
+import { useSession } from "next-auth/react";
 import useSWR from "swr";
 
-type ActiveBetsByMarketId = {
-  "Match Odds": Record<string, number>;
+type GroupedBetHistoryPerGame = {
   Bookmaker: Record<string, number>;
   Fancy: Record<string, number>;
+  MatchOdds: Record<string, number>;
 };
 
-export default function ExpandedRiskAnalysis({
-  eventId,
-  marketId,
-}: {
-  eventId: string;
-  marketId: string;
-}) {
-  const { data, isLoading, error } = useSWR<{ data: ActiveBetsByMarketId }>(
-    `/admin/sports/list/activebets?eventId=${eventId}&marketId=${marketId}`,
+export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
+  const session = useSession();
+
+  const { data, isLoading, error } = useSWR<{ data: GroupedBetHistoryPerGame }>(
+    `/admin/sports/list/activebets?eventId=${eventId}`,
     fetcher
   );
 
   if (isLoading) {
-    return <div className="p-4">Loading...</div>;
+    return <div className="p-4 text-center text-gray-500">Loading...</div>;
   }
 
   if (error) {
-    return <div className="p-4 text-red-500">Failed to fetch data</div>;
+    return (
+      <div className="p-4 text-center text-red-500">Failed to fetch data</div>
+    );
   }
 
-  if (!data?.data || Object.keys(data.data).length === 0) {
-    return <div className="p-4">No data available.</div>;
+  function reverseSign(num: number) {
+    return -num;
   }
+
+  const matchOdds = data?.data.MatchOdds || {};
+  const bookmaker = data?.data.Bookmaker || {};
+  const fancy = data?.data.Fancy || {};
 
   return (
-    <div className="p-4 border-t w-full">
-      {Object.entries(data.data).map(([category, teams]) => (
-        <div
-          key={category}
-          className="border rounded-lg sm:mb-4 mb-1 flex sm:flex-row flex-col items-center justify-between"
-        >
-          <div className="flex justify-between items-center sm:p-4 p-2 bg-gray-100 rounded-t">
-            <h3 className="font-semibold">{category}</h3>
-          </div>
+    <div className="p-4 border-t w-full text-sm">
+      {Object.keys(matchOdds).length === 0 &&
+        Object.keys(bookmaker).length === 0 && (
+          <h2 className="text-base font-bold mb-4">No Data yet</h2>
+        )}
 
-          <div className="sm:p-4 p-2">
-            {Object.keys(teams).length === 0 ? (
-              <p className="text-gray-500">No exposures in this category.</p>
-            ) : (
-              <div className="sm:flex grid grid-cols-2 w-full items-center gap-1">
-                {Object.entries(teams).map(([team, exposure]) => (
-                  <div
-                    key={team}
-                    className="flex sm:flex-row flex-col sm:gap-5 gap-1 justify-between items-center bg-white shadow-sm border rounded p-2"
-                  >
-                    <div className="font-medium">{team}</div>
-                    <div
-                      className={`font-bold ${
-                        exposure >= 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {exposure}
-                    </div>
-                  </div>
-                ))}
+      {Object.keys(matchOdds).length > 0 && (
+        <div className="mb-6">
+          <h3 className="font-semibold mb-2">Match Odds</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {Object.keys(matchOdds).map((item) => (
+              <div
+                key={item}
+                className={`flex justify-between p-2 text-white rounded border shadow-sm`}
+              >
+                <span className="font-medium text-black">{item}</span>
+                <span
+                  className={`${reverseSign(matchOdds[item]) >= 0 ? "text-green-500" : "text-red-500"}`}
+                >
+                  {(
+                    reverseSign(matchOdds[item]) *
+                    (session.data?.user.sportsShare! / 100)
+                  ).toFixed(2)}
+                </span>
               </div>
-            )}
+            ))}
           </div>
         </div>
-      ))}
+      )}
+      {Object.keys(bookmaker).length > 0 && (
+        <div className="mb-6">
+          <h3 className="font-semibold mb-2">Bookmaker</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {Object.keys(bookmaker).map((item) => (
+              <div
+                key={item}
+                className={`flex justify-between p-2 text-white rounded border shadow-sm`}
+              >
+                <span className="font-medium text-black">{item}</span>
+                <span
+                  className={`${reverseSign(bookmaker[item]) >= 0 ? "text-green-500" : "text-red-500"}`}
+                >
+                  {(
+                    reverseSign(bookmaker[item]) *
+                    (session.data?.user.sportsShare! / 100)
+                  ).toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* <div>
+        <h3 className="text-md font-semibold mb-2">Fancy</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {Object.keys(fancy).map((item) => (
+            <div
+              key={item}
+              className="flex justify-between bg-gray-100 p-2 rounded shadow-sm"
+            >
+              <span className="font-medium text-gray-700">{item}</span>
+              <span className="text-gray-900">{fancy[item]}</span>
+            </div>
+          ))}
+        </div>
+      </div> */}
     </div>
   );
 }

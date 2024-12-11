@@ -52,9 +52,13 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 
 		// sports
 		r.Route("/sports", func(r chi.Router) {
-
 			r.Get("/list/activebets", h.GetActiveBetsListByMarketID)
+			r.Get("/bethistory/pergame", h.BetHistoryPerGame)
+		})
 
+		//reports
+		r.Route("/report", func(r chi.Router) {
+			r.Get("/balancesheet", h.GetBalanceSheetReport)
 		})
 
 	})

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"server/internal/models"
 	"server/internal/store"
-	"sort"
+	"server/pkg/utils"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -167,7 +167,7 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 		exposure = (payload.OddsRate - 1) * float64(payload.Amount)
 	}
 
-	if err := s.store.TransferUserBalanceToExposure(ctx, tx, payload.UserId, exposure); err != nil {
+	if err := s.store.TransferBetValueToExposure(ctx, tx, payload.UserId, exposure); err != nil {
 		return fmt.Errorf("Failed to transfer user balance :%w", err)
 	}
 
@@ -184,7 +184,7 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 
 func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error) {
 
-	d, err := s.store.BetHistoryPerGame(ctx, userId, eventId)
+	d, err := s.store.BetHistoryPerGamePerUser(ctx, userId, eventId)
 
 	if err != nil {
 		return nil, models.GroupedData{}, err
@@ -211,8 +211,8 @@ func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId s
 	// close(matchOddsChan)
 	// close(bookmakerChan)
 
-	matchOddsResults := calculateMatchOddsResults(d, "Match Odds")
-	bookmakerResults := calculateMatchOddsResults(d, "Bookmaker")
+	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds")
+	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker")
 
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
@@ -220,50 +220,6 @@ func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId s
 	}
 
 	return d, grouped, nil
-}
-
-func calculateMatchOddsResults(bets *[]models.BetHistoryPerGame, marketType string) map[string]float64 {
-
-	runnerSet := make(map[string]struct{})
-	runners := []string{}
-
-	for _, bet := range *bets {
-		if _, exists := runnerSet[bet.Selection]; !exists {
-			runners = append(runners, bet.Selection)
-			runnerSet[bet.Selection] = struct{}{}
-		}
-	}
-
-	sort.Strings(runners)
-
-	results := make(map[string]float64)
-	for _, runner := range runners {
-		results[runner] = 0
-	}
-
-	for _, bet := range *bets {
-		if bet.MarketName != marketType {
-			continue
-		}
-
-		if bet.BetType == "back" {
-			results[bet.Selection] += bet.PNL
-			for _, runner := range runners {
-				if runner != bet.Selection {
-					results[runner] -= bet.Stake
-				}
-			}
-		} else if bet.BetType == "lay" {
-			results[bet.Selection] -= bet.Stake
-			for _, runner := range runners {
-				if runner != bet.Selection {
-					results[runner] += bet.PNL
-				}
-			}
-		}
-	}
-
-	return results
 }
 
 func (s *sportsService) GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error) {

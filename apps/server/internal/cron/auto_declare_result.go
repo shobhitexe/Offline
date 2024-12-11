@@ -88,14 +88,26 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 			case "WINNER":
 				if bet.BetType == "back" {
 					err = c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
+					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "win"); err != nil {
+						return err
+					}
 				} else if bet.BetType == "lay" {
 					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
+					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "loss"); err != nil {
+						return err
+					}
 				}
 			case "LOSER":
 				if bet.BetType == "back" {
 					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
+					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "win"); err != nil {
+						return err
+					}
 				} else if bet.BetType == "lay" {
 					err = c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
+					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "loss"); err != nil {
+						return err
+					}
 				}
 			default:
 				log.Printf("Unrecognized result status: %s for event %s", result.Status, result.EventID)
@@ -103,10 +115,6 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 			}
 
 			if err != nil {
-				return err
-			}
-
-			if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID); err != nil {
 				return err
 			}
 

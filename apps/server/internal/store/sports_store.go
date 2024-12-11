@@ -17,11 +17,11 @@ type SportsStore interface {
 	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
 	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error)
 	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents, id string) error
-	TransferUserBalanceToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
+	TransferBetValueToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
 	BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, id string) error
 	BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error
-	ChangeActiveBetStatus(ctx context.Context, id string) error
-	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
+	ChangeActiveBetStatus(ctx context.Context, id, result string) error
+	BetHistoryPerGamePerUser(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
 	GetInPlayEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 }
 
@@ -121,11 +121,11 @@ func (s *sportsStore) FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id st
 	return Eventid, nil
 }
 
-func (s *sportsStore) TransferUserBalanceToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error {
+func (s *sportsStore) TransferBetValueToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error {
 
 	query := `
 	UPDATE users 
-	SET balance = balance - $1, exposure = exposure + $1 
+	exposure = exposure + $1
 	WHERE id = $2 AND balance >= $1
 `
 
@@ -244,26 +244,27 @@ func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.Activ
 }
 
 func (s *sportsStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, userID string) error {
-	query := `UPDATE users SET balance = balance + $1, exposure = exposure - $2 WHERE id = $3`
+	query := `UPDATE users SET settlement = settlement + $1, exposure = exposure - $2 WHERE id = $3`
 	if _, err := s.db.Exec(ctx, query, profit, exposure, userID); err != nil {
-		return fmt.Errorf("failed to update balance and exposure for user %s: %w", userID, err)
+		return fmt.Errorf("failed to update settlement and exposure for user %s: %w", userID, err)
 	}
+
 	return nil
 }
 
 func (s *sportsStore) BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error {
-	query := `UPDATE users SET exposure = exposure - $1 WHERE id = $2`
+	query := `UPDATE users SET exposure = exposure - $1, settlement = settlement - $1 WHERE id = $2`
 	if _, err := s.db.Exec(ctx, query, exposure, userID); err != nil {
 		return fmt.Errorf("failed to update balance and exposure for user %s: %w", userID, err)
 	}
 	return nil
 }
 
-func (s *sportsStore) ChangeActiveBetStatus(ctx context.Context, id string) error {
+func (s *sportsStore) ChangeActiveBetStatus(ctx context.Context, id, result string) error {
 
-	query := `UPDATE sport_bets SET settled = true WHERE id = $1`
+	query := `UPDATE sport_bets SET settled = true, result = $1 WHERE id = $2`
 
-	if _, err := s.db.Exec(ctx, query, id); err != nil {
+	if _, err := s.db.Exec(ctx, query, result, id); err != nil {
 		return fmt.Errorf("failed to status for bet %s: %w", id, err)
 
 	}
@@ -271,7 +272,7 @@ func (s *sportsStore) ChangeActiveBetStatus(ctx context.Context, id string) erro
 	return nil
 }
 
-func (s *sportsStore) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error) {
+func (s *sportsStore) BetHistoryPerGamePerUser(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error) {
 
 	var history []models.BetHistoryPerGame
 

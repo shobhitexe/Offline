@@ -2,41 +2,60 @@ package store
 
 import (
 	"context"
-	"log"
 	"server/internal/models"
 )
 
 type AdminSportsStore interface {
-	GetActiveBetsListByMarketID(ctx context.Context, eventId, marketId string) (*[]models.ActiveExposureByTeam, error)
+	GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error)
+	BetHistoryPerGame(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error)
 }
 
-func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId, marketId string) (*[]models.ActiveExposureByTeam, error) {
+func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {
 
-	var list []models.ActiveExposureByTeam
+	var history []models.BetHistoryPerGame
 
-	query := `SELECT runner_name, exposure, bet_type, market_type
-	FROM sport_bets 
-	WHERE event_id = $1 AND market_id = $2`
+	query := `SELECT 
+	runner_name, odds_rate, exposure, profit, bet_type, market_type, runner_id 
+	FROM sport_bets WHERE event_id = $1 AND settled = false
+	ORDER BY created_at DESC`
 
-	rows, err := s.db.Query(ctx, query, eventId, marketId)
+	rows, err := s.db.Query(ctx, query, eventId)
 
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
-	defer rows.Close()
 
 	for rows.Next() {
-		var bet models.ActiveExposureByTeam
-		if err := rows.Scan(&bet.Team, &bet.Exposure, &bet.BetType, &bet.MarketType); err != nil {
-			return nil, err
-		}
-		list = append(list, bet)
+		var row models.BetHistoryPerGame
+		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId)
+
+		history = append(history, row)
 	}
 
-	if err := rows.Err(); err != nil {
+	return &history, nil
+}
+
+func (s *adminStore) BetHistoryPerGame(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {
+
+	var history []models.BetHistoryPerGame
+
+	query := `SELECT 
+	runner_name, odds_rate, exposure, profit, bet_type, market_type, runner_id 
+	FROM sport_bets WHERE event_id = $1 AND settled = false
+	ORDER BY created_at DESC`
+
+	rows, err := s.db.Query(ctx, query, eventId)
+
+	if err != nil {
 		return nil, err
 	}
 
-	return &list, nil
+	for rows.Next() {
+		var row models.BetHistoryPerGame
+		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId)
+
+		history = append(history, row)
+	}
+
+	return &history, nil
 }

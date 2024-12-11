@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"server/internal/models"
-	"strconv"
 )
 
 func (h *AdminHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -16,6 +16,8 @@ func (h *AdminHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.CreateUser(r.Context(), payload); err != nil {
+
+		log.Println(err.Error())
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
 		return
 	}
@@ -51,17 +53,7 @@ func (h *AdminHandler) GetUsersList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_id, err := strconv.Atoi(id)
-
-	if err != nil {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
-			Message: "Failed, error converting to int",
-			Data:    "[]",
-		})
-		return
-	}
-
-	list, err := h.service.UsersList(r.Context(), _id)
+	list, err := h.service.UsersList(r.Context(), id)
 
 	if err != nil {
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed", Data: err.Error()})

@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS admins (
   name TEXT NOT NULL,
   password TEXT NOT NULL,
   balance NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-  exposure NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
   added_by INTEGER, 
   child_level INT NOT NULL CHECK (child_level IN (1, 2, 3, 4, 5, 6, 7, 8)),
   sports_share INT DEFAULT 0 CHECK (sports_share <= 100) NOT NULL,
@@ -29,6 +28,8 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   password TEXT NOT NULL,
   balance NUMERIC NOT NULL DEFAULT 0.0,
+  exposure NUMERIC NOT NULL DEFAULT 0.0,
+  settlement NUMERIC NOT NULL DEFAULT 0.0,
   market_commission INT NOT NULL,
   session_commission INT NOT NULL,
   added_by INTEGER,   
@@ -37,22 +38,22 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL
 );
 
-CREATE OR REPLACE FUNCTION notify_balance_update() 
-RETURNS trigger AS $$
-BEGIN
-  IF NEW.balance <> OLD.balance THEN
-    PERFORM pg_notify('balance_update', 
-                      'User ID: ' || NEW.id || ', New Balance: ' || NEW.balance);
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION notify_balance_update() 
+-- RETURNS trigger AS $$
+-- BEGIN
+--   IF NEW.balance <> OLD.balance THEN
+--     PERFORM pg_notify('balance_update', 
+--                       'User ID: ' || NEW.id || ', New Balance: ' || NEW.balance);
+--   END IF;
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 
-CREATE TRIGGER balance_update_trigger
-AFTER UPDATE OF balance ON users
-FOR EACH ROW
-EXECUTE FUNCTION notify_balance_update();
+-- CREATE TRIGGER balance_update_trigger
+-- AFTER UPDATE OF balance ON users
+-- FOR EACH ROW
+-- EXECUTE FUNCTION notify_balance_update();
 -- +goose StatementEnd
 
 -- +goose StatementBegin
@@ -132,6 +133,7 @@ CREATE TABLE IF NOT EXISTS sport_bets (
   profit NUMERIC(12, 2) NOT NULL CHECK (profit > 0), 
   exposure NUMERIC(12, 2) NOT NULL DEFAULT 0.0 CHECK (exposure >= 0),
   settled BOOLEAN DEFAULT FALSE,
+  result TEXT CHECK(result IN ('win','loss')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_match_id FOREIGN KEY (match_id) REFERENCES active_events(id) ON DELETE CASCADE,

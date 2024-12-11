@@ -2,31 +2,47 @@ package service
 
 import (
 	"context"
+	"server/internal/models"
+	"server/pkg/utils"
 )
 
 type AdminSportsService interface {
-	GetActiveBetsListByMarketID(ctx context.Context, eventId, marketId string) (map[string]map[string]float64, error)
+	GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error)
+	GetBetHistoryPerGame(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
 }
 
-func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId, marketId string) (map[string]map[string]float64, error) {
-	bets, err := s.store.GetActiveBetsListByMarketID(ctx, eventId, marketId)
+func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error) {
+	bets, err := s.store.GetActiveBetsListByMarketID(ctx, eventId)
 	if err != nil {
-		return nil, err
+		return models.GroupedData{}, err
 	}
 
-	result := make(map[string]map[string]float64)
+	matchOddsResults := utils.CalculateActiveBetsOdds(bets, "Match Odds")
+	bookmakerResults := utils.CalculateActiveBetsOdds(bets, "Bookmaker")
 
-	for _, bet := range *bets {
-		if _, exists := result[bet.MarketType]; !exists {
-			result[bet.MarketType] = make(map[string]float64)
-		}
-
-		if bet.BetType == "back" {
-			result[bet.MarketType][bet.Team] += bet.Exposure
-		} else if bet.BetType == "lay" {
-			result[bet.MarketType][bet.Team] -= bet.Exposure
-		}
+	grouped := models.GroupedData{
+		MatchOdds: matchOddsResults,
+		Bookmaker: bookmakerResults,
 	}
 
-	return result, nil
+	return grouped, nil
+}
+
+func (s *adminService) GetBetHistoryPerGame(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error) {
+
+	d, err := s.store.BetHistoryPerGame(ctx, eventId)
+
+	if err != nil {
+		return nil, models.GroupedData{}, err
+	}
+
+	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds")
+	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker")
+
+	grouped := models.GroupedData{
+		MatchOdds: matchOddsResults,
+		Bookmaker: bookmakerResults,
+	}
+
+	return d, grouped, nil
 }

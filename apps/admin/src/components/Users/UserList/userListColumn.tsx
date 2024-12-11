@@ -22,35 +22,43 @@ export const userListColumn: ColumnDef<any>[] = [
   {
     accessorKey: "name",
     header: "#",
-    cell: ({ row }) => <div>{row.index + 1}</div>,
+    cell: ({ row }) => <div>{row.index !== 0 && row.index}</div>,
   },
   {
     accessorKey: "username",
     header: "UserName [FullName]",
-    cell: ({ row }) => (
-      <div>
-        {row.getValue("username")} [{row.getValue("name")}]
-      </div>
-    ),
+    cell: ({ row }) => {
+      const name = row.getValue("name") as string;
+      return (
+        <div>
+          {row.getValue("username")} {name && `[${name}]`}
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "Credit Ref.",
+    accessorKey: "balance",
     header: "Credit Ref.",
   },
   {
-    accessorKey: "P/L",
+    accessorKey: "pnl",
     header: "P/L",
   },
   {
-    accessorKey: "Settlement(P|L)",
+    accessorKey: "settlement",
     header: "Settlement(P|L)",
   },
   {
     accessorKey: "exposure",
     header: "Exposure",
+    cell: ({ row }) => {
+      const exposure = (row.getValue("exposure") as number) || 0;
+
+      return <div className="text-red-500">-{exposure}</div>;
+    },
   },
   {
-    accessorKey: "balance",
+    accessorKey: "availBal",
     header: "Availabel Bal.",
   },
   {
@@ -61,6 +69,10 @@ export const userListColumn: ColumnDef<any>[] = [
     accessorKey: "id",
     header: "Action",
     cell: ({ row }) => {
+      if (!row.getValue("username")) {
+        return null;
+      }
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

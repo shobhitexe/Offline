@@ -6,7 +6,13 @@ import { EventType } from "@/types";
 import ExpandedRiskAnalysis from "./ExpandedRiskAnalysis";
 import Link from "next/link";
 
-export default function RiskAnalysis({ events }: { events: EventType[] }) {
+export default function RiskAnalysis({
+  events,
+  heading,
+}: {
+  events: EventType[];
+  heading: string;
+}) {
   const [expandedMatches, setExpandedMatches] = useState<string[]>([]);
 
   const toggleMatch = (id: string) => {
@@ -21,7 +27,7 @@ export default function RiskAnalysis({ events }: { events: EventType[] }) {
     <div className="w-full">
       <div className="space-y-4">
         <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Cricket</h2>
+          <h2 className="text-lg font-semibold">{heading}</h2>
           {events.map((event) => (
             <div key={event.eventId} className="border rounded-lg">
               <div
@@ -67,10 +73,7 @@ export default function RiskAnalysis({ events }: { events: EventType[] }) {
                 </div>
               </div>
               {expandedMatches.includes(event.eventId) && event.MatchOdds && (
-                <ExpandedRiskAnalysis
-                  eventId={event.eventId}
-                  marketId={event.MatchOdds.MarketId}
-                />
+                <ExpandedRiskAnalysis eventId={event.eventId} />
               )}
             </div>
           ))}

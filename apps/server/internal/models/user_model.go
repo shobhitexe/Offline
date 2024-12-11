@@ -1,15 +1,18 @@
 package models
 
 type User struct {
-	ID                string `json:"id"`
-	Name              string `json:"name"`
-	Username          string `json:"username"`
-	Password          string `json:"-"`
-	Balance           string `json:"balance"`
-	Exposure          string `json:"exposure"`
-	MarketCommission  int64  `json:"marketCommission"`
-	SessionCommission int64  `json:"sessionCommission"`
-	CreatedAt         string `json:"createdAt"`
+	ID                string  `json:"id"`
+	Name              string  `json:"name"`
+	Username          string  `json:"username"`
+	Password          string  `json:"-"`
+	Balance           float64 `json:"balance"`
+	Exposure          float64 `json:"exposure"`
+	PnL               float64 `json:"pnl"`
+	AvailableBalance  float64 `json:"availBal"`
+	Settlement        float64 `json:"settlement"`
+	MarketCommission  int64   `json:"marketCommission"`
+	SessionCommission int64   `json:"sessionCommission"`
+	CreatedAt         string  `json:"createdAt"`
 }
 
 type UserWallet struct {

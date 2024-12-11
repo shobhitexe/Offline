@@ -10,7 +10,7 @@ import (
 
 type AdminUserStore interface {
 	CreateUser(ctx context.Context, tx pgx.Tx, payload models.CreateUser) error
-	GetUsersList(ctx context.Context, id int) (*[]models.User, error)
+	GetUsersList(ctx context.Context, id string) (*[]models.User, error)
 	EditUser(ctx context.Context, payload models.EditUser) error
 }
 
@@ -27,10 +27,15 @@ func (s *adminStore) CreateUser(ctx context.Context, tx pgx.Tx, payload models.C
 
 }
 
-func (s *adminStore) GetUsersList(ctx context.Context, id int) (*[]models.User, error) {
+func (s *adminStore) GetUsersList(ctx context.Context, id string) (*[]models.User, error) {
 	var users []models.User
 
-	query := `SELECT id, name, username, balance, exposure, 
+	query := `SELECT id, name, username, 
+	ROUND(balance::numeric, 2) AS balance, 
+	ROUND(exposure::numeric, 2) AS exposure,
+	ROUND(settlement::numeric, 2) AS settlement,
+    ROUND(balance::numeric + settlement::numeric, 2) AS pnl,
+	ROUND(balance::numeric - exposure::numeric, 2) AS avail_bal,  
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM users
 	WHERE added_by = $1
@@ -46,7 +51,17 @@ func (s *adminStore) GetUsersList(ctx context.Context, id int) (*[]models.User, 
 
 	for rows.Next() {
 		var user models.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Balance, &user.Exposure, &user.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Username,
+			&user.Balance,
+			&user.Exposure,
+			&user.Settlement,
+			&user.PnL,
+			&user.AvailableBalance,
+			&user.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		users = append(users, user)

@@ -43,11 +43,11 @@ export default function FancyTableComponent({
             }}
           >
             {item.Lay.Price === 0 || item.Lay.Rate === 0 ? (
-              <div className="h-10 text-xs flex flex-col items-center justify-center">
+              <div className="h-10 text-xs flex flex-col items-center justify-center text-black">
                 {"Suspended"}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-10 px-4 py-2">
+              <div className="flex flex-col items-center justify-center h-10 px-4 py-2 text-black">
                 {item.Lay.Rate}
                 <span className="block text-xs">{item.Lay.Price}</span>
               </div>
@@ -62,11 +62,11 @@ export default function FancyTableComponent({
             }}
           >
             {item.Back.Price === 0 || item.Back.Rate === 0 ? (
-              <div className="h-10 text-xs flex flex-col items-center justify-center">
+              <div className="h-10 text-xs flex flex-col items-center justify-center text-black">
                 {"Suspended"}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-10 px-4 py-2">
+              <div className="flex flex-col items-center justify-center h-10 px-4 py-2 text-black">
                 {item.Back.Rate}
                 <span className="block text-xs">{item.Back.Price}</span>
               </div>

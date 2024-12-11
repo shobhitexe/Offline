@@ -33,7 +33,7 @@ export const agentListColumn: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "Credit Ref.",
+    accessorKey: "balance",
     header: "Credit Ref.",
   },
   {
