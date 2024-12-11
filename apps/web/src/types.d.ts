@@ -61,13 +61,8 @@ type BetHistoryPerGame = {
   betType: string;
 };
 
-type GroupedStats = {
-  totalPnl: number;
-  totalStake: number;
-};
-
 type GroupedBetHistoryPerGame = {
-  Bookmaker: Record<string, GroupedStats>;
-  Fancy: Record<string, GroupedStats>;
-  "Match Odds": Record<string, GroupedStats>;
+  Bookmaker: Record<string, number>;
+  Fancy: Record<string, number>;
+  MatchOdds: Record<string, number>;
 };

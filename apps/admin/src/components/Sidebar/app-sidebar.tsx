@@ -14,7 +14,14 @@ import {
   SidebarMenuItem,
 } from "./index";
 import { usePathname } from "next/navigation";
-import { Gauge, Layers, User, Users } from "lucide-react";
+import {
+  BookA,
+  Gauge,
+  Layers,
+  User,
+  Users,
+  ReceiptPoundSterling,
+} from "lucide-react";
 
 const items = [
   {
@@ -36,6 +43,51 @@ const items = [
     title: "Risk Analysis",
     icon: Layers,
     url: "/risk-analysis/in-play",
+  },
+  {
+    title: "Balance Sheet",
+    icon: BookA,
+    url: "/balance-sheet",
+  },
+  {
+    title: "Reports",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
+  },
+  {
+    title: "Open Market",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
+  },
+  {
+    title: "Casino",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
+  },
+  {
+    title: "Tournament List",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
+  },
+  {
+    title: "Events",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
+  },
+  {
+    title: "Match Settings",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
+  },
+  {
+    title: "Sports",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
+  },
+  {
+    title: "General Settings",
+    icon: ReceiptPoundSterling,
+    url: "/reports",
   },
 ];
 

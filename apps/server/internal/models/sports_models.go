@@ -108,7 +108,7 @@ type BetHistoryPerGame struct {
 	RunnerId   string  `json:"runnerId"`
 }
 
-type SelectionData struct {
-	TotalPNL   float64 `json:"totalPnl"`
-	TotalStake float64 `json:"totalStake"`
+type GroupedData struct {
+	MatchOdds map[string]float64
+	Bookmaker map[string]float64
 }

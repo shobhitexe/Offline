@@ -20,6 +20,7 @@ import { submitBetAction } from "./submitBetAction";
 import { useSession } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/root-reducer";
+import { KeyedMutator } from "swr";
 
 const amountsList = [100, 200, 500, 1000, 5000, 10000, 20000, 50000, 100000];
 
@@ -33,6 +34,7 @@ export default function Betslip({
   runnerName,
   runnerID,
   marketType,
+  mutate,
 }: {
   rate: number;
   price: number;
@@ -43,6 +45,7 @@ export default function Betslip({
   runnerName: string;
   runnerID: string;
   marketType: string;
+  mutate: KeyedMutator<any>;
 }) {
   const { toast } = useToast();
 
@@ -96,6 +99,7 @@ export default function Betslip({
 
       if (res === true) {
         setAmount(0);
+        mutate();
         toast({ description: "Bet placed successfully" });
         return;
       }
@@ -125,7 +129,14 @@ export default function Betslip({
       >
         {price === 0 || rate === 0 ? (
           <div className="h-10 text-xs flex flex-col items-center justify-center">
-            {marketType === "Fancy" ? "Running" : "Suspended"}
+            {marketType === "Fancy" ? (
+              <div>
+                Ball <br />
+                Running
+              </div>
+            ) : (
+              "Suspended"
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-10 px-4 py-2">

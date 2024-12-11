@@ -1,5 +1,6 @@
-import { BetHistoryPerGame, GroupedStats, Market } from "@/types";
+import { BetHistoryPerGame, Market } from "@/types";
 import Betslip from "../BetSlip";
+import { KeyedMutator } from "swr";
 
 export default function FancyTableComponent({
   data,
@@ -7,14 +8,14 @@ export default function FancyTableComponent({
   matchName,
   marketId,
   type,
-  bets,
+  mutate,
 }: {
   data: Market;
   eventId: string;
   matchName: string;
   marketId: string;
   type: string;
-  bets?: Record<string, GroupedStats>;
+  mutate: KeyedMutator<any>;
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -49,6 +50,7 @@ export default function FancyTableComponent({
             runnerName={item.RunnerName}
             runnerID={item.RunnerId}
             marketType={type}
+            mutate={mutate}
           />
 
           <Betslip
@@ -61,6 +63,7 @@ export default function FancyTableComponent({
             runnerName={item.RunnerName}
             runnerID={item.RunnerId}
             marketType={type}
+            mutate={mutate}
           />
         </div>
       ))}

@@ -1,4 +1,4 @@
-import { MobileSidebarSports, SportsSidebar } from "@/components";
+import { MobileSidebarSports, SportsSidebar, TopBar } from "@/components";
 import { ReactNode } from "react";
 
 export default function layout({ children }: { children: ReactNode }) {
@@ -27,6 +27,8 @@ export default function layout({ children }: { children: ReactNode }) {
           <div className="md:hidden">
             <MobileSidebarSports />
           </div>
+
+          <TopBar />
 
           {children}
         </div>

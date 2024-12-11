@@ -4,9 +4,9 @@ import MarketTableComponent from "./MarketTable";
 import FancyTableComponent from "./FancyTable";
 import BetHistory from "../BetHistory";
 import { useSession } from "next-auth/react";
-import useSWR from "swr";
 import { BackendURL } from "@/config/env";
 import fetcher from "@/lib/data/setup";
+import useSWR from "swr";
 
 export default function MatchTable({
   matchOdds,
@@ -67,7 +67,8 @@ export default function MatchTable({
             matchName={matchName}
             marketId={marketId}
             type="Match Odds"
-            bets={data?.data.grouped["Match Odds"]}
+            bets={data?.data.grouped.MatchOdds}
+            mutate={mutate}
           />
         )}
 
@@ -80,6 +81,7 @@ export default function MatchTable({
             matchName={matchName}
             marketId={marketId}
             type="Bookmaker"
+            mutate={mutate}
             bets={data?.data.grouped.Bookmaker}
           />
         )}
@@ -120,7 +122,7 @@ export default function MatchTable({
               matchName={matchName}
               marketId={marketId}
               type="Fancy"
-              bets={data?.data.grouped.Fancy}
+              mutate={mutate}
             />
           )}
       </div>

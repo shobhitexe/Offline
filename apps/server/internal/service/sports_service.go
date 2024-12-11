@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"server/internal/models"
 	"server/internal/store"
+	"sort"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -22,7 +23,8 @@ type SportsService interface {
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
 	SaveActiveEvents(ctx context.Context, id string) error
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
-	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, map[string]map[string]models.SelectionData, error)
+	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
+	GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error)
 }
 
 type sportsService struct {
@@ -180,41 +182,126 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 	return nil
 }
 
-func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, map[string]map[string]models.SelectionData, error) {
+func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error) {
 
 	d, err := s.store.BetHistoryPerGame(ctx, userId, eventId)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, models.GroupedData{}, err
 	}
 
-	selectionData := make(map[string]map[string]models.SelectionData)
-	groupedBets := make(map[string]map[string][]models.BetHistoryPerGame)
+	// matchOddsChan := make(chan map[string]float64)
+	// bookmakerChan := make(chan map[string]float64)
 
-	for _, bet := range *d {
-		if _, exists := groupedBets[bet.MarketName]; !exists {
-			groupedBets[bet.MarketName] = make(map[string][]models.BetHistoryPerGame)
-		}
+	// var wg sync.WaitGroup
+	// wg.Add(2)
 
-		if _, exists := groupedBets[bet.MarketName][bet.RunnerId]; !exists {
-			groupedBets[bet.MarketName][bet.RunnerId] = make([]models.BetHistoryPerGame, 0)
-		}
+	// go func() {
+	// 	defer wg.Done()
+	// 	matchOddsChan <- calculateMatchOddsResults(d, "Match Odds")
+	// }()
 
-		groupedBets[bet.MarketName][bet.RunnerId] = append(groupedBets[bet.MarketName][bet.RunnerId], bet)
+	// go func() {
+	// 	defer wg.Done()
+	// 	bookmakerChan <- calculateMatchOddsResults(d, "Bookmaker")
+	// }()
 
-		if _, exists := selectionData[bet.MarketName]; !exists {
-			selectionData[bet.MarketName] = make(map[string]models.SelectionData)
-		}
+	// wg.Wait()
 
-		data := selectionData[bet.MarketName][bet.RunnerId]
+	// close(matchOddsChan)
+	// close(bookmakerChan)
 
-		selectionData[bet.MarketName][bet.RunnerId] = models.SelectionData{
-			TotalPNL:   data.TotalPNL + bet.PNL,
-			TotalStake: data.TotalStake + bet.Stake,
+	matchOddsResults := calculateMatchOddsResults(d, "Match Odds")
+	bookmakerResults := calculateMatchOddsResults(d, "Bookmaker")
+
+	grouped := models.GroupedData{
+		MatchOdds: matchOddsResults,
+		Bookmaker: bookmakerResults,
+	}
+
+	return d, grouped, nil
+}
+
+func calculateMatchOddsResults(bets *[]models.BetHistoryPerGame, marketType string) map[string]float64 {
+
+	runnerSet := make(map[string]struct{})
+	runners := []string{}
+
+	for _, bet := range *bets {
+		if _, exists := runnerSet[bet.Selection]; !exists {
+			runners = append(runners, bet.Selection)
+			runnerSet[bet.Selection] = struct{}{}
 		}
 	}
 
-	return d, selectionData, nil
+	sort.Strings(runners)
+
+	results := make(map[string]float64)
+	for _, runner := range runners {
+		results[runner] = 0
+	}
+
+	for _, bet := range *bets {
+		if bet.MarketName != marketType {
+			continue
+		}
+
+		if bet.BetType == "back" {
+			results[bet.Selection] += bet.PNL
+			for _, runner := range runners {
+				if runner != bet.Selection {
+					results[runner] -= bet.Stake
+				}
+			}
+		} else if bet.BetType == "lay" {
+			results[bet.Selection] -= bet.Stake
+			for _, runner := range runners {
+				if runner != bet.Selection {
+					results[runner] += bet.PNL
+				}
+			}
+		}
+	}
+
+	return results
+}
+
+func (s *sportsService) GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error) {
+	type result struct {
+		data    *[]models.ActiveEvents
+		err     error
+		sportID string
+	}
+
+	resultChan := make(chan result, 3)
+
+	fetch := func(sportID string) {
+		data, err := s.store.GetInPlayEvents(ctx, sportID)
+		resultChan <- result{data: data, err: err, sportID: sportID}
+	}
+
+	go fetch("4")
+	go fetch("2")
+	go fetch("1")
+
+	var cricket, tennis, football *[]models.ActiveEvents
+
+	for i := 0; i < 3; i++ {
+		res := <-resultChan
+		if res.err != nil {
+			return nil, nil, nil, res.err
+		}
+		switch res.sportID {
+		case "4":
+			cricket = res.data
+		case "2":
+			tennis = res.data
+		case "1":
+			football = res.data
+		}
+	}
+
+	return cricket, tennis, football, nil
 }
 
 // func getPriceAndOdds(eventId, runnerId, marketName, betType string) (price, rate float64, err error) {

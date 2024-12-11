@@ -90,6 +90,10 @@ export default function Match({ params }: { params: { id: string[] } }) {
     return <div>Loading....</div>;
   }
 
+  if (!info.MatchOdds) {
+    return <div>Loading....</div>;
+  }
+
   return (
     <div className="w-full mx-auto sm:p-4 p-2 space-y-6">
       <Timer eventName={info.EventName} eventTime={info.EventTime} />

@@ -22,6 +22,7 @@ type SportsStore interface {
 	BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error
 	ChangeActiveBetStatus(ctx context.Context, id string) error
 	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
+	GetInPlayEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 }
 
 type sportsStore struct {
@@ -46,6 +47,44 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 		active_events
 	WHERE 
 		sports_id = $1 AND status = 'active' AND is_declared = false`
+
+	rows, err := s.db.Query(ctx, query, id)
+
+	if err != nil {
+
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var event models.ActiveEvents
+		if err := rows.Scan(&event.EventName, &event.EventId, &event.CompetitionId, &event.MatchOdds, &event.EventTime); err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	return &events, nil
+}
+
+func (s *sportsStore) GetInPlayEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
+	var events []models.ActiveEvents
+
+	query := `
+	SELECT 
+		match_name, 
+		event_id,
+		competition_id,
+		match_odds_runners, 
+		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+	FROM 
+		active_events
+	WHERE 
+		sports_id = $1 
+		AND status = 'active' 
+		AND is_declared = false
+		AND NOW() > opening_time`
 
 	rows, err := s.db.Query(ctx, query, id)
 
