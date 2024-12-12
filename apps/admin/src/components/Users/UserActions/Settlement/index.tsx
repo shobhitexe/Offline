@@ -64,7 +64,7 @@ export default function Settlement({
       <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2" asChild>
         {table === "userlist" ? (
           <div
-            className={`${settlement === 0 ? "bg-gray-500" : settlement < 0 ? "bg-red-500" : "bg-green-500"} cursor-pointer p-1 rounded w-full text-white text-right`}
+            className={`${settlement === 0 ? "bg-gray-500" : settlement < 0 ? "bg-red-500" : "bg-green-500"} cursor-pointer p-1 rounded w-full text-right`}
           >
             {settlement}
           </div>

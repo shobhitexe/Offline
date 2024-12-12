@@ -92,8 +92,8 @@ export default function DepositCredit({ id }: { id: string }) {
 
   return (
     <Dialog onOpenChange={(open) => setIsOpen(open)}>
-      <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2">
-        Deposit Credit
+      <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2 bg-yellow-500 p-1 rounded">
+        D
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

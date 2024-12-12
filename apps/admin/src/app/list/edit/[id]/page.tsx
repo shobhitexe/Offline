@@ -1,4 +1,4 @@
-import { EditAgent, PageHeading } from "@/components";
+import { CreateAgent, CreateUser, EditUser, PageHeading } from "@/components";
 import { buttonVariants } from "@repo/ui";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -9,7 +9,7 @@ export default function page({ params }: { params: { id: string } }) {
       <PageHeading
         button={
           <Link
-            href={"/agent-list"}
+            href={"/list"}
             className={`${buttonVariants({
               variant: "default",
               size: "sm",
@@ -21,10 +21,10 @@ export default function page({ params }: { params: { id: string } }) {
           </Link>
         }
       >
-        Edit Agent
+        Edit User
       </PageHeading>
 
-      <EditAgent id={params.id} />
+      <EditUser id={params.id} />
     </div>
   );
 }

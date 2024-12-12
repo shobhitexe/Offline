@@ -106,6 +106,7 @@ type BetHistoryPerGame struct {
 	BetType    string  `json:"betType"`
 	MarketName string  `json:"marketName"`
 	RunnerId   string  `json:"runnerId"`
+	EventId    string
 }
 
 type GroupedData struct {

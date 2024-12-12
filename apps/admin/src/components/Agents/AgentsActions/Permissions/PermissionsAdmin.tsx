@@ -15,7 +15,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import { changePermissions } from "./changePermissionAction";
 
-export default function Permission({ id }: { id: string }) {
+export default function PermissionAdmin({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);

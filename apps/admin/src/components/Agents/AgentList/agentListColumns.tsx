@@ -1,21 +1,6 @@
 "use client";
 
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import DepositCredit from "../AgentsActions/DepositCredit/DepositCredit";
-import WithdrawCredit from "../AgentsActions/WithdrawCredit/WithDrawCredit";
-import ProfileInfo from "../AgentsActions/ProfileInfo/ProfileInfo";
-import Permission from "../AgentsActions/Permissions/Permissions";
-import Link from "next/link";
 
 export const agentListColumn: ColumnDef<any>[] = [
   {
@@ -59,44 +44,5 @@ export const agentListColumn: ColumnDef<any>[] = [
   {
     accessorKey: "id",
     header: "Action",
-    cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 mx-auto">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link href={`/agent-list/edit/${row.getValue("id")}`}>Edit</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <div className="flex flex-col items-start">
-              <DropdownMenuItem asChild>
-                <DepositCredit id={row.getValue("id")} />
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <WithdrawCredit id={row.getValue("id")} />
-              </DropdownMenuItem>
-            </div>
-            <DropdownMenuSeparator />
-            {/* <DropdownMenuItem>Share</DropdownMenuItem> */}
-            <div className="flex flex-col items-start">
-              <DropdownMenuItem>Reports</DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Permission id={row.getValue("id")} />
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem>Level - Supermaster</DropdownMenuItem> */}
-              <DropdownMenuItem asChild>
-                <ProfileInfo id={row.getValue("id")} />
-              </DropdownMenuItem>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
   },
 ];

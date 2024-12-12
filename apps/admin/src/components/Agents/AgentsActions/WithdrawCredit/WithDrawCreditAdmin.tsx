@@ -16,9 +16,9 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
-import { DepositCreditAction } from "./depositCreditAction";
+import { WithdrawCreditAction } from "./withdrawCreditAction";
 
-export default function DepositCredit({ id }: { id: string }) {
+export default function WithdrawCreditAdmin({ id }: { id: string }) {
   const session = useSession();
 
   const { toast } = useToast();
@@ -52,7 +52,7 @@ export default function DepositCredit({ id }: { id: string }) {
 
   async function FormActionClient(formdata: FormData) {
     try {
-      if (Number(formdata.get("amount")) > Number(balance)) {
+      if (Number(formdata.get("amount")) > Number(userData?.data.balance)) {
         toast({
           title: "Can't Transfer",
           description: "Insufficient balance",
@@ -61,10 +61,10 @@ export default function DepositCredit({ id }: { id: string }) {
         return;
       }
 
-      const res = await DepositCreditAction(
+      const res = await WithdrawCreditAction(
         formdata,
-        session.data?.user.id!,
-        id
+        id,
+        session.data?.user.id!
       );
 
       if (res !== true) {
@@ -75,9 +75,9 @@ export default function DepositCredit({ id }: { id: string }) {
         return;
       }
 
-      toast({ description: "Amount credited" });
+      toast({ description: "Amount debited" });
 
-      setBalance(Number(balance) - Number(formdata.get("amount")));
+      setBalance(Number(balance) + Number(formdata.get("amount")));
 
       mutate();
 
@@ -92,8 +92,8 @@ export default function DepositCredit({ id }: { id: string }) {
 
   return (
     <Dialog onOpenChange={(open) => setIsOpen(open)}>
-      <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2">
-        Deposit Credit
+      <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2 bg-red-500 p-1 rounded">
+        W
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -114,7 +114,7 @@ export default function DepositCredit({ id }: { id: string }) {
               type="number"
               id="amount"
               placeholder={"Enter Chips"}
-              label="Deposit Credit"
+              label="Withdraw Credit"
               required
               containerClassname="max-w-full"
             />
@@ -140,7 +140,6 @@ export default function DepositCredit({ id }: { id: string }) {
                 label={`${userData?.data.name} [${userData?.data.username}]`}
               />
             )}
-
             <FormInput
               name="remarks"
               type="text"
@@ -151,7 +150,7 @@ export default function DepositCredit({ id }: { id: string }) {
               containerClassname="max-w-full"
             />
 
-            <Button>Deposit</Button>
+            <Button>Withdraw</Button>
           </form>
         </DialogHeader>
       </DialogContent>

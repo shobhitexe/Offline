@@ -46,7 +46,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 	FROM 
 		active_events
 	WHERE 
-		sports_id = $1 AND status = 'active' AND is_declared = false`
+		sports_id = $1 AND is_declared = false`
 
 	rows, err := s.db.Query(ctx, query, id)
 
@@ -277,7 +277,7 @@ func (s *sportsStore) BetHistoryPerGamePerUser(ctx context.Context, userId, even
 	var history []models.BetHistoryPerGame
 
 	query := `SELECT 
-	runner_name, odds_rate, exposure, profit, bet_type, market_type, runner_id 
+	runner_name, odds_rate, exposure, profit, bet_type, market_type, runner_id, event_id 
 	FROM sport_bets WHERE user_id = $1 AND event_id = $2 AND settled = false
 	ORDER BY created_at DESC`
 
@@ -289,7 +289,7 @@ func (s *sportsStore) BetHistoryPerGamePerUser(ctx context.Context, userId, even
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
-		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId)
+		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId, &row.EventId)
 
 		history = append(history, row)
 	}

@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, PencilIcon } from "lucide-react";
 
 import DepositCredit from "../UserActions/DepositCredit/DepositCredit";
 import WithdrawCredit from "../UserActions/WithdrawCredit/WithDrawCredit";
@@ -18,12 +18,31 @@ import ProfileInfo from "../UserActions/ProfileInfo/ProfileInfo";
 import Permission from "../UserActions/Permissions/Permissions";
 import Link from "next/link";
 import Settlement from "../UserActions/Settlement";
+import DepositCreditAdmin from "@/components/Agents/AgentsActions/DepositCredit/DepositCreditAdmin";
+import WithdrawCreditAdmin from "@/components/Agents/AgentsActions/WithdrawCredit/WithDrawCreditAdmin";
+import PermissionAdmin from "@/components/Agents/AgentsActions/Permissions/PermissionsAdmin";
+import ProfileInfoAdmin from "@/components/Agents/AgentsActions/ProfileInfo/ProfileInfoAdmin";
 
 export const userListColumn: ColumnDef<any>[] = [
   {
     accessorKey: "name",
     header: "#",
     cell: ({ row }) => <div>{row.index !== 0 && row.index}</div>,
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => {
+      const role = row.getValue("role") as string;
+
+      return (
+        <div
+          className={`${role === "A" ? "bg-red-500" : "bg-yellow-500"} w-fit p-1 rounded`}
+        >
+          {role}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "username",
@@ -103,42 +122,63 @@ export const userListColumn: ColumnDef<any>[] = [
         return null;
       }
 
+      const role = row.getValue("role") as string;
+
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 mx-auto">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link href={`/user-list/edit/${row.getValue("id")}`}>Edit</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <div className="flex flex-col items-start">
-              <DropdownMenuItem asChild>
-                <DepositCredit id={row.getValue("id")} />
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <WithdrawCredit id={row.getValue("id")} />
-              </DropdownMenuItem>
+        <div className="flex items-center">
+          {role === "C" ? (
+            <div className="flex items-center gap-1">
+              <DepositCredit id={row.getValue("id")} />
+              <WithdrawCredit id={row.getValue("id")} />
             </div>
-
-            <DropdownMenuSeparator />
-
-            <div className="flex flex-col items-start">
-              <DropdownMenuItem>Reports</DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Permission id={row.getValue("id")} />
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <ProfileInfo id={row.getValue("id")} />
-              </DropdownMenuItem>
+          ) : (
+            <div className="flex items-center gap-1">
+              <DepositCreditAdmin id={row.getValue("id")} />
+              <WithdrawCreditAdmin id={row.getValue("id")} />
             </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0 mx-auto">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+              <DropdownMenuSeparator />
+
+              <div className="flex flex-col items-start">
+                <DropdownMenuItem>Reports</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  {role === "C" ? (
+                    <Permission id={row.getValue("id")} />
+                  ) : (
+                    <PermissionAdmin id={row.getValue("id")} />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  {role === "C" ? (
+                    <ProfileInfo id={row.getValue("id")} />
+                  ) : (
+                    <ProfileInfoAdmin id={row.getValue("id")} />
+                  )}
+                </DropdownMenuItem>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {role === "C" ? (
+            <Link href={`/list/edit/${row.getValue("id")}`}>
+              <PencilIcon className="w-4 h-4" />
+            </Link>
+          ) : (
+            <Link href={`/agent/edit/${row.getValue("id")}`}>
+              <PencilIcon className="w-4 h-4" />
+            </Link>
+          )}
+        </div>
       );
     },
   },

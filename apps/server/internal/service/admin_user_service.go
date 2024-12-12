@@ -10,7 +10,7 @@ import (
 
 type AdminUserService interface {
 	CreateUser(ctx context.Context, payload models.CreateUser) error
-	UsersList(ctx context.Context, id string) (*[]models.User, error)
+	UsersList(ctx context.Context, id string) (*[]models.List, error)
 	EditUser(ctx context.Context, payload models.EditUser) error
 }
 
@@ -54,7 +54,7 @@ func (a *adminService) CreateUser(ctx context.Context, payload models.CreateUser
 
 }
 
-func (a *adminService) UsersList(ctx context.Context, id string) (*[]models.User, error) {
+func (a *adminService) UsersList(ctx context.Context, id string) (*[]models.List, error) {
 	list, err := a.store.GetUsersList(ctx, id)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (a *adminService) UsersList(ctx context.Context, id string) (*[]models.User
 		PnL += item.PnL
 	}
 
-	totals := models.User{
+	totals := models.List{
 		Exposure:         totalExposure,
 		Balance:          creditRef,
 		AvailableBalance: availBal,
@@ -82,7 +82,7 @@ func (a *adminService) UsersList(ctx context.Context, id string) (*[]models.User
 		PnL:              PnL,
 	}
 
-	*list = append([]models.User{totals}, *list...)
+	*list = append([]models.List{totals}, *list...)
 	return list, nil
 }
 

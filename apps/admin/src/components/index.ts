@@ -12,6 +12,7 @@ import MatchInfo from "./RiskAnalysis/Match/MatchInfo";
 import MatchTable from "./RiskAnalysis/Match/MatchTable/MatchTable";
 import Timer from "./RiskAnalysis/Match/Timer";
 import { balanceSheetColumns } from "./BalanceSheet/balanceSheetColumns";
+import { balanceSheetColumnsChild } from "./BalanceSheet/balanceSheetColumnsChild";
 
 export {
   Signin,
@@ -28,4 +29,5 @@ export {
   MatchTable,
   Timer,
   balanceSheetColumns,
+  balanceSheetColumnsChild,
 };

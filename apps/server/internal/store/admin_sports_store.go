@@ -15,7 +15,7 @@ func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId st
 	var history []models.BetHistoryPerGame
 
 	query := `SELECT 
-	runner_name, odds_rate, exposure, profit, bet_type, market_type, runner_id 
+	runner_name, odds_rate, exposure, profit, bet_type, market_type, runner_id, event_id
 	FROM sport_bets WHERE event_id = $1 AND settled = false
 	ORDER BY created_at DESC`
 
@@ -27,7 +27,7 @@ func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId st
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
-		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId)
+		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId, &row.EventId)
 
 		history = append(history, row)
 	}

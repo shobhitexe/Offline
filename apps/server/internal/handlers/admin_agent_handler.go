@@ -200,3 +200,53 @@ func (h *AdminHandler) EditAdmin(w http.ResponseWriter, r *http.Request) {
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "User edited", Data: true})
 }
+
+func (h *AdminHandler) GetUsersAndAgentsList(w http.ResponseWriter, r *http.Request) {
+
+	query := r.URL.Query()
+
+	id := query.Get("id")
+	if len(id) == 0 {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
+			Message: "Failed, no ID provided",
+			Data:    "[]",
+		})
+		return
+	}
+
+	childLevelStr := query.Get("childLevel")
+	if len(childLevelStr) == 0 {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
+			Message: "Failed, no childLevel provided",
+			Data:    "[]",
+		})
+		return
+	}
+
+	childLevel, err := strconv.Atoi(childLevelStr)
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
+			Message: "Failed, childLevel must be an integer",
+			Data:    err.Error(),
+		})
+		return
+	}
+
+	if childLevel < 1 || childLevel > 8 {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
+			Message: "Failed, childLevel must be between 1 and 8",
+			Data:    "[]",
+		})
+		return
+	}
+
+	list, err := h.service.UsersAndAgentsList(r.Context(), id, childLevel)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Fetched list", Data: list})
+
+}

@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Settlement from "../Users/UserActions/Settlement";
 import Link from "next/link";
 
-export const balanceSheetColumns: ColumnDef<any>[] = [
+export const balanceSheetColumnsChild: ColumnDef<any>[] = [
   {
     accessorKey: "id",
     header: "#",
@@ -35,7 +35,9 @@ export const balanceSheetColumns: ColumnDef<any>[] = [
           );
           break;
         case "cash":
-          userDiv = <div className="bg-green-500 p-1 rounded">Cash</div>;
+          userDiv = (
+            <div className="bg-yellow-500 p-1 rounded">Settlement (Parent)</div>
+          );
       }
 
       return (
@@ -50,7 +52,7 @@ export const balanceSheetColumns: ColumnDef<any>[] = [
     accessorKey: "balance",
     header: "Balance",
     cell: ({ row }) => {
-      const value = row.getValue("balance") as number;
+      const value = -1 * (row.getValue("balance") as number);
 
       return (
         <div

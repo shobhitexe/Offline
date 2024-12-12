@@ -10,7 +10,7 @@ import (
 
 type AdminAgentStore interface {
 	GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error)
-	GetAgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error)
+	GetAgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error)
 	CreateAgent(ctx context.Context, tx pgx.Tx, payload models.CreateAgent) (string, error)
 	TransferSportsShare(ctx context.Context, tx pgx.Tx, from, to string, share int64) error
 	EditAdmin(ctx context.Context, id, name string) error
@@ -29,10 +29,10 @@ func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*
 	return &admin, nil
 }
 
-func (s *adminStore) GetAgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error) {
-	var admins []models.Admin
+func (s *adminStore) GetAgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error) {
+	var admins []models.List
 
-	query := `SELECT id, name, username, balance, 
+	query := `SELECT id, name, username, balance, settlement, 'A' AS role,
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM admins
 	WHERE child_level < $1 AND added_by = $2
@@ -46,8 +46,16 @@ func (s *adminStore) GetAgentsList(ctx context.Context, id string, childLevel in
 	defer rows.Close()
 
 	for rows.Next() {
-		var admin models.Admin
-		if err := rows.Scan(&admin.ID, &admin.Name, &admin.Username, &admin.Balance, &admin.CreatedAt); err != nil {
+		var admin models.List
+		if err := rows.Scan(
+			&admin.ID,
+			&admin.Name,
+			&admin.Username,
+			&admin.Balance,
+			&admin.Settlement,
+			&admin.Role,
+			&admin.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		admins = append(admins, admin)

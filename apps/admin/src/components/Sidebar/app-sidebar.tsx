@@ -32,13 +32,13 @@ const items = [
   {
     title: "User List",
     icon: User,
-    url: "/user-list",
+    url: "/list",
   },
-  {
-    title: "Agents List",
-    icon: Users,
-    url: "/agent-list",
-  },
+  // {
+  //   title: "Agents List",
+  //   icon: Users,
+  //   url: "/agent-list",
+  // },
   {
     title: "Risk Analysis",
     icon: Layers,

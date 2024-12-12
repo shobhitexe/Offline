@@ -12,9 +12,10 @@ import (
 
 type AdminAgentService interface {
 	AdminLogin(payload models.AdminLoginRequest, ctx context.Context) (*models.Admin, error)
-	AgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error)
+	AgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error)
 	CreateAgent(ctx context.Context, payload models.CreateAgent) error
 	EditAgent(ctx context.Context, id, name string) error
+	UsersAndAgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error)
 }
 
 func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.Context) (*models.Admin, error) {
@@ -40,13 +41,56 @@ func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.
 	return admin, nil
 }
 
-func (a *adminService) AgentsList(ctx context.Context, id string, childLevel int) (*[]models.Admin, error) {
+func (a *adminService) AgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error) {
 
 	list, err := a.store.GetAgentsList(ctx, id, childLevel)
 
 	if err != nil {
 		return nil, err
 	}
+
+	return list, nil
+}
+
+func (a *adminService) UsersAndAgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error) {
+
+	list, err := a.store.GetAgentsList(ctx, id, childLevel)
+
+	if err != nil {
+		return nil, err
+	}
+
+	users, err := a.store.GetUsersList(ctx, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	*list = append(*list, *users...)
+
+	var totalExposure float64
+	var creditRef float64
+	var availBal float64
+	var settlementPnL float64
+	var PnL float64
+
+	for _, item := range *list {
+		totalExposure += item.Exposure
+		creditRef += item.Balance
+		availBal += item.AvailableBalance
+		settlementPnL += item.Settlement
+		PnL += item.PnL
+	}
+
+	totals := models.List{
+		Exposure:         totalExposure,
+		Balance:          creditRef,
+		AvailableBalance: availBal,
+		Settlement:       settlementPnL,
+		PnL:              PnL,
+	}
+
+	*list = append([]models.List{totals}, *list...)
 
 	return list, nil
 }

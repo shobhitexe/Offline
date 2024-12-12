@@ -92,8 +92,8 @@ export default function WithdrawCredit({ id }: { id: string }) {
 
   return (
     <Dialog onOpenChange={(open) => setIsOpen(open)}>
-      <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2">
-        Withdraw Credit
+      <DialogTrigger className="ui-py-1.5 ui-text-sm ui-px-2 bg-red-500 p-1 rounded">
+        W
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

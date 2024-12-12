@@ -11,7 +11,7 @@ import {
 import { useState } from "react";
 import useSWR from "swr";
 
-export default function ProfileInfo({ id }: { id: string }) {
+export default function ProfileInfoAdmin({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const { data, isLoading } = useSWR<{

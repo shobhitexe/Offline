@@ -11,6 +11,9 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 	r.Route("/admin", func(r chi.Router) {
 
 		r.Get("/", h.AdminDetails)
+
+		r.Get("/list", h.GetUsersAndAgentsList)
+
 		r.Post("/changepassword", h.ChangePassword)
 
 		r.Get("/block", h.IsAdminBlocked)
