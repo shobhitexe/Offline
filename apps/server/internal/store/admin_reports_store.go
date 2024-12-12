@@ -13,7 +13,7 @@ func (s *adminStore) GetSettledBetsUsers(ctx context.Context, ids []string) (*[]
 
 	var report []models.PerUserBalanceSheetReport
 
-	query := `SELECT sb.user_id, u.username, u.name, sb.profit, sb.exposure, sb.result 
+	query := `SELECT sb.user_id, u.username, u.name, sb.profit, sb.settlement 
 	FROM sport_bets sb 
 	JOIN users u ON sb.user_id = u.id 
 	WHERE sb.settled = true AND sb.user_id = ANY($1::int[])`
@@ -26,7 +26,7 @@ func (s *adminStore) GetSettledBetsUsers(ctx context.Context, ids []string) (*[]
 
 	for rows.Next() {
 		var u models.PerUserBalanceSheetReport
-		rows.Scan(&u.UserID, &u.UserName, &u.Name, &u.Profit, &u.Exposure, &u.Result)
+		rows.Scan(&u.UserID, &u.UserName, &u.Name, &u.Settlement, &u.Result)
 		report = append(report, u)
 	}
 

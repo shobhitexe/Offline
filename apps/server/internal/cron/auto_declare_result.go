@@ -100,12 +100,12 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 			case "LOSER":
 				if bet.BetType == "back" {
 					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
-					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "win"); err != nil {
+					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "loss"); err != nil {
 						return err
 					}
 				} else if bet.BetType == "lay" {
 					err = c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
-					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "loss"); err != nil {
+					if err := c.sportsStore.ChangeActiveBetStatus(ctx, bet.ID, "win"); err != nil {
 						return err
 					}
 				}

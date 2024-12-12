@@ -17,6 +17,7 @@ import WithdrawCredit from "../UserActions/WithdrawCredit/WithDrawCredit";
 import ProfileInfo from "../UserActions/ProfileInfo/ProfileInfo";
 import Permission from "../UserActions/Permissions/Permissions";
 import Link from "next/link";
+import Settlement from "../UserActions/Settlement";
 
 export const userListColumn: ColumnDef<any>[] = [
   {
@@ -47,6 +48,30 @@ export const userListColumn: ColumnDef<any>[] = [
   {
     accessorKey: "settlement",
     header: "Settlement(P|L)",
+    cell: ({ row }) => {
+      const settlement = row.getValue("settlement") as number;
+      const id = row.getValue("id") as string;
+      const name = row.getValue("name") as string;
+
+      return (
+        <>
+          {row.index !== 0 ? (
+            <div className="flex items-center gap-2 w-full">
+              <Settlement settlement={settlement} id={id} name={name} />
+              <div className="bg-blue-400 w-fit p-1 text-white cursor-pointer rounded">
+                H
+              </div>
+            </div>
+          ) : (
+            <div
+              className={`${settlement < 0 ? "text-red-500" : "text-green-500"}`}
+            >
+              {settlement}
+            </div>
+          )}
+        </>
+      );
+    },
   },
   {
     accessorKey: "exposure",
@@ -54,7 +79,12 @@ export const userListColumn: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const exposure = (row.getValue("exposure") as number) || 0;
 
-      return <div className="text-red-500">-{exposure}</div>;
+      return (
+        <div className="text-red-500">
+          {exposure > 0 && "-"}
+          {exposure}
+        </div>
+      );
     },
   },
   {

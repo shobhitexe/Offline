@@ -93,6 +93,18 @@ func (a *adminService) CreateAgent(ctx context.Context, payload models.CreateAge
 		return err
 	}
 
+	txnHistory := models.TransferCredit{
+		Amount:  payload.Credit,
+		From:    payload.AddedBy,
+		To:      id,
+		Remarks: "Agent Create",
+	}
+
+	if err := a.store.RecordAdminTransaction(ctx, tx, txnHistory, "credit", "credit"); err != nil {
+		return fmt.Errorf("Failed to Record Login History: %w", err)
+
+	}
+
 	if err = tx.Commit(ctx); err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}

@@ -2,10 +2,11 @@
 
 import { Button } from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
+import Settlement from "../Users/UserActions/Settlement";
 
 export const balanceSheetColumns: ColumnDef<any>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "id",
     header: "#",
     cell: ({ row }) => <div>{row.index + 1}</div>,
   },
@@ -14,16 +15,24 @@ export const balanceSheetColumns: ColumnDef<any>[] = [
     header: "UserName [FullName]",
     cell: ({ row }) => {
       const userType = row.getValue("userType") as string;
-      const name = row.getValue("name") as string;
+
+      var userDiv;
+
+      switch (userType) {
+        case "user":
+          userDiv = <div className="bg-yellow-500 p-1 rounded">C</div>;
+          break;
+        case "agent":
+          userDiv = <div className="bg-red-500 p-1 rounded">A</div>;
+          break;
+        case "cash":
+          userDiv = <div className="bg-green-500 p-1 rounded">Cash</div>;
+      }
 
       return (
         <div className="flex items-center gap-2">
-          <span
-            className={`${userType === "user" ? "bg-yellow-500" : "bg-red-500"} p-1 cursor-pointer`}
-          >
-            {userType !== "" && userType[0].toUpperCase()}
-          </span>
-          {row.getValue("username")} {name && `[${name}]`}
+          <span className={`cursor-pointer`}>{userDiv}</span>
+          {row.getValue("username")}
         </div>
       );
     },
@@ -47,19 +56,23 @@ export const balanceSheetColumns: ColumnDef<any>[] = [
     accessorKey: "userType",
     header: "Action",
     cell: ({ row }) => {
-      const userType = row.getValue("userType");
+      const userType = row.getValue("userType") as string;
+
+      if (userType === "cash") {
+        return <></>;
+      }
+
+      const balance = row.getValue("balance") as number;
+      const id = row.getValue("balance") as string;
+      const username = row.getValue("username") as string;
 
       return (
-        <div>
-          {userType === "user" ? (
-            <div className="flex items-center gap-2">
-              <Button>Settlement</Button>
-              <Button>History</Button>
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
+        <Settlement
+          settlement={balance}
+          id={id}
+          name={username}
+          table="balancesheet"
+        />
       );
     },
   },

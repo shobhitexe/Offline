@@ -32,6 +32,10 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 			// Credit debit for agents
 			r.Post("/credit/admin", h.CreditAdmin)
 			r.Post("/debit/admin", h.DebitAdmin)
+
+			// settlement
+			r.Post("/settlement/user", h.Settlementuser)
+
 		})
 
 		//agent

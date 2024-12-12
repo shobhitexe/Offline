@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"server/internal/models"
 )
 
@@ -15,82 +14,89 @@ func (s *adminService) GetBalanceSheetReport(ctx context.Context, id string) (*m
 	users, err := s.store.GetUsersList(ctx, id)
 
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
-	userIds := []string{}
+	// sheet, err := s.store.GetSettledBetsUsers(ctx, userIds)
 
-	for _, user := range *users {
-		userIds = append(userIds, user.ID)
-	}
+	// if err != nil {
+	// 	log.Println("Error fetching settled bets:", err)
+	// 	return nil, err
+	// }
 
-	sheet, err := s.store.GetSettledBetsUsers(ctx, userIds)
-	Sheetmap := make(map[string]struct {
-		UserType string
-		Balance  float64
-		UserId   int64
-		Name     string
-	})
+	// if sheet == nil {
+	// 	log.Println("No settled bets found")
+	// 	return nil, fmt.Errorf("no settled bets found for users")
+	// }
 
-	for _, s := range *sheet {
-		data := Sheetmap[s.UserName]
+	// Sheetmap := make(map[string]struct {
+	// 	UserType string
+	// 	Balance  float64
+	// 	UserId   int64
+	// 	Name     string
+	// })
 
-		switch s.Result {
-		case "win":
-			data.Balance += s.Profit
-		case "loss":
-			data.Balance -= s.Exposure
-		}
+	// for _, s := range *sheet {
+	// 	data := Sheetmap[s.UserName]
 
-		data.UserType = "user"
-		data.UserId = s.UserID
-		data.Name = s.Name
+	// 	data.UserType = "user"
+	// 	data.UserId = s.UserID
+	// 	data.Name = s.Name
+	// 	data.Balance = s.Settlement
 
-		Sheetmap[s.UserName] = data
+	// 	Sheetmap[s.UserName] = data
+	// }
+
+	admin, err := s.store.GetAdminWalllets(ctx, id)
+
+	if err != nil {
+		return nil, err
 	}
 
 	profitreport := make([]models.BalanceSheetReport, 0)
 	lossreport := make([]models.BalanceSheetReport, 0)
 
-	for UserName, data := range Sheetmap {
+	for _, data := range *users {
 		switch {
-		case data.Balance > 0:
+		case data.Settlement > 0:
 			profitreport = append(profitreport, models.BalanceSheetReport{
-				UserType: data.UserType,
-				Balance:  data.Balance,
-				UserName: UserName,
-				UserId:   data.UserId,
-				Name:     data.Name,
+				UserType: "user",
+				Balance:  data.Settlement,
+				UserName: data.Username + "[" + data.Name + "]",
+				UserId:   data.ID,
 			})
 
-		case data.Balance <= 0:
+		case data.Settlement <= 0:
 			lossreport = append(lossreport, models.BalanceSheetReport{
-				UserType: data.UserType,
-				Balance:  data.Balance,
-				UserName: UserName,
-				UserId:   data.UserId,
-				Name:     data.Name,
+				UserType: "user",
+				Balance:  data.Settlement,
+				UserName: data.Username + "[" + data.Name + "]",
+				UserId:   data.ID,
 			})
 		}
 	}
 
-	var total float64
-
-	for _, item := range profitreport {
-		total += item.Balance
+	extra := models.BalanceSheetReport{
+		UserType: "cash",
+		Balance:  admin.Settlement,
+		UserName: "",
+		UserId:   "",
 	}
 
-	profitTotal := models.BalanceSheetReport{
-		Balance:  total,
-		UserName: "Total",
-	}
+	lossreport = append(lossreport, extra)
 
-	profitreport = append(profitreport, profitTotal)
+	// var total float64
 
-	if err != nil {
-		return nil, err
-	}
+	// for _, item := range profitreport {
+	// 	total += item.Balance
+	// }
+
+	// profitTotal := models.BalanceSheetReport{
+	// 	Balance:  total,
+	// 	UserName: "Total",
+	// }
+
+	// profitreport = append(profitreport, profitTotal)
 
 	return &models.BalanceSheet{
 		Profit: profitreport,

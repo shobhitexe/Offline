@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS admins (
   username TEXT NOT NULL UNIQUE, 
   name TEXT NOT NULL,
   password TEXT NOT NULL,
-  balance NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+  balance NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+  settlement NUMERIC NOT NULL DEFAULT 0.0,
   added_by INTEGER, 
   child_level INT NOT NULL CHECK (child_level IN (1, 2, 3, 4, 5, 6, 7, 8)),
   sports_share INT DEFAULT 0 CHECK (sports_share <= 100) NOT NULL,
@@ -78,7 +79,8 @@ CREATE TABLE IF NOT EXISTS user_txns (
   admin_id INTEGER,
   amount NUMERIC NOT NULL,
   remarks TEXT,
-  txn_type TEXT CHECK (txn_type IN ('debit', 'credit')) NOT NULL, 
+  txn_type TEXT CHECK (txn_type IN ('debit', 'credit')) NOT NULL,
+  wallet_type TEXT CHECK (wallet_type IN ('credit','cash')) NOT NULL, 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
@@ -95,6 +97,7 @@ CREATE TABLE IF NOT EXISTS admin_txns (
   amount NUMERIC NOT NULL,
   remarks TEXT,
   txn_type TEXT CHECK (txn_type IN ('debit', 'credit')) NOT NULL, 
+  wallet_type TEXT CHECK (wallet_type IN ('credit','cash')) NOT NULL, 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_from_id FOREIGN KEY (from_id) REFERENCES admins(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (to_id) REFERENCES admins(id) ON DELETE CASCADE

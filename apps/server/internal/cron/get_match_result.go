@@ -80,7 +80,7 @@ func (c *Cron) GetMatchOddsResult(ctx context.Context) error {
 				return
 			}
 
-			if err := c.redis.Set(ctx, redisKey, r, 1*time.Hour).Err(); err != nil {
+			if err := c.redis.Set(ctx, redisKey, r, 24*time.Hour).Err(); err != nil {
 				log.Printf("Error saving result to redis %s: %v", key, err)
 				return
 			}

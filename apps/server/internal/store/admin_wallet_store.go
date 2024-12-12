@@ -14,9 +14,10 @@ type AdminWalletStore interface {
 	DebitBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error
 	TransferBalance(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
 	TransferBalanceToUser(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
-	RecordUserTransaction(ctx context.Context, tx pgx.Tx, from, to, remarks, txnType string, amount float64) error
-	RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payload models.TransferCredit, txnType string) error
+	RecordUserTransaction(ctx context.Context, tx pgx.Tx, from, to, remarks, txnType, walletType string, amount float64) error
+	RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payload models.TransferCredit, txnType, walletType string) error
 	DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
+	Settlementuser(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error
 }
 
 func (s *adminStore) GetBalance(ctx context.Context, id string) (float64, error) {
@@ -179,25 +180,54 @@ func (s *adminStore) DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID
 	return nil
 }
 
-func (s *adminStore) RecordUserTransaction(ctx context.Context, tx pgx.Tx, from, to, remarks, txnType string, amount float64) error {
+func (s *adminStore) RecordUserTransaction(ctx context.Context, tx pgx.Tx, from, to, remarks, txnType, walletType string, amount float64) error {
 
-	query := `INSERT INTO user_txns (user_id, admin_id, amount, remarks, txn_type)
-	VALUES ($1, $2, $3, $4, $5)`
+	query := `INSERT INTO user_txns (user_id, admin_id, amount, remarks, txn_type, wallet_type)
+	VALUES ($1, $2, $3, $4, $5, $6)`
 
-	if _, err := tx.Exec(ctx, query, to, from, amount, remarks, txnType); err != nil {
+	if _, err := tx.Exec(ctx, query, to, from, amount, remarks, txnType, walletType); err != nil {
 		return fmt.Errorf("failed to record transaction : %w", err)
 	}
 
 	return nil
 }
 
-func (s *adminStore) RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payload models.TransferCredit, txnType string) error {
+func (s *adminStore) RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payload models.TransferCredit, txnType, walletType string) error {
 
-	query := `INSERT INTO admin_txns (from_id, to_id, amount, remarks, txn_type)
-	VALUES ($1, $2, $3, $4, $5)`
+	query := `INSERT INTO admin_txns (from_id, to_id, amount, remarks, txn_type, wallet_type)
+	VALUES ($1, $2, $3, $4, $5, $6)`
 
-	if _, err := tx.Exec(ctx, query, payload.From, payload.To, payload.Amount, payload.Remarks, txnType); err != nil {
+	if _, err := tx.Exec(ctx, query, payload.From, payload.To, payload.Amount, payload.Remarks, txnType, walletType); err != nil {
 		return fmt.Errorf("failed to record transaction : %w", err)
+	}
+
+	return nil
+}
+
+func (s *adminStore) Settlementuser(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error {
+
+	debitQuery := `UPDATE users SET settlement = settlement - $1 WHERE id = $2`
+
+	debitResult, err := tx.Exec(ctx, debitQuery, payload.Cash, payload.ToId)
+
+	if err != nil {
+		return err
+	}
+
+	if debitResult.RowsAffected() == 0 {
+		return fmt.Errorf("no user record updated during debit operation")
+	}
+
+	creditQuery := `UPDATE admins SET settlement = settlement + $1 WHERE id = $2`
+
+	creditResult, err := tx.Exec(ctx, creditQuery, payload.Cash, payload.FromId)
+
+	if err != nil {
+		return err
+	}
+
+	if creditResult.RowsAffected() == 0 {
+		return fmt.Errorf("no admin record updated during credit operation")
 	}
 
 	return nil

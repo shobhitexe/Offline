@@ -52,7 +52,7 @@ func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, l
 func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin, error) {
 	var admin models.Admin
 
-	query := `SELECT id, username, name, balance, child_level, sports_share, blocked, market_commission, session_commission,
+	query := `SELECT id, username, name, balance, settlement, child_level, sports_share, blocked, market_commission, session_commission,
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
 	FROM admins WHERE id = $1`
 	err := s.db.QueryRow(ctx, query, id).Scan(
@@ -60,12 +60,14 @@ func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin
 		&admin.Username,
 		&admin.Name,
 		&admin.Balance,
+		&admin.Settlement,
 		&admin.ChildLevel,
 		&admin.SportsShare,
 		&admin.Blocked,
 		&admin.MarketCommission,
 		&admin.SessionCommission,
-		&admin.CreatedAt)
+		&admin.CreatedAt,
+	)
 
 	if err != nil {
 		log.Println(err)

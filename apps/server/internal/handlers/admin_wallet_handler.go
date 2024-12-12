@@ -94,3 +94,20 @@ func (h *AdminHandler) DebitAdmin(w http.ResponseWriter, r *http.Request) {
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Transferred successfully", Data: true})
 
 }
+
+func (h *AdminHandler) Settlementuser(w http.ResponseWriter, r *http.Request) {
+
+	var payload models.SettlementRequest
+
+	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Validation Failed", Data: err.Error()})
+		return
+	}
+
+	if err := h.service.Settlementuser(r.Context(), payload); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to do settlement", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Transferred successfully", Data: true})
+}

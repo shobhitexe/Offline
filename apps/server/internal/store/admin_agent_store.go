@@ -14,6 +14,7 @@ type AdminAgentStore interface {
 	CreateAgent(ctx context.Context, tx pgx.Tx, payload models.CreateAgent) (string, error)
 	TransferSportsShare(ctx context.Context, tx pgx.Tx, from, to string, share int64) error
 	EditAdmin(ctx context.Context, id, name string) error
+	GetAdminWalllets(ctx context.Context, id string) (*models.Admin, error)
 }
 
 func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error) {
@@ -123,4 +124,19 @@ func (s *adminStore) EditAdmin(ctx context.Context, id, name string) error {
 	}
 
 	return nil
+}
+
+func (s *adminStore) GetAdminWalllets(ctx context.Context, id string) (*models.Admin, error) {
+
+	var admin models.Admin
+
+	query := `SELECT id, settlement, balance FROM admins WHERE id = $1`
+
+	err := s.db.QueryRow(ctx, query, id).Scan(&admin.ID, &admin.Settlement, &admin.Balance)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin, nil
 }

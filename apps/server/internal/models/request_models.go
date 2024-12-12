@@ -95,3 +95,14 @@ type SignInRequest struct {
 	UserAgent string `json:"userAgent" validate:"required"`
 	Username  string `json:"username" validate:"required"`
 }
+
+// settlement
+
+type SettlementRequest struct {
+	Cash     float64 `json:"cash" validate:"required"`
+	FromId   string  `json:"fromId" validate:"required"`
+	ToId     string  `json:"toId" validate:"required"`
+	Remarks  string  `json:"remarks" validate:"required"`
+	Password string  `json:"password" validate:"required"`
+	TxnType  string  `json:"txnType" validate:"required"`
+}
