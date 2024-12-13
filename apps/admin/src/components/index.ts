@@ -13,6 +13,7 @@ import MatchTable from "./RiskAnalysis/Match/MatchTable/MatchTable";
 import Timer from "./RiskAnalysis/Match/Timer";
 import { balanceSheetColumns } from "./BalanceSheet/balanceSheetColumns";
 import { balanceSheetColumnsChild } from "./BalanceSheet/balanceSheetColumnsChild";
+import { addEventColumn } from "./Events/Addevent/addEventColumns";
 
 export {
   Signin,
@@ -30,4 +31,5 @@ export {
   Timer,
   balanceSheetColumns,
   balanceSheetColumnsChild,
+  addEventColumn,
 };

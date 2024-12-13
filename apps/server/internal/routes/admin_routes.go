@@ -62,6 +62,9 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 		r.Route("/sports", func(r chi.Router) {
 			r.Get("/list/activebets", h.GetActiveBetsListByMarketID)
 			r.Get("/bethistory/pergame", h.BetHistoryPerGame)
+
+			// events
+			r.Get("/events/getlist", h.GetTournamentsList)
 		})
 
 		//reports

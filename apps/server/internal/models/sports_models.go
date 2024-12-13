@@ -113,3 +113,20 @@ type GroupedData struct {
 	MatchOdds map[string]float64
 	Bookmaker map[string]float64
 }
+
+// events
+type competitionData struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type TournamentsListRaw struct {
+	Competition       competitionData `json:"competition"`
+	CompetitionRegion string          `json:"competitionRegion"`
+}
+
+type TournamentsListData struct {
+	ID                string `json:"id"`
+	Name              string `json:"name"`
+	CompetitionRegion string `json:"competitionRegion"`
+}

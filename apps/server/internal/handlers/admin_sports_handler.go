@@ -56,3 +56,22 @@ func (h *AdminHandler) BetHistoryPerGame(w http.ResponseWriter, r *http.Request)
 		"grouped": grouped,
 	}})
 }
+
+func (h *AdminHandler) GetTournamentsList(w http.ResponseWriter, r *http.Request) {
+
+	game := r.URL.Query().Get("game")
+
+	if len(game) == 0 || game == "" {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch no game id provided", Data: false})
+		return
+	}
+
+	list, err := h.service.GetTournamentsList(r.Context(), game)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch no game id provided", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: list})
+}

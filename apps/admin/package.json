@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@radix-ui/react-collapsible": "^1.1.2",
     "@repo/ui": "*",
     "@tanstack/react-table": "^8.20.5",
     "install": "^0.13.0",

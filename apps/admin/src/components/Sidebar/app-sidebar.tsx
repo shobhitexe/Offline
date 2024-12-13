@@ -12,16 +12,29 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
 } from "./index";
 import { usePathname } from "next/navigation";
 import {
-  BookA,
   Gauge,
   Layers,
   User,
-  Users,
-  ReceiptPoundSterling,
+  Sheet,
+  Proportions,
+  Store,
+  Spade,
+  List,
+  SquareChartGantt,
+  FolderCog,
+  Trophy,
+  Settings,
 } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./collapsible";
 
 const items = [
   {
@@ -41,56 +54,70 @@ const items = [
   },
   {
     title: "Balance Sheet",
-    icon: BookA,
+    icon: Sheet,
     url: "/balance-sheet",
   },
   {
     title: "Reports",
-    icon: ReceiptPoundSterling,
+    icon: Proportions,
     url: "/reports",
   },
   {
     title: "Open Market",
-    icon: ReceiptPoundSterling,
+    icon: Store,
     url: "/reports",
   },
   {
     title: "Casino",
-    icon: ReceiptPoundSterling,
+    icon: Spade,
     url: "/reports",
   },
   {
     title: "Tournament List",
-    icon: ReceiptPoundSterling,
-    url: "/reports",
-  },
-  {
-    title: "Events",
-    icon: ReceiptPoundSterling,
+    icon: List,
     url: "/reports",
   },
   {
     title: "Match Settings",
-    icon: ReceiptPoundSterling,
+    icon: FolderCog,
     url: "/reports",
   },
   {
     title: "Sports",
-    icon: ReceiptPoundSterling,
+    icon: Trophy,
     url: "/reports",
   },
   {
     title: "General Settings",
-    icon: ReceiptPoundSterling,
+    icon: Settings,
     url: "/reports",
+  },
+];
+
+const collapsibleItems = [
+  {
+    title: "Events",
+    icon: SquareChartGantt,
+    url: "/reports",
+    childrens: [
+      {
+        title: "Add Event",
+        url: "/events/add-event?game=cricket",
+        base: "/events/add-event",
+      },
+    ],
   },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
 
-  const isLinkActive = (link: string) => {
-    return pathname === link || pathname.startsWith(link);
+  const isLinkActive = (link: string, base: string) => {
+    return (
+      pathname === link ||
+      pathname.startsWith(link) ||
+      pathname.startsWith(base)
+    );
   };
 
   return (
@@ -106,7 +133,7 @@ export function AppSidebar() {
                     <Link
                       href={item.url}
                       className={`${
-                        isLinkActive(item.url)
+                        isLinkActive(item.url, item.url)
                           ? "bg-black text-white shadow-md border font-medium hover:bg-black hover:text-white"
                           : "hover:bg-black/10"
                       } p-4 rounded-lg flex items-center`}
@@ -116,6 +143,48 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+              ))}
+
+              {collapsibleItems.map((item) => (
+                <Collapsible key={item.title}>
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton asChild>
+                        <div
+                          className={`rounded-lg flex items-center cursor-pointer pl-4`}
+                        >
+                          <item.icon />
+                          <span className="relative -bottom-px">
+                            {item.title}
+                          </span>
+                        </div>
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.childrens.map((item) => (
+                          <SidebarMenuSubItem key={item.title}>
+                            {" "}
+                            <SidebarMenuButton asChild>
+                              <Link
+                                href={item.url}
+                                className={`${
+                                  isLinkActive(item.url, item.base)
+                                    ? "bg-black text-white shadow-md border font-medium hover:bg-black hover:text-white"
+                                    : "hover:bg-black/10"
+                                } p-4 rounded-lg flex items-center`}
+                              >
+                                <span className="relative -bottom-px">
+                                  {item.title}
+                                </span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
