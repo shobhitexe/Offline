@@ -6,21 +6,19 @@ CREATE TABLE IF NOT EXISTS admins (
   name TEXT NOT NULL,
   password TEXT NOT NULL,
   balance NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
-  settlement NUMERIC NOT NULL DEFAULT 0.0,
+  settlement NUMERIC(12, 2) NOT NULL DEFAULT 0.0,
+  exposure NUMERIC(12, 2) NOT NULL DEFAULT 0.0,
   added_by INTEGER, 
   child_level INT NOT NULL CHECK (child_level IN (1, 2, 3, 4, 5, 6, 7, 8)),
   sports_share INT DEFAULT 0 CHECK (sports_share <= 100) NOT NULL,
   market_commission INT NOT NULL,
   session_commission INT NOT NULL,
   blocked BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL;
 );
 -- +goose StatementEnd
 
--- +goose StatementBegin
-ALTER TABLE admins 
-  ADD CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL;
--- +goose StatementEnd
 
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS users (
@@ -28,9 +26,9 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT NOT NULL UNIQUE, 
   name TEXT NOT NULL,
   password TEXT NOT NULL,
-  balance NUMERIC NOT NULL DEFAULT 0.0,
-  exposure NUMERIC NOT NULL DEFAULT 0.0,
-  settlement NUMERIC NOT NULL DEFAULT 0.0,
+  balance NUMERIC(12, 2) NOT NULL DEFAULT 0.0,
+  exposure NUMERIC(12, 2) NOT NULL DEFAULT 0.0,
+  settlement NUMERIC(12, 2) NOT NULL DEFAULT 0.0,
   market_commission INT NOT NULL,
   session_commission INT NOT NULL,
   added_by INTEGER,   
@@ -77,7 +75,7 @@ CREATE TABLE IF NOT EXISTS user_txns (
   id SERIAL PRIMARY KEY,             
   user_id INTEGER,
   admin_id INTEGER,
-  amount NUMERIC NOT NULL,
+  amount NUMERIC(12, 2) NOT NULL,
   remarks TEXT,
   txn_type TEXT CHECK (txn_type IN ('debit', 'credit')) NOT NULL,
   wallet_type TEXT CHECK (wallet_type IN ('credit','cash')) NOT NULL, 
@@ -94,7 +92,7 @@ CREATE TABLE IF NOT EXISTS admin_txns (
   id SERIAL PRIMARY KEY,             
   from_id INTEGER,
   to_id INTEGER,
-  amount NUMERIC NOT NULL,
+  amount NUMERIC(12, 2) NOT NULL,
   remarks TEXT,
   txn_type TEXT CHECK (txn_type IN ('debit', 'credit')) NOT NULL, 
   wallet_type TEXT CHECK (wallet_type IN ('credit','cash')) NOT NULL, 

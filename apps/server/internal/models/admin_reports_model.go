@@ -6,6 +6,7 @@ type List struct {
 	Name              string  `json:"name"`
 	Username          string  `json:"username"`
 	Password          string  `json:"-"`
+	Downline          int64   `json:"downline"`
 	Balance           float64 `json:"balance"`
 	Exposure          float64 `json:"exposure"`
 	Settlement        float64 `json:"settlement"`

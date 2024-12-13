@@ -38,6 +38,7 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 
 			// settlement
 			r.Post("/settlement/user", h.Settlementuser)
+			r.Post("/settlement/agent", h.Settlementagent)
 
 		})
 

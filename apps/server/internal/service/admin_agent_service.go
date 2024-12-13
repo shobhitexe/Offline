@@ -6,16 +6,17 @@ import (
 	"fmt"
 	"log"
 	"server/internal/models"
+	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AdminAgentService interface {
 	AdminLogin(payload models.AdminLoginRequest, ctx context.Context) (*models.Admin, error)
-	AgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error)
+	AgentsList(ctx context.Context, id string) (*[]models.List, error)
 	CreateAgent(ctx context.Context, payload models.CreateAgent) error
 	EditAgent(ctx context.Context, id, name string) error
-	UsersAndAgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error)
+	UsersAndAgentsList(ctx context.Context, id string) (*[]models.List, error)
 }
 
 func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.Context) (*models.Admin, error) {
@@ -41,9 +42,9 @@ func (a *adminService) AdminLogin(payload models.AdminLoginRequest, ctx context.
 	return admin, nil
 }
 
-func (a *adminService) AgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error) {
+func (a *adminService) AgentsList(ctx context.Context, id string) (*[]models.List, error) {
 
-	list, err := a.store.GetAgentsList(ctx, id, childLevel)
+	list, err := a.store.GetAgentsList(ctx, id)
 
 	if err != nil {
 		return nil, err
@@ -52,29 +53,39 @@ func (a *adminService) AgentsList(ctx context.Context, id string, childLevel int
 	return list, nil
 }
 
-func (a *adminService) UsersAndAgentsList(ctx context.Context, id string, childLevel int) (*[]models.List, error) {
+func (a *adminService) UsersAndAgentsList(ctx context.Context, id string) (*[]models.List, error) {
 
-	list, err := a.store.GetAgentsList(ctx, id, childLevel)
+	var wg sync.WaitGroup
+	var adminList, usersList *[]models.List
+	var adminErr, usersErr error
 
-	if err != nil {
-		return nil, err
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		adminList, adminErr = a.store.GetAgentsList(ctx, id)
+
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		usersList, usersErr = a.store.GetUsersList(ctx, id)
+	}()
+
+	wg.Wait()
+
+	switch {
+	case adminErr != nil:
+		return nil, adminErr
+	case usersErr != nil:
+		return nil, usersErr
 	}
 
-	users, err := a.store.GetUsersList(ctx, id)
+	*adminList = append(*adminList, *usersList...)
 
-	if err != nil {
-		return nil, err
-	}
+	var totalExposure, creditRef, availBal, settlementPnL, PnL float64
 
-	*list = append(*list, *users...)
-
-	var totalExposure float64
-	var creditRef float64
-	var availBal float64
-	var settlementPnL float64
-	var PnL float64
-
-	for _, item := range *list {
+	for _, item := range *adminList {
 		totalExposure += item.Exposure
 		creditRef += item.Balance
 		availBal += item.AvailableBalance
@@ -89,10 +100,9 @@ func (a *adminService) UsersAndAgentsList(ctx context.Context, id string, childL
 		Settlement:       settlementPnL,
 		PnL:              PnL,
 	}
+	*adminList = append([]models.List{totals}, *adminList...)
 
-	*list = append([]models.List{totals}, *list...)
-
-	return list, nil
+	return adminList, nil
 }
 
 func (a *adminService) CreateAgent(ctx context.Context, payload models.CreateAgent) error {

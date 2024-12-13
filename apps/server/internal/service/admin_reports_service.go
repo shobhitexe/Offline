@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"log"
 	"server/internal/models"
+	"sync"
 )
 
 type AdminReportsService interface {
@@ -12,53 +12,58 @@ type AdminReportsService interface {
 
 func (s *adminService) GetBalanceSheetReport(ctx context.Context, id string) (*models.BalanceSheet, error) {
 
-	users, err := s.store.GetUsersList(ctx, id)
+	var wg sync.WaitGroup
+	var users *[]models.List
+	var agents *[]models.List
+	var cashParent, cashChild float64
+	var admin *models.Admin
+	var usersErr, agentsErr, cashParentErr, cashChildErr, adminErr error
 
-	if err != nil {
-		return nil, err
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		users, usersErr = s.store.GetUsersList(ctx, id)
+	}()
 
-	agents, err := s.store.GetAgentsList(ctx, id, 8)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		agents, agentsErr = s.store.GetAgentsList(ctx, id)
 
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
+	}()
 
-	// sheet, err := s.store.GetSettledBetsUsers(ctx, userIds)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		cashParent, cashParentErr = s.store.CalculateCashParent(ctx, id)
+	}()
 
-	// if err != nil {
-	// 	log.Println("Error fetching settled bets:", err)
-	// 	return nil, err
-	// }
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		cashChild, cashChildErr = s.store.CalculateCashChild(ctx, id)
+	}()
 
-	// if sheet == nil {
-	// 	log.Println("No settled bets found")
-	// 	return nil, fmt.Errorf("no settled bets found for users")
-	// }
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		admin, adminErr = s.store.GetAdminWalllets(ctx, id)
+	}()
 
-	// Sheetmap := make(map[string]struct {
-	// 	UserType string
-	// 	Balance  float64
-	// 	UserId   int64
-	// 	Name     string
-	// })
+	wg.Wait()
 
-	// for _, s := range *sheet {
-	// 	data := Sheetmap[s.UserName]
+	switch {
+	case usersErr != nil:
+		return nil, usersErr
+	case agentsErr != nil:
+		return nil, agentsErr
+	case cashParentErr != nil:
+		return nil, cashParentErr
+	case cashChildErr != nil:
+		return nil, cashChildErr
+	case adminErr != nil:
+		return nil, adminErr
 
-	// 	data.UserType = "user"
-	// 	data.UserId = s.UserID
-	// 	data.Name = s.Name
-	// 	data.Balance = s.Settlement
-
-	// 	Sheetmap[s.UserName] = data
-	// }
-
-	admin, err := s.store.GetAdminWalllets(ctx, id)
-
-	if err != nil {
-		return nil, err
 	}
 
 	profitreport := make([]models.BalanceSheetReport, 0)
@@ -70,17 +75,19 @@ func (s *adminService) GetBalanceSheetReport(ctx context.Context, id string) (*m
 			profitreport = append(profitreport, models.BalanceSheetReport{
 				UserType: "user",
 				Balance:  data.Settlement,
-				UserName: data.Username + "[" + data.Name + "]",
+				UserName: data.Username + " [" + data.Name + "]",
 				UserId:   data.ID,
 			})
+			break
 
 		case data.Settlement <= 0:
 			lossreport = append(lossreport, models.BalanceSheetReport{
 				UserType: "user",
 				Balance:  data.Settlement,
-				UserName: data.Username + "[" + data.Name + "]",
+				UserName: data.Username + " [" + data.Name + "]",
 				UserId:   data.ID,
 			})
+			break
 		}
 	}
 
@@ -90,7 +97,7 @@ func (s *adminService) GetBalanceSheetReport(ctx context.Context, id string) (*m
 			profitreport = append(profitreport, models.BalanceSheetReport{
 				UserType: "agent",
 				Balance:  data.Settlement,
-				UserName: data.Username + "[" + data.Name + "]",
+				UserName: data.Username + " [" + data.Name + "]",
 				UserId:   data.ID,
 			})
 
@@ -98,38 +105,45 @@ func (s *adminService) GetBalanceSheetReport(ctx context.Context, id string) (*m
 			lossreport = append(lossreport, models.BalanceSheetReport{
 				UserType: "agent",
 				Balance:  data.Settlement,
-				UserName: data.Username + "[" + data.Name + "]",
+				UserName: data.Username + " [" + data.Name + "]",
 				UserId:   data.ID,
 			})
 		}
 	}
-	extra := models.BalanceSheetReport{
-		UserType: "cash",
-		Balance:  admin.Settlement,
-		UserName: "",
-		UserId:   "",
+	extra := []models.BalanceSheetReport{
+		{
+			UserType: "cash",
+			Balance:  cashChild,
+		},
+		{
+			UserType: "session",
+			Balance:  0,
+		},
+		{
+			UserType: "settlement",
+			Balance:  admin.Settlement,
+		},
+		{
+			UserType: "cashparent",
+			Balance:  cashParent,
+		},
+		{
+			UserType: "pnl",
+			Balance:  0,
+		},
+		{
+			UserType: "commission",
+			Balance:  0,
+		},
 	}
 
 	switch {
 	case admin.Settlement <= 0:
-		lossreport = append(lossreport, extra)
+		lossreport = append(lossreport, extra...)
 
 	case admin.Settlement > 0:
-		profitreport = append(profitreport, extra)
+		profitreport = append(profitreport, extra...)
 	}
-
-	// var total float64
-
-	// for _, item := range profitreport {
-	// 	total += item.Balance
-	// }
-
-	// profitTotal := models.BalanceSheetReport{
-	// 	Balance:  total,
-	// 	UserName: "Total",
-	// }
-
-	// profitreport = append(profitreport, profitTotal)
 
 	return &models.BalanceSheet{
 		Profit: profitreport,

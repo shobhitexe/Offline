@@ -125,7 +125,8 @@ func (s *sportsStore) TransferBetValueToExposure(ctx context.Context, tx pgx.Tx,
 
 	query := `
 	UPDATE users 
-	SET exposure = exposure + $1
+	SET exposure = exposure + $1,
+	balance = balance - $1
 	WHERE id = $2 AND balance >= $1
 `
 
@@ -166,9 +167,7 @@ func (s *sportsStore) PlaceBet(ctx context.Context, tx pgx.Tx, payload models.Pl
 	)
 
 	if err != nil {
-
 		log.Println(err)
-
 		return fmt.Errorf("Failed to save bet :%w", err)
 	}
 

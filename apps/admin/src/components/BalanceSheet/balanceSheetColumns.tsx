@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
 import Settlement from "../Users/UserActions/Settlement";
 import Link from "next/link";
@@ -36,6 +35,36 @@ export const balanceSheetColumns: ColumnDef<any>[] = [
           break;
         case "cash":
           userDiv = <div className="bg-green-500 p-1 rounded">Cash</div>;
+          break;
+        case "session":
+          userDiv = (
+            <div className="bg-yellow-500 p-1 rounded">Session Commission</div>
+          );
+          break;
+        case "settlement":
+          userDiv = (
+            <div className="bg-yellow-500 p-1 rounded">Settlement (Parent)</div>
+          );
+          break;
+        case "cashparent":
+          userDiv = <div className="bg-green-500 p-1 rounded">Cash Parent</div>;
+          break;
+        case "pnl":
+          userDiv = (
+            <div className="bg-violet-500 text-white p-1 rounded">
+              Market P/L
+            </div>
+          );
+          break;
+        case "commission":
+          userDiv = (
+            <div className="bg-blue-500 text-white p-1 rounded">
+              Market Commission
+            </div>
+          );
+          break;
+        default:
+          userDiv = <></>;
       }
 
       return (
@@ -66,23 +95,21 @@ export const balanceSheetColumns: ColumnDef<any>[] = [
     header: "Action",
     cell: ({ row }) => {
       const userType = row.getValue("userType") as string;
-
-      if (userType === "cash") {
-        return <></>;
-      }
-
       const balance = row.getValue("balance") as number;
       const id = row.getValue("id") as string;
       const username = row.getValue("username") as string;
 
-      return (
-        <Settlement
-          settlement={balance}
-          id={id}
-          name={username}
-          table="balancesheet"
-        />
-      );
+      if (userType === "user" || userType === "agent") {
+        return (
+          <Settlement
+            settlement={balance}
+            id={id}
+            name={username}
+            table="balancesheet"
+            userType={userType}
+          />
+        );
+      }
     },
   },
 ];

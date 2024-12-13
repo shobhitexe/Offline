@@ -28,9 +28,9 @@ export default async function page() {
     <div className="w-full flex flex-col gap-5">
       <Tabs />
 
-      <RiskAnalysis events={data.cricket} heading="Cricket" />
-      <RiskAnalysis events={data.tennis} heading="Tennis" />
-      <RiskAnalysis events={data.football} heading="Football" />
+      <RiskAnalysis events={data.cricket || []} heading="Cricket" />
+      <RiskAnalysis events={data.tennis || []} heading="Tennis" />
+      <RiskAnalysis events={data.football || []} heading="Football" />
     </div>
   );
 }

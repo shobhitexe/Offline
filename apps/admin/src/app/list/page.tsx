@@ -47,7 +47,7 @@ export default async function page() {
           </div>
         }
       >
-        List
+        User List
       </PageHeading>
 
       <DataTable columns={userListColumn} data={list} />

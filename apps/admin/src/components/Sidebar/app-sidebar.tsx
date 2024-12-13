@@ -34,11 +34,6 @@ const items = [
     icon: User,
     url: "/list",
   },
-  // {
-  //   title: "Agents List",
-  //   icon: Users,
-  //   url: "/agent-list",
-  // },
   {
     title: "Risk Analysis",
     icon: Layers,
@@ -110,10 +105,14 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <Link
                       href={item.url}
-                      className={`${isLinkActive(item.url) ? "bg-white shadow hover:bg-white" : "bg-transparent"} p-5`}
+                      className={`${
+                        isLinkActive(item.url)
+                          ? "bg-black text-white shadow-md border font-medium hover:bg-black hover:text-white"
+                          : "hover:bg-black/10"
+                      } p-4 rounded-lg flex items-center`}
                     >
                       <item.icon />
-                      <span className="text-black">{item.title}</span>
+                      <span className="relative -bottom-px">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

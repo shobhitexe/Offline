@@ -18,6 +18,7 @@ type AdminWalletStore interface {
 	RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payload models.TransferCredit, txnType, walletType string) error
 	DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
 	Settlementuser(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error
+	Settlementagent(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error
 }
 
 func (s *adminStore) GetBalance(ctx context.Context, id string) (float64, error) {
@@ -207,6 +208,35 @@ func (s *adminStore) RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payl
 func (s *adminStore) Settlementuser(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error {
 
 	debitQuery := `UPDATE users SET settlement = settlement - $1 WHERE id = $2`
+
+	debitResult, err := tx.Exec(ctx, debitQuery, payload.Cash, payload.ToId)
+
+	if err != nil {
+		return err
+	}
+
+	if debitResult.RowsAffected() == 0 {
+		return fmt.Errorf("no user record updated during debit operation")
+	}
+
+	creditQuery := `UPDATE admins SET settlement = settlement + $1 WHERE id = $2`
+
+	creditResult, err := tx.Exec(ctx, creditQuery, payload.Cash, payload.FromId)
+
+	if err != nil {
+		return err
+	}
+
+	if creditResult.RowsAffected() == 0 {
+		return fmt.Errorf("no admin record updated during credit operation")
+	}
+
+	return nil
+}
+
+func (s *adminStore) Settlementagent(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error {
+
+	debitQuery := `UPDATE admins SET settlement = settlement - $1 WHERE id = $2`
 
 	debitResult, err := tx.Exec(ctx, debitQuery, payload.Cash, payload.ToId)
 

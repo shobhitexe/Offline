@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"server/internal/models"
-	"strconv"
 )
 
 func (h *AdminHandler) HandleLogin(w http.ResponseWriter, r *http.Request) {
@@ -39,33 +38,7 @@ func (h *AdminHandler) GetAgentList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	childLevelStr := query.Get("childLevel")
-	if len(childLevelStr) == 0 {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
-			Message: "Failed, no childLevel provided",
-			Data:    "[]",
-		})
-		return
-	}
-
-	childLevel, err := strconv.Atoi(childLevelStr)
-	if err != nil {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
-			Message: "Failed, childLevel must be an integer",
-			Data:    err.Error(),
-		})
-		return
-	}
-
-	if childLevel < 1 || childLevel > 8 {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
-			Message: "Failed, childLevel must be between 1 and 8",
-			Data:    "[]",
-		})
-		return
-	}
-
-	list, err := h.service.AgentsList(r.Context(), id, childLevel)
+	list, err := h.service.AgentsList(r.Context(), id)
 
 	if err != nil {
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed", Data: err.Error()})
@@ -214,33 +187,7 @@ func (h *AdminHandler) GetUsersAndAgentsList(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	childLevelStr := query.Get("childLevel")
-	if len(childLevelStr) == 0 {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
-			Message: "Failed, no childLevel provided",
-			Data:    "[]",
-		})
-		return
-	}
-
-	childLevel, err := strconv.Atoi(childLevelStr)
-	if err != nil {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
-			Message: "Failed, childLevel must be an integer",
-			Data:    err.Error(),
-		})
-		return
-	}
-
-	if childLevel < 1 || childLevel > 8 {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
-			Message: "Failed, childLevel must be between 1 and 8",
-			Data:    "[]",
-		})
-		return
-	}
-
-	list, err := h.service.UsersAndAgentsList(r.Context(), id, childLevel)
+	list, err := h.service.UsersAndAgentsList(r.Context(), id)
 
 	if err != nil {
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed", Data: err.Error()})

@@ -34,14 +34,44 @@ export const userListColumn: ColumnDef<any>[] = [
     header: "Role",
     cell: ({ row }) => {
       const role = row.getValue("role") as string;
+      const id = row.getValue("id") as string;
 
-      return (
-        <div
-          className={`${role === "A" ? "bg-red-500" : "bg-yellow-500"} w-fit p-1 rounded`}
-        >
-          {role}
-        </div>
-      );
+      var element;
+
+      switch (role) {
+        case "A":
+          element = (
+            <Link
+              href={`/list/agent/${id}`}
+              className={`bg-red-500 w-fit p-1 rounded`}
+            >
+              {role}{" "}
+            </Link>
+          );
+          break;
+        case "C":
+          element = (
+            <div className={`bg-yellow-500 w-fit p-1 rounded cursor-pointer`}>
+              {role}
+            </div>
+          );
+          break;
+        default:
+          element = <></>;
+      }
+
+      return element;
+    },
+  },
+  {
+    accessorKey: "downline",
+    header: "Downline",
+    cell: ({ row }) => {
+      if (row.index === 0) {
+        return <></>;
+      }
+
+      return <div>{row.getValue("downline")}</div>;
     },
   },
   {
@@ -71,12 +101,31 @@ export const userListColumn: ColumnDef<any>[] = [
       const settlement = row.getValue("settlement") as number;
       const id = row.getValue("id") as string;
       const name = row.getValue("name") as string;
+      const role = row.getValue("role") as string;
+      var userType: "agent" | "user";
+
+      switch (role) {
+        case "A":
+          userType = "agent";
+          break;
+        case "C":
+          userType = "user";
+          break;
+
+        default:
+          userType = "user";
+      }
 
       return (
         <>
           {row.index !== 0 ? (
             <div className="flex items-center gap-2 w-full">
-              <Settlement settlement={settlement} id={id} name={name} />
+              <Settlement
+                settlement={settlement}
+                id={id}
+                name={name}
+                userType={userType}
+              />
               <div className="bg-blue-400 w-fit p-1 text-white cursor-pointer rounded">
                 H
               </div>

@@ -13,7 +13,7 @@ import {
   useToast,
 } from "@repo/ui";
 import { useState } from "react";
-import { settlementAction } from "./settlementAction";
+import { settlementAction, settlementActionAgent } from "./settlementAction";
 import { useSession } from "next-auth/react";
 
 export default function Settlement({
@@ -21,11 +21,13 @@ export default function Settlement({
   id,
   name,
   table = "userlist",
+  userType,
 }: {
   settlement: number;
   id: string;
   name: string;
   table?: "userlist" | "balancesheet";
+  userType: "user" | "agent";
 }) {
   const session = useSession();
 
@@ -40,20 +42,44 @@ export default function Settlement({
         return;
       }
 
-      const res = await settlementAction(
-        formdata,
-        cash,
-        session.data?.user.id!,
-        id,
-        settlement > 0 ? "debit" : "credit"
-      );
+      switch (userType) {
+        case "user":
+          const res = await settlementAction(
+            formdata,
+            cash,
+            session.data?.user.id!,
+            id,
+            settlement > 0 ? "debit" : "credit"
+          );
 
-      if (res !== true) {
-        toast({ description: "Failed", variant: "destructive" });
-        return;
+          if (res !== true) {
+            toast({ description: "Failed", variant: "destructive" });
+            return;
+          }
+
+          toast({ description: "Setteled" });
+          break;
+
+        case "agent":
+          const _res = await settlementActionAgent(
+            formdata,
+            cash,
+            session.data?.user.id!,
+            id,
+            settlement > 0 ? "debit" : "credit"
+          );
+
+          if (_res !== true) {
+            toast({ description: "Failed", variant: "destructive" });
+            return;
+          }
+
+          toast({ description: "Setteled" });
+          break;
+
+        default:
+          break;
       }
-
-      toast({ description: "Setteled" });
     } catch (error) {
       toast({ description: "Failed", variant: "destructive" });
     }
