@@ -90,14 +90,18 @@ export default function Match({ params }: { params: { id: string } }) {
     return <div>Loading....</div>;
   }
 
+  if (!info.EventName) {
+    return <div>No Data yet</div>;
+  }
+
   return (
     <div className="w-full mx-auto sm:p-4 p-2 space-y-6">
       <Timer eventName={info.EventName} eventTime={info.EventTime} />
 
       <MatchInfo
         matchTime={info.EventTime}
-        firstTeam={info.MatchOdds.runners[0].RunnerName}
-        secondTeam={info.MatchOdds.runners[1].RunnerName}
+        firstTeam={info.MatchOdds?.runners[0].RunnerName}
+        secondTeam={info.MatchOdds?.runners[1].RunnerName}
       />
 
       <MatchTable
@@ -106,7 +110,7 @@ export default function Match({ params }: { params: { id: string } }) {
         Fancy={info.Fancy}
         eventId={info.EventId}
         matchName={info.EventName}
-        marketId={info.MatchOdds.MarketId}
+        marketId={info.MatchOdds?.MarketId}
         tabType={params.id[1]}
       />
     </div>

@@ -71,7 +71,10 @@ export const userListColumn: ColumnDef<any>[] = [
         return <></>;
       }
 
-      return <div>{row.getValue("downline")}</div>;
+      const downline = row.getValue("downline") as number;
+      const id = row.getValue("id") as string;
+
+      return <Link href={`/list/agent/${id}`}>{downline}</Link>;
     },
   },
   {
@@ -87,7 +90,7 @@ export const userListColumn: ColumnDef<any>[] = [
     },
   },
   {
-    accessorKey: "balance",
+    accessorKey: "creditRef",
     header: "Credit Ref.",
   },
   {
@@ -156,7 +159,7 @@ export const userListColumn: ColumnDef<any>[] = [
     },
   },
   {
-    accessorKey: "availBal",
+    accessorKey: "balance",
     header: "Availabel Bal.",
   },
   {

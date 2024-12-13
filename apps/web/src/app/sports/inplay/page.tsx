@@ -27,45 +27,49 @@ export default async function page() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <div className="text-lg font-bold">Cricket</div>
-        <div>In Play</div>
-        <div className="bg-[#444446] h-1 w-full mt-3" />
+      {data.cricket && (
+        <div>
+          <div className="text-lg font-bold">Cricket</div>
+          <div>In Play</div>
+          <div className="bg-[#444446] h-1 w-full mt-3" />
 
-        <div className="flex flex-col divide-y divide-[#444446]">
-          {data.cricket.map((item) => (
-            <GameCard key={item.eventId} {...item} />
-          ))}
+          <div className="flex flex-col divide-y divide-[#444446]">
+            {data.cricket.map((item) => (
+              <GameCard key={item.eventId} event={item} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+      {data.tennis && (
+        <div>
+          <div className="text-lg font-bold">Tennis</div>
 
-      <div>
-        <div className="text-lg font-bold">Tennis</div>
+          <div>In Play</div>
 
-        <div>In Play</div>
+          <div className="bg-[#444446] h-1 w-full mt-3" />
 
-        <div className="bg-[#444446] h-1 w-full mt-3" />
-
-        <div className="flex flex-col divide-y divide-[#444446]">
-          {data.tennis.map((item) => (
-            <GameCard key={item.eventId} {...item} />
-          ))}
+          <div className="flex flex-col divide-y divide-[#444446]">
+            {data.tennis.map((item) => (
+              <GameCard key={item.eventId} event={item} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+      {data.football && (
+        <div>
+          <div className="text-lg font-bold">Football</div>
 
-      <div>
-        <div className="text-lg font-bold">Football</div>
+          <div>In Play</div>
 
-        <div>In Play</div>
+          <div className="bg-[#444446] h-1 w-full mt-3" />
 
-        <div className="bg-[#444446] h-1 w-full mt-3" />
-
-        <div className="flex flex-col divide-y divide-[#444446]">
-          {data.football.map((item) => (
-            <GameCard key={item.eventId} {...item} />
-          ))}
+          <div className="flex flex-col divide-y divide-[#444446]">
+            {data.football.map((item) => (
+              <GameCard key={item.eventId} event={item} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

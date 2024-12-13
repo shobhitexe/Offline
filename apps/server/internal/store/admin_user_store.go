@@ -9,22 +9,34 @@ import (
 )
 
 type AdminUserStore interface {
-	CreateUser(ctx context.Context, tx pgx.Tx, payload models.CreateUser) error
+	CreateUser(ctx context.Context, tx pgx.Tx, payload models.CreateUser) (string, error)
 	GetUsersList(ctx context.Context, id string) (*[]models.List, error)
 	EditUser(ctx context.Context, payload models.EditUser) error
 }
 
-func (s *adminStore) CreateUser(ctx context.Context, tx pgx.Tx, payload models.CreateUser) error {
+func (s *adminStore) CreateUser(ctx context.Context, tx pgx.Tx, payload models.CreateUser) (string, error) {
+	var id string
+	query := `INSERT INTO users (username, name, password, market_commission, session_commission, added_by)
+	VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
-	query := `INSERT INTO users (username, name, password, balance, market_commission, session_commission, added_by)
-	VALUES ($1, $2, $3, $4, $5, $6, $7)`
-
-	if _, err := tx.Exec(ctx, query, payload.Username, payload.Name, payload.Password, payload.Credit, payload.MarketCommission, payload.SessionCommission, payload.AddedBy); err != nil {
-		return fmt.Errorf("Failed to create user ;%w", err)
+	if err := tx.QueryRow(ctx, query,
+		payload.Username,
+		payload.Name,
+		payload.Password,
+		payload.MarketCommission,
+		payload.SessionCommission,
+		payload.AddedBy,
+	).Scan(&id); err != nil {
+		return "", fmt.Errorf("failed to create user: %w", err)
 	}
 
-	return nil
+	downLineQuery := `UPDATE admins SET downline = downline + 1 WHERE id = $1`
 
+	if _, err := tx.Exec(ctx, downLineQuery, payload.AddedBy); err != nil {
+		return "", fmt.Errorf("failed to create agent: %w", err)
+	}
+
+	return id, nil
 }
 
 func (s *adminStore) GetUsersList(ctx context.Context, id string) (*[]models.List, error) {
@@ -34,8 +46,8 @@ func (s *adminStore) GetUsersList(ctx context.Context, id string) (*[]models.Lis
 	ROUND(balance::numeric, 2) AS balance, 
 	ROUND(exposure::numeric, 2) AS exposure,
 	ROUND(settlement::numeric, 2) AS settlement,
-    ROUND(balance::numeric + settlement::numeric, 2) AS pnl,
-	ROUND(balance::numeric - exposure::numeric, 2) AS avail_bal,
+    ROUND(credit_ref::numeric + settlement::numeric, 2) AS pnl,
+	credit_ref,
 	'C' AS role,  
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM users
@@ -60,7 +72,8 @@ func (s *adminStore) GetUsersList(ctx context.Context, id string) (*[]models.Lis
 			&user.Exposure,
 			&user.Settlement,
 			&user.PnL,
-			&user.AvailableBalance,
+			&user.CreditRef,
+			// &user.AvailableBalance,
 			&user.Role,
 			&user.CreatedAt,
 		); err != nil {

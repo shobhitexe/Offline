@@ -1,4 +1,4 @@
-import { BetHistoryPerGame, Market } from "@/types";
+import { Market } from "@/types";
 import Betslip from "../BetSlip";
 import { KeyedMutator } from "swr";
 

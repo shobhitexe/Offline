@@ -10,8 +10,8 @@ import (
 
 type AdminWalletStore interface {
 	GetBalance(ctx context.Context, id string) (float64, error)
-	CreditBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error
-	DebitBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error
+	// CreditBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error
+	// DebitBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error
 	TransferBalance(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
 	TransferBalanceToUser(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error
 	RecordUserTransaction(ctx context.Context, tx pgx.Tx, from, to, remarks, txnType, walletType string, amount float64) error
@@ -35,40 +35,40 @@ func (s *adminStore) GetBalance(ctx context.Context, id string) (float64, error)
 	return balance, nil
 }
 
-func (s *adminStore) CreditBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error {
+// func (s *adminStore) CreditBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error {
 
-	query := `UPDATE admins SET balance = balance + $1 WHERE id = $2`
+// 	query := `UPDATE admins SET balance = balance + $1 WHERE id = $2`
 
-	_, err := tx.Exec(ctx, query, balance, id)
+// 	_, err := tx.Exec(ctx, query, balance, id)
 
-	if err != nil {
-		return err
-	}
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
+// 	return nil
 
-}
+// }
 
-func (s *adminStore) DebitBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error {
-	query := `
-		UPDATE admins 
-		SET balance = balance - $1 
-		WHERE id = $2 AND balance >= $1
-	`
+// func (s *adminStore) DebitBalance(ctx context.Context, tx pgx.Tx, id string, balance float64) error {
+// 	query := `
+// 		UPDATE admins
+// 		SET balance = balance - $1
+// 		WHERE id = $2 AND balance >= $1
+// 	`
 
-	result, err := tx.Exec(ctx, query, balance, id)
-	if err != nil {
-		return fmt.Errorf("failed to debit balance: %w", err)
-	}
+// 	result, err := tx.Exec(ctx, query, balance, id)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to debit balance: %w", err)
+// 	}
 
-	rowsAffected := result.RowsAffected()
+// 	rowsAffected := result.RowsAffected()
 
-	if rowsAffected == 0 {
-		return fmt.Errorf("insufficient balance for debit operation")
-	}
+// 	if rowsAffected == 0 {
+// 		return fmt.Errorf("insufficient balance for debit operation")
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (s *adminStore) TransferBalance(ctx context.Context, tx pgx.Tx, fromID, toID string, amount float64) error {
 	if amount <= 0 {
@@ -77,7 +77,7 @@ func (s *adminStore) TransferBalance(ctx context.Context, tx pgx.Tx, fromID, toI
 
 	debitQuery := `
 		UPDATE admins 
-		SET balance = balance - $1 
+		SET balance = balance - $1
 		WHERE id = $2 AND balance >= $1
 	`
 	debitResult, err := tx.Exec(ctx, debitQuery, amount, fromID)
@@ -91,12 +91,12 @@ func (s *adminStore) TransferBalance(ctx context.Context, tx pgx.Tx, fromID, toI
 
 	creditQuery := `
 		UPDATE admins 
-		SET balance = balance + $1 
+		SET balance = balance + $1,
+		credit_ref = credit_ref + $1
 		WHERE id = $2
 	`
 	creditResult, err := tx.Exec(ctx, creditQuery, amount, toID)
 	if err != nil {
-
 		return fmt.Errorf("failed to credit balance: %w", err)
 	}
 
@@ -114,7 +114,7 @@ func (s *adminStore) TransferBalanceToUser(ctx context.Context, tx pgx.Tx, fromI
 
 	debitQuery := `
 		UPDATE admins 
-		SET balance = balance - $1 
+		SET balance = balance - $1
 		WHERE id = $2 AND balance >= $1
 	`
 	debitResult, err := tx.Exec(ctx, debitQuery, amount, fromID)
@@ -128,12 +128,12 @@ func (s *adminStore) TransferBalanceToUser(ctx context.Context, tx pgx.Tx, fromI
 
 	creditQuery := `
 		UPDATE users 
-		SET balance = balance + $1 
+		SET balance = balance + $1,
+		credit_ref = credit_ref + $1
 		WHERE id = $2
 	`
 	creditResult, err := tx.Exec(ctx, creditQuery, amount, toID)
 	if err != nil {
-
 		return fmt.Errorf("failed to credit balance: %w", err)
 	}
 
@@ -151,7 +151,8 @@ func (s *adminStore) DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID
 
 	debitQuery := `
 		UPDATE users 
-		SET balance = balance - $1 
+		SET balance = balance - $1,
+		credit_ref = credit_ref - $1
 		WHERE id = $2 AND balance >= $1
 	`
 	debitResult, err := tx.Exec(ctx, debitQuery, amount, fromID)

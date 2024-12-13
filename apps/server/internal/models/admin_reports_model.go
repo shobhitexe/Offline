@@ -10,8 +10,8 @@ type List struct {
 	Balance           float64 `json:"balance"`
 	Exposure          float64 `json:"exposure"`
 	Settlement        float64 `json:"settlement"`
+	CreditRef         float64 `json:"creditRef"`
 	PnL               float64 `json:"pnl"`
-	AvailableBalance  float64 `json:"availBal"`
 	SportsShare       int64   `json:"sportsShare"`
 	ChildLevel        int64   `json:"childLevel"`
 	Blocked           bool    `json:"blocked"`

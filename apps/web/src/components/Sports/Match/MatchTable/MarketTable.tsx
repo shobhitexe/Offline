@@ -45,9 +45,9 @@ export default function MarketTableComponent({
                 {item.RunnerName}
               </span>
               <span
-                className={`${currbets >= 0 ? "text-green-500" : "text-red-500"} flex items-center gap-2 text-sm`}
+                className={`${(currbets || 0) >= 0 ? "text-green-500" : "text-red-500"} flex items-center gap-2 text-sm`}
               >
-                <ArrowRight className="w-4 h-4" /> {currbets}
+                <ArrowRight className="w-4 h-4" /> {currbets || 0}
               </span>
             </div>
             <div className="col-span-3 max-ss:hidden"></div>

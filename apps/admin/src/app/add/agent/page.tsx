@@ -9,7 +9,7 @@ export default function page() {
       <PageHeading
         button={
           <Link
-            href={"/agent-list"}
+            href={"/list"}
             className={`${buttonVariants({
               variant: "default",
               size: "sm",

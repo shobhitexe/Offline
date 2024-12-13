@@ -31,19 +31,29 @@ func (a *adminService) CreateUser(ctx context.Context, payload models.CreateUser
 
 	defer func() {
 		if p := recover(); p != nil {
-			_ = tx.Rollback(ctx)
+			if rErr := tx.Rollback(ctx); rErr != nil {
+				fmt.Printf("Rollback failed: %v\n", rErr)
+			}
 			panic(p)
 		} else if err != nil {
-			_ = tx.Rollback(ctx)
+			if rErr := tx.Rollback(ctx); rErr != nil {
+				fmt.Printf("Rollback failed: %v\n", rErr)
+			}
 		}
 	}()
 
-	if err := a.store.CreateUser(ctx, tx, payload); err != nil {
+	id, err := a.store.CreateUser(ctx, tx, payload)
+
+	if err != nil {
 		return fmt.Errorf("Failed to create user :%w", err)
 	}
 
-	if err := a.store.DebitBalance(ctx, tx, payload.AddedBy, payload.Credit); err != nil {
-		return fmt.Errorf("Failed to deduct balance :%w", err)
+	if err := a.store.TransferBalanceToUser(ctx, tx, payload.AddedBy, id, payload.Credit); err != nil {
+		return err
+	}
+
+	if err := a.store.RecordUserTransaction(ctx, tx, payload.AddedBy, id, "Create User", "credit", "credit", payload.Credit); err != nil {
+		return err
 	}
 
 	if err = tx.Commit(ctx); err != nil {
@@ -62,24 +72,21 @@ func (a *adminService) UsersList(ctx context.Context, id string) (*[]models.List
 
 	var totalExposure float64
 	var creditRef float64
-	var availBal float64
 	var settlementPnL float64
 	var PnL float64
 
 	for _, item := range *list {
 		totalExposure += item.Exposure
 		creditRef += item.Balance
-		availBal += item.AvailableBalance
 		settlementPnL += item.Settlement
 		PnL += item.PnL
 	}
 
 	totals := models.List{
-		Exposure:         totalExposure,
-		Balance:          creditRef,
-		AvailableBalance: availBal,
-		Settlement:       settlementPnL,
-		PnL:              PnL,
+		Exposure:   totalExposure,
+		Balance:    creditRef,
+		Settlement: settlementPnL,
+		PnL:        PnL,
 	}
 
 	*list = append([]models.List{totals}, *list...)

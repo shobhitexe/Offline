@@ -56,8 +56,8 @@ export default function RiskAnalysis({
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-0">
-                  {event.MatchOdds.Runners &&
-                    event.MatchOdds.Runners.map((runner) => (
+                  {event.MatchOdds.runners &&
+                    event.MatchOdds.runners.map((runner) => (
                       <div
                         key={runner.RunnerId}
                         className="flex gap-2 justify-between sm:justify-start"

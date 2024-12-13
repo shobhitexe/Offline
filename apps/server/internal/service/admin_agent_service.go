@@ -88,17 +88,16 @@ func (a *adminService) UsersAndAgentsList(ctx context.Context, id string) (*[]mo
 	for _, item := range *adminList {
 		totalExposure += item.Exposure
 		creditRef += item.Balance
-		availBal += item.AvailableBalance
+		availBal += item.Balance
 		settlementPnL += item.Settlement
 		PnL += item.PnL
 	}
 
 	totals := models.List{
-		Exposure:         totalExposure,
-		Balance:          creditRef,
-		AvailableBalance: availBal,
-		Settlement:       settlementPnL,
-		PnL:              PnL,
+		Exposure:   totalExposure,
+		Balance:    creditRef,
+		Settlement: settlementPnL,
+		PnL:        PnL,
 	}
 	*adminList = append([]models.List{totals}, *adminList...)
 
@@ -140,10 +139,6 @@ func (a *adminService) CreateAgent(ctx context.Context, payload models.CreateAge
 	}
 
 	if err := a.store.TransferBalance(ctx, tx, payload.AddedBy, id, payload.Credit); err != nil {
-		return err
-	}
-
-	if err := a.store.TransferSportsShare(ctx, tx, payload.AddedBy, id, payload.SportsShare); err != nil {
 		return err
 	}
 

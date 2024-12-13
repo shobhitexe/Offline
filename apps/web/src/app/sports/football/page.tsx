@@ -31,7 +31,7 @@ export default async function page() {
 
       <div className="flex flex-col divide-y divide-[#444446]">
         {data.map((item) => (
-          <GameCard key={item.eventId} {...item} />
+          <GameCard key={item.eventId} event={item} />
         ))}
       </div>
     </div>

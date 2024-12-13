@@ -12,7 +12,6 @@ type AdminAgentStore interface {
 	GetAdminByUsername(ctx context.Context, username string) (*models.Admin, error)
 	GetAgentsList(ctx context.Context, id string) (*[]models.List, error)
 	CreateAgent(ctx context.Context, tx pgx.Tx, payload models.CreateAgent) (string, error)
-	TransferSportsShare(ctx context.Context, tx pgx.Tx, from, to string, share int64) error
 	EditAdmin(ctx context.Context, id, name string) error
 	GetAdminWalllets(ctx context.Context, id string) (*models.Admin, error)
 }
@@ -32,7 +31,7 @@ func (s *adminStore) GetAdminByUsername(ctx context.Context, username string) (*
 func (s *adminStore) GetAgentsList(ctx context.Context, id string) (*[]models.List, error) {
 	var admins []models.List
 
-	query := `SELECT id, name, username, balance, settlement, 'A' AS role,
+	query := `SELECT id, name, username, balance, settlement, credit_ref, 'A' AS role, downline,
 	ROUND(balance::numeric + settlement::numeric, 2) AS pnl,
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM admins
@@ -54,7 +53,9 @@ func (s *adminStore) GetAgentsList(ctx context.Context, id string) (*[]models.Li
 			&admin.Username,
 			&admin.Balance,
 			&admin.Settlement,
+			&admin.CreditRef,
 			&admin.Role,
+			&admin.Downline,
 			&admin.PnL,
 			&admin.CreatedAt,
 		); err != nil {
@@ -87,7 +88,12 @@ func (s *adminStore) CreateAgent(ctx context.Context, tx pgx.Tx, payload models.
 		payload.SessionCommission,
 	).Scan(&id)
 	if err != nil {
+		return "", fmt.Errorf("failed to create agent: %w", err)
+	}
 
+	downLineQuery := `UPDATE admins SET downline = downline + 1 WHERE id = $1`
+
+	if _, err := tx.Exec(ctx, downLineQuery, payload.AddedBy); err != nil {
 		return "", fmt.Errorf("failed to create agent: %w", err)
 	}
 
@@ -95,33 +101,33 @@ func (s *adminStore) CreateAgent(ctx context.Context, tx pgx.Tx, payload models.
 
 }
 
-func (s *adminStore) TransferSportsShare(ctx context.Context, tx pgx.Tx, from, to string, share int64) error {
+// func (s *adminStore) TransferSportsShare(ctx context.Context, tx pgx.Tx, from, to string, share int64) error {
 
-	query := `
-		UPDATE admins 
-		SET 
-			sports_share = CASE 
-				WHEN id = $2 THEN sports_share + $1
-				WHEN id = $3 AND sports_share >= $1 THEN sports_share - $1
-				ELSE sports_share
-			END
-		WHERE id IN ($2, $3)
-	`
+// 	query := `
+// 		UPDATE admins
+// 		SET
+// 			sports_share = CASE
+// 				WHEN id = $2 THEN sports_share + $1
+// 				WHEN id = $3 AND sports_share >= $1 THEN sports_share - $1
+// 				ELSE sports_share
+// 			END
+// 		WHERE id IN ($2, $3)
+// 	`
 
-	result, err := tx.Exec(ctx, query, share, to, from)
-	if err != nil {
-		return fmt.Errorf("failed to update sports_share: %w", err)
-	}
+// 	result, err := tx.Exec(ctx, query, share, to, from)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to update sports_share: %w", err)
+// 	}
 
-	rowsAffected := result.RowsAffected()
+// 	rowsAffected := result.RowsAffected()
 
-	if rowsAffected == 0 {
-		return fmt.Errorf("no rows updated; insufficient sports_share for the decrement or invalid IDs")
-	}
+// 	if rowsAffected == 0 {
+// 		return fmt.Errorf("no rows updated; insufficient sports_share for the decrement or invalid IDs")
+// 	}
 
-	return nil
+// 	return nil
 
-}
+// }
 
 func (s *adminStore) EditAdmin(ctx context.Context, id, name string) error {
 
