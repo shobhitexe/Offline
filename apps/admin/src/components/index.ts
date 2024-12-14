@@ -14,6 +14,12 @@ import Timer from "./RiskAnalysis/Match/Timer";
 import { balanceSheetColumns } from "./BalanceSheet/balanceSheetColumns";
 import { balanceSheetColumnsChild } from "./BalanceSheet/balanceSheetColumnsChild";
 import { addEventColumn } from "./Events/Addevent/addEventColumns";
+import { resultMarketHistoryColumns } from "./MatchSettings/ResultHiistory/resultHistoryColumns";
+import SelectComponent from "./Select";
+import { sessionColumns } from "./MatchSettings/Session/sessionColumns";
+import { resultMarketColumns } from "./MatchSettings/ResultMarket/resultmarketColumns";
+import { sportsSettingsColumns } from "./SportsSettings/sportsSettingsColumns";
+import { tournamentSettingsColumns } from "./TournamentList/tournamentSettingColumns";
 
 export {
   Signin,
@@ -32,4 +38,10 @@ export {
   balanceSheetColumns,
   balanceSheetColumnsChild,
   addEventColumn,
+  resultMarketHistoryColumns,
+  SelectComponent,
+  sessionColumns,
+  resultMarketColumns,
+  sportsSettingsColumns,
+  tournamentSettingsColumns,
 };

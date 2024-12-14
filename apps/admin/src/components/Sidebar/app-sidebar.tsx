@@ -75,26 +75,9 @@ const items = [
   {
     title: "Tournament List",
     icon: List,
-    url: "/reports",
+    url: "/tournament-list?game=cricket",
+    base: "/tournament-list",
   },
-  {
-    title: "Match Settings",
-    icon: FolderCog,
-    url: "/reports",
-  },
-  {
-    title: "Sports",
-    icon: Trophy,
-    url: "/reports",
-  },
-  {
-    title: "General Settings",
-    icon: Settings,
-    url: "/reports",
-  },
-];
-
-const collapsibleItems = [
   {
     title: "Events",
     icon: SquareChartGantt,
@@ -107,6 +90,38 @@ const collapsibleItems = [
       },
     ],
   },
+  {
+    title: "Match Settings",
+    icon: FolderCog,
+    url: "/reports",
+    childrens: [
+      {
+        title: "Session",
+        url: "/match-settings/session",
+        base: "/match-settings/session",
+      },
+      {
+        title: "Match",
+        url: "/match-settings/result-market",
+        base: "/match-settings/result-market",
+      },
+      {
+        title: "Match History",
+        url: "/match-settings/match-history",
+        base: "/match-settings/match-history",
+      },
+    ],
+  },
+  {
+    title: "Sports Settings",
+    icon: Trophy,
+    url: "/sports-settings",
+  },
+  {
+    title: "General Settings",
+    icon: Settings,
+    url: "/reports",
+  },
 ];
 
 export function AppSidebar() {
@@ -114,78 +129,81 @@ export function AppSidebar() {
 
   const isLinkActive = (link: string, base: string) => {
     return (
-      pathname === link ||
-      pathname.startsWith(link) ||
-      pathname.startsWith(base)
+      pathname === link || pathname.startsWith(link) || pathname.includes(base)
     );
   };
 
   return (
-    <Sidebar className="sm:mt-20 mt-10">
+    <Sidebar className="mt-14">
       <SidebarContent>
         <SidebarGroup>
-          {/* <SidebarGroupLabel>Application</SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu className="mt-2">
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      href={item.url}
-                      className={`${
-                        isLinkActive(item.url, item.url)
-                          ? "bg-black text-white shadow-md border font-medium hover:bg-black hover:text-white"
-                          : "hover:bg-black/10"
-                      } p-4 rounded-lg flex items-center`}
-                    >
-                      <item.icon />
-                      <span className="relative -bottom-px">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                if (item.childrens) {
+                  return (
+                    <Collapsible key={item.title}>
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton asChild>
+                            <div
+                              className={`rounded-lg flex items-center cursor-pointer pl-4`}
+                            >
+                              <item.icon />
+                              <span className="relative -bottom-px">
+                                {item.title}
+                              </span>
+                            </div>
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.childrens.map((item) => (
+                              <SidebarMenuSubItem key={item.title}>
+                                {" "}
+                                <SidebarMenuButton asChild>
+                                  <Link
+                                    href={item.url}
+                                    className={`${
+                                      isLinkActive(item.url, item.base)
+                                        ? "bg-black text-white shadow-md border font-medium"
+                                        : "hover:bg-black/10"
+                                    } p-4 rounded-lg flex items-center`}
+                                  >
+                                    <span className="relative -bottom-px">
+                                      {item.title}
+                                    </span>
+                                  </Link>
+                                </SidebarMenuButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  );
+                }
 
-              {collapsibleItems.map((item) => (
-                <Collapsible key={item.title}>
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton asChild>
-                        <div
-                          className={`rounded-lg flex items-center cursor-pointer pl-4`}
-                        >
-                          <item.icon />
-                          <span className="relative -bottom-px">
-                            {item.title}
-                          </span>
-                        </div>
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.childrens.map((item) => (
-                          <SidebarMenuSubItem key={item.title}>
-                            {" "}
-                            <SidebarMenuButton asChild>
-                              <Link
-                                href={item.url}
-                                className={`${
-                                  isLinkActive(item.url, item.base)
-                                    ? "bg-black text-white shadow-md border font-medium hover:bg-black hover:text-white"
-                                    : "hover:bg-black/10"
-                                } p-4 rounded-lg flex items-center`}
-                              >
-                                <span className="relative -bottom-px">
-                                  {item.title}
-                                </span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={item.url}
+                        className={`${
+                          isLinkActive(item.url, item.base || "none")
+                            ? "bg-black text-white shadow-md border font-medium hover:bg-black hover:text-white"
+                            : "hover:bg-black/10"
+                        } p-4 rounded-lg flex items-center`}
+                      >
+                        <item.icon />
+                        <span className="relative -bottom-px">
+                          {item.title}
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
-                </Collapsible>
-              ))}
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

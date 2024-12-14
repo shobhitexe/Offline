@@ -42,8 +42,8 @@ export default async function Navbar() {
   const fetchedBalance = await getBalance(session?.user.id!);
 
   return (
-    <div className="bg-[#04061b] sm:h-20 h-10 z-20 relative flex items-center justify-between px-5">
-      <div className="text-white">Offline</div>
+    <div className="bg-black h-14 z-20 relative flex items-center justify-between px-5">
+      <div className="text-white font-medium italic">OFFLINE ⚽ 🏏 🎾</div>
       <div className="flex gap-5">
         <DropdownMenu>
           <DropdownMenuTrigger className="text-white">
@@ -70,7 +70,9 @@ export default async function Navbar() {
               <ChevronDown />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuLabel>{session?.user.name}</DropdownMenuLabel>
+              <DropdownMenuLabel className="ui-text-sm">
+                {session?.user.name}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <Profile />
 

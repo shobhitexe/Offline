@@ -82,7 +82,6 @@ func (s *sportsStore) GetInPlayEvents(ctx context.Context, id string) (*[]models
 		active_events
 	WHERE 
 		sports_id = $1 
-		AND status = 'active' 
 		AND is_declared = false
 		AND NOW() > opening_time`
 

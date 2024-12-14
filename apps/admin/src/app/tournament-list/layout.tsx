@@ -10,9 +10,9 @@ const Games = [
 export default function layout({ children }: { children: ReactNode }) {
   return (
     <div className="w-full flex flex-col gap-5">
-      <PageHeading>Add Event</PageHeading>
+      <PageHeading>Tournament List</PageHeading>
 
-      <SelectComponent data={Games} link={"/events/add-event?game="} />
+      <SelectComponent data={Games} link={"/tournament-list?game="} />
 
       {children}
     </div>
