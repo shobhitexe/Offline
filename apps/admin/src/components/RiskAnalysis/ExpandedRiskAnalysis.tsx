@@ -2,10 +2,17 @@ import fetcher from "@/lib/setup";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 
+type Fancy = {
+  RunnerName: string;
+  OddsRate: number;
+  TotalExposure: number;
+  TotalProfit: number;
+};
+
 type GroupedBetHistoryPerGame = {
   Bookmaker: Record<string, number>;
-  Fancy: Record<string, number>;
   MatchOdds: Record<string, number>;
+  Fancy: Fancy[];
 };
 
 export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
@@ -15,6 +22,8 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
     `/admin/sports/list/activebets?eventId=${eventId}`,
     fetcher
   );
+
+  console.log(data);
 
   if (isLoading) {
     return <div className="p-4 text-center text-gray-500">Loading...</div>;
@@ -32,7 +41,7 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
 
   const matchOdds = data?.data.MatchOdds || {};
   const bookmaker = data?.data.Bookmaker || {};
-  const fancy = data?.data.Fancy || {};
+  const fancy = data?.data.Fancy || [];
 
   return (
     <div className="p-4 border-t w-full text-sm">
@@ -40,7 +49,6 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
         Object.keys(bookmaker).length === 0 && (
           <h2 className="text-base font-bold mb-4">No Data yet</h2>
         )}
-
       {Object.keys(matchOdds).length > 0 && (
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Match Odds</h3>
@@ -87,21 +95,47 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
           </div>
         </div>
       )}
+      <div className="mb-6">
+        <h3 className="font-semibold mb-2">Fancy</h3>
 
-      {/* <div>
-        <h3 className="text-md font-semibold mb-2">Fancy</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {Object.keys(fancy).map((item) => (
-            <div
-              key={item}
-              className="flex justify-between bg-gray-100 p-2 rounded shadow-sm"
-            >
-              <span className="font-medium text-gray-700">{item}</span>
-              <span className="text-gray-900">{fancy[item]}</span>
+        <div className="flex items-center gap-5">
+          {fancy.map((item) => (
+            <div key={item.RunnerName}>
+              <div className="text-center">{item.RunnerName}</div>
+              <table>
+                <tbody>
+                  <tr className="border">
+                    {Array.from({ length: 11 }, (_, i) => {
+                      const offset = i - 5;
+                      return (
+                        <th key={offset} className="border border-black p-1">
+                          {item.OddsRate + offset}
+                        </th>
+                      );
+                    })}
+                  </tr>
+
+                  <tr>
+                    {Array.from({ length: 11 }, (_, i) => {
+                      const isNegative = i < 5;
+                      return (
+                        <td
+                          key={i}
+                          className={`border border-black p-1 ${isNegative ? "text-red-600" : "text-green-600"}`}
+                        >
+                          {isNegative
+                            ? `-${item.TotalExposure}`
+                            : item.TotalProfit}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           ))}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

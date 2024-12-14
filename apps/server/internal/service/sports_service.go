@@ -159,12 +159,25 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 
 	var profit, exposure float64
 
-	if payload.BetType == "back" || payload.BetType == "yes" {
+	switch payload.BetType {
+	case "back":
 		profit = (payload.OddsRate - 1) * float64(payload.Amount)
 		exposure = float64(payload.Amount)
-	} else {
+		break
+	case "lay":
 		profit = float64(payload.Amount)
 		exposure = (payload.OddsRate - 1) * float64(payload.Amount)
+		break
+	case "no":
+		profit = payload.Amount
+		exposure = payload.OddsPrice * (payload.Amount / 100)
+		break
+	case "yes":
+		profit = payload.OddsPrice * (payload.Amount / 100)
+		exposure = payload.Amount
+		break
+	default:
+		return fmt.Errorf("Invalid Bet Type")
 	}
 
 	if err := s.store.TransferBetValueToExposure(ctx, tx, payload.UserId, exposure); err != nil {

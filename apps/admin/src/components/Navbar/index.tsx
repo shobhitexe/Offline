@@ -17,6 +17,7 @@ import { universalGET } from "@/lib/requests";
 import Balance from "./Balance";
 import ChangePassword from "./ChangePass/ChangePassword";
 import TermsCondition from "./Terms";
+import Image from "next/image";
 
 async function getBalance(id: string) {
   try {
@@ -42,8 +43,11 @@ export default async function Navbar() {
   const fetchedBalance = await getBalance(session?.user.id!);
 
   return (
-    <div className="bg-black h-14 z-20 relative flex items-center justify-between px-5">
-      <div className="text-white font-medium italic">OFFLINE ⚽ 🏏 🎾</div>
+    <div className="bg-black h-14 z-20 relative flex items-center justify-between pr-5">
+      {/* <div className="text-white font-medium italic">OFFLINE ⚽ 🏏 🎾</div> */}
+
+      <Image src={"/images/logo.jpeg"} alt={"logo"} width={150} height={70} />
+
       <div className="flex gap-5">
         <DropdownMenu>
           <DropdownMenuTrigger className="text-white">

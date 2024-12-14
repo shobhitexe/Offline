@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"server/internal/models"
 	"server/pkg/utils"
@@ -22,12 +23,21 @@ func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId 
 		return models.GroupedData{}, err
 	}
 
+	fancyBets, err := s.store.FancyBetsPerEventId(ctx, eventId)
+
+	log.Println(fancyBets)
+
+	if err != nil {
+		return models.GroupedData{}, err
+	}
+
 	matchOddsResults := utils.CalculateActiveBetsOdds(bets, "Match Odds")
 	bookmakerResults := utils.CalculateActiveBetsOdds(bets, "Bookmaker")
 
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
 		Bookmaker: bookmakerResults,
+		Fancy:     fancyBets,
 	}
 
 	return grouped, nil

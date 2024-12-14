@@ -157,20 +157,35 @@ export default function Betslip({
 
         <DrawerHeader>
           <DrawerTitle>
-            <div className="flex items-center justify-center gap-5">
-              <div className="text-green-400">
-                {"Profit: "}
-                {betType === "back" || betType === "yes"
-                  ? ((rate - 1) * amount).toFixed(2)
-                  : amount}
+            {(betType === "back" || betType === "lay") && (
+              <div className="flex items-center justify-center gap-5">
+                <div className="text-green-400">
+                  {"Profit: "}
+                  {betType === "back"
+                    ? ((rate - 1) * amount).toFixed(2)
+                    : amount}
+                </div>
+                <div className="text-red-400">
+                  {"Exposure: "}
+                  {betType === "back"
+                    ? amount
+                    : ((rate - 1) * amount).toFixed(2)}
+                </div>
               </div>
-              <div className="text-red-400">
-                {"Exposure: "}
-                {betType === "back" || betType === "yes"
-                  ? amount
-                  : ((rate - 1) * amount).toFixed(2)}
+            )}
+
+            {(betType === "no" || betType === "yes") && (
+              <div className="flex items-center justify-center gap-5">
+                <div className="text-green-400">
+                  {"Profit: "}
+                  {betType === "no" ? amount : price * (amount / 100)}
+                </div>
+                <div className="text-red-400">
+                  {"Exposure: "}
+                  {betType === "no" ? price * (amount / 100) : amount}
+                </div>
               </div>
-            </div>
+            )}
           </DrawerTitle>
         </DrawerHeader>
 

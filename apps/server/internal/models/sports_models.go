@@ -24,6 +24,13 @@ type ActiveBet struct {
 	RunnerID   string
 }
 
+type FancyBets struct {
+	RunnerName    string
+	OddsRate      float64
+	TotalExposure float64
+	TotalProfit   float64
+}
+
 // ///
 type Odds struct {
 	BookMaker     BookMakerInfo `json:"BookMaker"`
@@ -112,6 +119,7 @@ type BetHistoryPerGame struct {
 type GroupedData struct {
 	MatchOdds map[string]float64
 	Bookmaker map[string]float64
+	Fancy     []FancyBets
 }
 
 // events
