@@ -36,7 +36,7 @@ func NewScheduler(sportsStore store.SportsStore, redis *redis.Client) *Cron {
 
 func (c *Cron) StartCron(ctx context.Context) {
 	go func() {
-		ticker := time.NewTicker(600 * time.Second)
+		ticker := time.NewTicker(6 * time.Second)
 		defer ticker.Stop()
 
 		for {
@@ -52,6 +52,9 @@ func (c *Cron) StartCron(ctx context.Context) {
 				if err := c.GetMatchOddsResult(taskCtx); err != nil {
 					log.Printf("Error in auto declaring results: %v", err)
 				}
+				if err := c.DeclareFancyResult(taskCtx); err != nil {
+					log.Printf("Error in declaring fancy results: %v", err)
+				}
 			case <-ctx.Done():
 				log.Println("Stopping 600-second cron tasks...")
 				return
@@ -60,26 +63,26 @@ func (c *Cron) StartCron(ctx context.Context) {
 		}
 	}()
 
-	go func() {
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
+	// go func() {
+	// 	ticker := time.NewTicker(1 * time.Second)
+	// 	defer ticker.Stop()
 
-		for {
-			select {
-			case <-ticker.C:
-				taskCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-				defer cancel()
+	// 	for {
+	// 		select {
+	// 		case <-ticker.C:
+	// 			taskCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	// 			defer cancel()
 
-				if err := c.UpdateMatchOdds(taskCtx); err != nil {
-					log.Printf("Error updating match odds: %v", err)
-				}
-				cancel()
+	// 			if err := c.UpdateMatchOdds(taskCtx); err != nil {
+	// 				log.Printf("Error updating match odds: %v", err)
+	// 			}
+	// 			cancel()
 
-			case <-ctx.Done():
-				log.Println("Stopping 1-second cron tasks...")
-				return
-			}
-		}
-	}()
+	// 		case <-ctx.Done():
+	// 			log.Println("Stopping 1-second cron tasks...")
+	// 			return
+	// 		}
+	// 	}
+	// }()
 
 }

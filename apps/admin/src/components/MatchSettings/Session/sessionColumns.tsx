@@ -35,7 +35,7 @@ export const sessionColumns: ColumnDef<any>[] = [
       const eventName = row.getValue("eventName") as string;
       const RunnerName = row.getValue("RunnerName") as string;
       const RunnerId = row.getValue("RunnerId") as string;
-      const runVal = row.getValue("run") as string;
+      const runVal = row.getValue("run") as number;
 
       const [run, setRun] = useState(0);
 
@@ -77,6 +77,7 @@ export const sessionColumns: ColumnDef<any>[] = [
             id="run"
             placeholder={"Run Value"}
             className="min-w-[80px]"
+            disabled={runVal !== 0}
             defaultValue={runVal}
             onChange={(e) => setRun(Number(e.target.value))}
           />

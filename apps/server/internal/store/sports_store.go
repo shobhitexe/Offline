@@ -24,6 +24,7 @@ type SportsStore interface {
 	BetHistoryPerGamePerUser(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
 	GetInPlayEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	FancyBetsPerEventIdSports(ctx context.Context, eventId, userId string) ([]models.FancyBets, error)
+	GetActiveFancyBets(ctx context.Context) ([]models.ActiveBet, error)
 }
 
 type sportsStore struct {
@@ -331,6 +332,37 @@ func (s *sportsStore) FancyBetsPerEventIdSports(ctx context.Context, eventId, us
 
 		bets = append(bets, bet)
 
+	}
+
+	return bets, nil
+}
+
+func (s *sportsStore) GetActiveFancyBets(ctx context.Context) ([]models.ActiveBet, error) {
+
+	var bets []models.ActiveBet
+
+	query := `SELECT 
+	id, match_id, event_id, user_id, odds_price, odds_rate, bet_type, market_name, market_id, runner_name, runner_id, profit, exposure 
+	from sport_bets
+	WHERE settled = false AND market_type = 'Fancy'`
+
+	rows, err := s.db.Query(ctx, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var item models.ActiveBet
+
+		if err := rows.Scan(); err != nil {
+			return nil, err
+		}
+
+		bets = append(bets, item)
 	}
 
 	return bets, nil
