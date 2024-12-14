@@ -124,6 +124,7 @@ export default function MatchTable({
               marketId={marketId}
               type="Fancy"
               mutate={mutate}
+              FancyBets={data?.data.grouped.Fancy}
             />
           )}
       </div>

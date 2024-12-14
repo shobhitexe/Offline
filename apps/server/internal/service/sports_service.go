@@ -29,6 +29,7 @@ type SportsService interface {
 
 type sportsService struct {
 	store store.SportsStore
+	admin store.AdminSportsStore
 	redis *redis.Client
 }
 
@@ -227,9 +228,16 @@ func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId s
 	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds")
 	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker")
 
+	fancyBets, err := s.store.FancyBetsPerEventIdSports(ctx, eventId, userId)
+
+	if err != nil {
+		return nil, models.GroupedData{}, err
+	}
+
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
 		Bookmaker: bookmakerResults,
+		Fancy:     fancyBets,
 	}
 
 	return d, grouped, nil

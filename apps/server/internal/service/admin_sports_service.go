@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"server/internal/models"
 	"server/pkg/utils"
@@ -24,8 +23,6 @@ func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId 
 	}
 
 	fancyBets, err := s.store.FancyBetsPerEventId(ctx, eventId)
-
-	log.Println(fancyBets)
 
 	if err != nil {
 		return models.GroupedData{}, err

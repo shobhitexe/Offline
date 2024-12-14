@@ -24,7 +24,7 @@ func (h *AdminHandler) GetActiveBetsListByMarketID(w http.ResponseWriter, r *htt
 	if err != nil {
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
 			Message: "Failed",
-			Data:    "[]",
+			Data:    err.Error(),
 		})
 		return
 	}

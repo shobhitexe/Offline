@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"log"
 	"server/internal/models"
 )
 
@@ -23,12 +24,18 @@ func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId st
 	rows, err := s.db.Query(ctx, query, eventId)
 
 	if err != nil {
+
 		return nil, err
 	}
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
-		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId, &row.EventId)
+		if err := rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId, &row.EventId); err != nil {
+
+			log.Println(err)
+
+			return nil, err
+		}
 
 		history = append(history, row)
 	}
@@ -65,12 +72,12 @@ func (s *adminStore) FancyBetsPerEventId(ctx context.Context, eventId string) ([
 
 	var bets []models.FancyBets
 
-	query := `SELECT runner_name, odds_rate, SUM(exposure) AS total_exposure, SUM(profit) AS total_profit
+	query := `SELECT runner_name, odds_rate, bet_type, SUM(exposure) AS total_exposure, SUM(profit) AS total_profit
 			  FROM sport_bets 
 			  WHERE settled = false 
               AND market_type = 'Fancy' 
               AND event_id = $1
-              GROUP BY runner_name, odds_rate`
+              GROUP BY runner_name, odds_rate, bet_type`
 
 	rows, err := s.db.Query(ctx, query, eventId)
 
@@ -82,12 +89,16 @@ func (s *adminStore) FancyBetsPerEventId(ctx context.Context, eventId string) ([
 
 	for rows.Next() {
 		var bet models.FancyBets
-		rows.Scan(
+
+		if err := rows.Scan(
 			&bet.RunnerName,
 			&bet.OddsRate,
+			&bet.BetType,
 			&bet.TotalExposure,
 			&bet.TotalProfit,
-		)
+		); err != nil {
+			return nil, err
+		}
 
 		bets = append(bets, bet)
 

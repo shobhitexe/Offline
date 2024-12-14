@@ -27,7 +27,7 @@ import { gameSessionType } from "./Games/game";
 
 import { ColorBetDataType } from "./Statement/Statement";
 
-import { BetHistoryPerGame, GroupedBetHistoryPerGame } from "./Sports";
+import { BetHistoryPerGame, GroupedBetHistoryPerGame, Fancy } from "./Sports";
 
 export type {
   UserType,
@@ -50,4 +50,5 @@ export type {
   ColorBetDataType,
   BetHistoryPerGame,
   GroupedBetHistoryPerGame,
+  Fancy,
 };

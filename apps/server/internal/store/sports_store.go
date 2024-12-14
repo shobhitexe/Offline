@@ -23,6 +23,7 @@ type SportsStore interface {
 	ChangeActiveBetStatus(ctx context.Context, id, result string) error
 	BetHistoryPerGamePerUser(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
 	GetInPlayEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
+	FancyBetsPerEventIdSports(ctx context.Context, eventId, userId string) ([]models.FancyBets, error)
 }
 
 type sportsStore struct {
@@ -293,4 +294,44 @@ func (s *sportsStore) BetHistoryPerGamePerUser(ctx context.Context, userId, even
 	}
 
 	return &history, nil
+}
+
+func (s *sportsStore) FancyBetsPerEventIdSports(ctx context.Context, eventId, userId string) ([]models.FancyBets, error) {
+
+	var bets []models.FancyBets
+
+	query := `SELECT runner_name, odds_rate, bet_type, SUM(exposure) AS total_exposure, SUM(profit) AS total_profit
+			  FROM sport_bets 
+			  WHERE settled = false 
+              AND market_type = 'Fancy' 
+              AND event_id = $1
+			  AND user_id = $2
+              GROUP BY runner_name, odds_rate, bet_type`
+
+	rows, err := s.db.Query(ctx, query, eventId, userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var bet models.FancyBets
+
+		if err := rows.Scan(
+			&bet.RunnerName,
+			&bet.OddsRate,
+			&bet.BetType,
+			&bet.TotalExposure,
+			&bet.TotalProfit,
+		); err != nil {
+			return nil, err
+		}
+
+		bets = append(bets, bet)
+
+	}
+
+	return bets, nil
 }

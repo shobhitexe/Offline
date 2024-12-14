@@ -29,6 +29,7 @@ type FancyBets struct {
 	OddsRate      float64
 	TotalExposure float64
 	TotalProfit   float64
+	BetType       string
 }
 
 // ///

@@ -1,6 +1,9 @@
 import { Market } from "@/types";
 import Betslip from "../BetSlip";
 import { KeyedMutator } from "swr";
+import { Fancy } from "@repo/types";
+
+import FancyBetsDialog from "./FancyBetsDialog";
 
 export default function FancyTableComponent({
   data,
@@ -9,6 +12,7 @@ export default function FancyTableComponent({
   marketId,
   type,
   mutate,
+  FancyBets,
 }: {
   data: Market;
   eventId: string;
@@ -16,6 +20,7 @@ export default function FancyTableComponent({
   marketId: string;
   type: string;
   mutate: KeyedMutator<any>;
+  FancyBets?: Fancy[];
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -24,49 +29,58 @@ export default function FancyTableComponent({
         {data.MarketName}
         {/* <span className="text-gray-400">(53636091.28)</span> */}
       </div>
-      {data.runners.map((item) => (
-        <div
-          key={item.RunnerId}
-          className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,60px)] gap-2 items-center"
-        >
-          <div className="flex items-center gap-2">
-            {/* <span className="font-semibold">
+      {data.runners.map((item) => {
+        const fancyData = FancyBets?.filter(
+          (_item) => _item.RunnerName === item.RunnerName
+        );
+
+        return (
+          <div
+            key={item.RunnerId}
+            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,60px)] gap-2 items-center"
+          >
+            <div className="flex flex-col gap-2">
+              {/* <span className="font-semibold">
               {item.RunnerName.slice(0, 2).toUpperCase()}
             </span> */}
-            <span className="text-white sm:text-lg text-sm">
-              {item.RunnerName}
-            </span>
-            {/* <span className="text-green-500">{item.Status}</span> */}
+              <span className="text-white sm:text-lg text-sm">
+                {item.RunnerName}
+              </span>
+
+              <span className="text-red-500 flex items-center gap-2 text-sm">
+                {fancyData?.map((item) => <FancyBetsDialog fancyData={item} />)}
+              </span>
+            </div>
+            <div className="col-span-3 max-ss:hidden"></div>
+
+            <Betslip
+              rate={item.Lay.Rate}
+              price={item.Lay.Price}
+              betType={"no"}
+              eventId={eventId}
+              marketName={matchName}
+              marketId={marketId}
+              runnerName={item.RunnerName}
+              runnerID={item.RunnerId}
+              marketType={type}
+              mutate={mutate}
+            />
+
+            <Betslip
+              rate={item.Back.Rate}
+              price={item.Back.Price}
+              betType={"yes"}
+              eventId={eventId}
+              marketName={matchName}
+              marketId={marketId}
+              runnerName={item.RunnerName}
+              runnerID={item.RunnerId}
+              marketType={type}
+              mutate={mutate}
+            />
           </div>
-          <div className="col-span-3 max-ss:hidden"></div>
-
-          <Betslip
-            rate={item.Lay.Rate}
-            price={item.Lay.Price}
-            betType={"no"}
-            eventId={eventId}
-            marketName={matchName}
-            marketId={marketId}
-            runnerName={item.RunnerName}
-            runnerID={item.RunnerId}
-            marketType={type}
-            mutate={mutate}
-          />
-
-          <Betslip
-            rate={item.Back.Rate}
-            price={item.Back.Price}
-            betType={"yes"}
-            eventId={eventId}
-            marketName={matchName}
-            marketId={marketId}
-            runnerName={item.RunnerName}
-            runnerID={item.RunnerId}
-            marketType={type}
-            mutate={mutate}
-          />
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

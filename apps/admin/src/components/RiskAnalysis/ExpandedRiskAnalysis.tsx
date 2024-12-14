@@ -1,19 +1,7 @@
 import fetcher from "@/lib/setup";
+import { GroupedBetHistoryPerGame } from "@repo/types";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
-
-type Fancy = {
-  RunnerName: string;
-  OddsRate: number;
-  TotalExposure: number;
-  TotalProfit: number;
-};
-
-type GroupedBetHistoryPerGame = {
-  Bookmaker: Record<string, number>;
-  MatchOdds: Record<string, number>;
-  Fancy: Fancy[];
-};
 
 export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
   const session = useSession();
@@ -22,8 +10,6 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
     `/admin/sports/list/activebets?eventId=${eventId}`,
     fetcher
   );
-
-  console.log(data);
 
   if (isLoading) {
     return <div className="p-4 text-center text-gray-500">Loading...</div>;
@@ -98,10 +84,12 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Fancy</h3>
 
-        <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-center gap-5">
           {fancy.map((item) => (
             <div key={item.RunnerName}>
-              <div className="text-center">{item.RunnerName}</div>
+              <div className="text-center">
+                {item.RunnerName} ({item.BetType})
+              </div>
               <table>
                 <tbody>
                   <tr className="border">
@@ -117,14 +105,14 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
 
                   <tr>
                     {Array.from({ length: 11 }, (_, i) => {
-                      const isNegative = i < 5;
+                      const isNegative = item.BetType === "no" ? i < 5 : i > 5;
                       return (
                         <td
                           key={i}
                           className={`border border-black p-1 ${isNegative ? "text-red-600" : "text-green-600"}`}
                         >
                           {isNegative
-                            ? `-${item.TotalExposure}`
+                            ? -`${item.TotalExposure}`
                             : item.TotalProfit}
                         </td>
                       );

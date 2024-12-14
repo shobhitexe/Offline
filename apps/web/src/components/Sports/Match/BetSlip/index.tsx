@@ -74,14 +74,14 @@ export default function Betslip({
         return;
       }
 
-      if (exposure > balance) {
-        toast({
-          title: "Failed to place bet",
-          description: "insufficient balance",
-          variant: "destructive",
-        });
-        return;
-      }
+      // if (exposure > balance) {
+      //   toast({
+      //     title: "Failed to place bet",
+      //     description: "insufficient balance",
+      //     variant: "destructive",
+      //   });
+      //   return;
+      // }
 
       const res = await submitBetAction(
         eventId,

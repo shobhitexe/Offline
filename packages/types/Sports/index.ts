@@ -6,8 +6,16 @@ export type BetHistoryPerGame = {
   betType: string;
 };
 
+export type Fancy = {
+  RunnerName: string;
+  OddsRate: number;
+  TotalExposure: number;
+  TotalProfit: number;
+  BetType: string;
+};
+
 export type GroupedBetHistoryPerGame = {
   Bookmaker: Record<string, number>;
-  Fancy: Record<string, number>;
   MatchOdds: Record<string, number>;
+  Fancy: Fancy[];
 };
