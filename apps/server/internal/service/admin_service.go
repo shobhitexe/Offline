@@ -6,6 +6,7 @@ import (
 	"server/internal/models"
 	"server/internal/store"
 
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,10 +26,11 @@ type AdminService interface {
 
 type adminService struct {
 	store store.AdminStore
+	redis *redis.Client
 }
 
-func NewAdminService(store store.AdminStore) AdminService {
-	return &adminService{store: store}
+func NewAdminService(store store.AdminStore, redis *redis.Client) AdminService {
+	return &adminService{store: store, redis: redis}
 }
 
 func (s *adminService) AdminDetails(ctx context.Context, id string) (*models.Admin, error) {

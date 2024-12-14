@@ -65,6 +65,10 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 
 			// events
 			r.Get("/events/getlist", h.GetTournamentsList)
+			r.Get("/event/runners", h.GetRunners)
+
+			//runners
+			r.Post("/runner/result", h.SetRunnerResult)
 		})
 
 		//reports

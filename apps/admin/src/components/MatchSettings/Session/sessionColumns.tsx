@@ -1,33 +1,92 @@
 "use client";
 
+import { Button, Input, useToast } from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
-import { CircleCheck, Save } from "lucide-react";
+import { CircleCheck, CircleOff } from "lucide-react";
+import { useState } from "react";
+import { setSessionResultAction } from "./setSessionResultAction";
 
 export const sessionColumns: ColumnDef<any>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "eventId",
     header: "#",
-    cell: ({ row }) => <div>{row.index}</div>,
+    cell: ({ row }) => <div>{row.index + 1}</div>,
   },
   {
-    accessorKey: "matchName",
+    accessorKey: "eventName",
     header: "Match Name",
   },
   {
-    accessorKey: "sessionName",
+    accessorKey: "RunnerName",
     header: "Session Name",
+  },
+  {
+    accessorKey: "RunnerId",
+    header: "",
+    cell: () => <></>,
   },
   {
     accessorKey: "run",
     header: "Run",
-  },
-  {
-    accessorKey: "action",
-    header: "Action",
-    cell: ({ row }) => (
-      <div className="cursor-pointer">
-        <CircleCheck />
-      </div>
-    ),
+    cell: ({ row }) => {
+      const { toast } = useToast();
+
+      const eventId = row.getValue("eventId") as string;
+      const eventName = row.getValue("eventName") as string;
+      const RunnerName = row.getValue("RunnerName") as string;
+      const RunnerId = row.getValue("RunnerId") as string;
+      const runVal = row.getValue("run") as string;
+
+      const [run, setRun] = useState(0);
+
+      async function submitResultClient() {
+        try {
+          const res = await setSessionResultAction(
+            eventId,
+            eventName,
+            RunnerName,
+            RunnerId,
+            run
+          );
+
+          if (res !== true) {
+            toast({
+              description: "Failed to set result",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          toast({ description: `Result set successfull` });
+        } catch (error) {
+          toast({
+            description: "Failed to set result",
+            variant: "destructive",
+          });
+        }
+      }
+
+      return (
+        <form
+          className="cursor-pointer flex items-center gap-4 w-full"
+          action={submitResultClient}
+        >
+          <Input
+            name="run"
+            type="number"
+            id="run"
+            placeholder={"Run Value"}
+            className="min-w-[80px]"
+            defaultValue={runVal}
+            onChange={(e) => setRun(Number(e.target.value))}
+          />
+          <Button>
+            <CircleCheck />
+          </Button>
+
+          <CircleOff />
+        </form>
+      );
+    },
   },
 ];

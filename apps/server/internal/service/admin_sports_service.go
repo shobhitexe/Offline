@@ -8,12 +8,16 @@ import (
 	"net/http"
 	"server/internal/models"
 	"server/pkg/utils"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type AdminSportsService interface {
 	GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error)
 	GetBetHistoryPerGame(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
 	GetTournamentsList(ctx context.Context, game string) ([]models.TournamentsListData, error)
+	GetRunnersofEvent(ctx context.Context, eventId string) ([]models.FancyList, error)
+	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
 }
 
 func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error) {
@@ -101,4 +105,61 @@ func (s *adminService) GetTournamentsList(ctx context.Context, game string) ([]m
 	}
 
 	return data, nil
+}
+
+func (s *adminService) GetRunnersofEvent(ctx context.Context, eventId string) ([]models.FancyList, error) {
+	key := `sports:eventDetails:` + eventId
+
+	e, err := s.redis.Get(ctx, key).Result()
+
+	if err == redis.Nil {
+		return nil, fmt.Errorf("no value found for key: %s", key)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch key %s from Redis: %v", key, err)
+	}
+
+	results, err := s.store.GetRunnerResults(ctx, eventId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var data models.Odds
+	if err := json.Unmarshal([]byte(e), &data); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal Redis value: %v", err)
+	}
+
+	var list []models.FancyList
+
+	for _, runner := range data.Fancy.Runners {
+
+		if runner.Status == "true" {
+			r := models.FancyList{
+				Back:       runner.Back,
+				Lay:        runner.Lay,
+				RunnerId:   runner.RunnerId,
+				RunnerName: runner.RunnerName,
+				Status:     runner.Status,
+				Eventname:  data.EventName,
+				EventId:    data.EventId,
+				Run:        results[runner.RunnerId],
+			}
+
+			list = append(list, r)
+		}
+
+	}
+
+	return list, nil
+}
+
+func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error {
+
+	if err := s.store.SetRunnerResult(ctx, payload); err != nil {
+		return err
+	}
+
+	return nil
 }

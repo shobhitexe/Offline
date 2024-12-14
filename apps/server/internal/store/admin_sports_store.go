@@ -10,6 +10,8 @@ type AdminSportsStore interface {
 	GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error)
 	BetHistoryPerGame(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error)
 	FancyBetsPerEventId(ctx context.Context, eventId string) ([]models.FancyBets, error)
+	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
+	GetRunnerResults(ctx context.Context, eventId string) (map[string]int64, error)
 }
 
 func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {
@@ -105,4 +107,45 @@ func (s *adminStore) FancyBetsPerEventId(ctx context.Context, eventId string) ([
 	}
 
 	return bets, nil
+}
+
+func (s *adminStore) GetRunnerResults(ctx context.Context, eventId string) (map[string]int64, error) {
+	result := make(map[string]int64)
+
+	query := `SELECT runner_id, run FROM runner_results WHERE is_declared = false AND event_id = $1`
+
+	rows, err := s.db.Query(ctx, query, eventId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item models.GetRunnerResults
+
+		if err := rows.Scan(&item.RunnerId, &item.Run); err != nil {
+			return nil, err
+		}
+
+		result[item.RunnerId] = item.Run
+	}
+
+	return result, nil
+}
+
+func (s *adminStore) SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error {
+
+	query := `INSERT INTO 
+	runner_results (event_id, event_name, runner_name, runner_id, run) 
+	VALUES ($1, $2, $3, $4, $5)`
+
+	_, err := s.db.Exec(ctx, query, payload.EventId, payload.EventName, payload.RunnerName, payload.RunnerId, payload.Run)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -12,12 +12,14 @@ import { redirect, useSearchParams } from "next/navigation";
 export default function SelectComponent({
   data,
   link,
+  param,
 }: {
   data: { title: string; value: string }[];
   link: string;
+  param: string;
 }) {
   const searchParams = useSearchParams();
-  const game = searchParams.get("game") as string;
+  const game = searchParams.get(param) as string;
 
   return (
     <Select defaultValue={game} onValueChange={(e) => redirect(`${link}${e}`)}>

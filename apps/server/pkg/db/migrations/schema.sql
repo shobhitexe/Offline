@@ -141,3 +141,18 @@ CREATE TABLE IF NOT EXISTS sport_bets (
   CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
+
+
+
+-- +goose StatementBegin
+CREATE TABLE IF NOT EXISTS runner_results (
+    id SERIAL PRIMARY KEY,
+    event_id TEXT NOT NULL,
+    event_name TEXT NOT NULL,
+    runner_name TEXT NOT NULL UNIQUE,
+    runner_id TEXT NOT NULL UNIQUE,
+    run INTEGER NOT NULL,
+    is_declared BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- +goose StatementEnd

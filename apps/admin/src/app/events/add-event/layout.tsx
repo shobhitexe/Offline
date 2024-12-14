@@ -12,7 +12,11 @@ export default function layout({ children }: { children: ReactNode }) {
     <div className="w-full flex flex-col gap-5">
       <PageHeading>Add Event</PageHeading>
 
-      <SelectComponent data={Games} link={"/events/add-event?game="} />
+      <SelectComponent
+        data={Games}
+        link={"/events/add-event?game="}
+        param="game"
+      />
 
       {children}
     </div>

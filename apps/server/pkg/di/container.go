@@ -28,7 +28,7 @@ func NewContainer(db *pgxpool.Pool, redis *redis.Client) *Container {
 
 	//admin
 	adminStore := store.NewAdminStore(db)
-	adminService := service.NewAdminService(adminStore)
+	adminService := service.NewAdminService(adminStore, redis)
 
 	//sports
 	sportsStore := store.NewSportsStore(db)

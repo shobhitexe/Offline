@@ -106,3 +106,13 @@ type SettlementRequest struct {
 	Password string  `json:"password" validate:"required"`
 	TxnType  string  `json:"txnType" validate:"required"`
 }
+
+//runners
+
+type SetRunnerResultRequest struct {
+	EventId    string `json:"eventId" validate:"required"`
+	EventName  string `json:"eventName" validate:"required"`
+	RunnerName string `json:"runnerName" validate:"required"`
+	RunnerId   string `json:"runnerId" validate:"required"`
+	Run        int64  `json:"run" validate:"required,gte=0"`
+}

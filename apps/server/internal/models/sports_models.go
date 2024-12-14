@@ -139,3 +139,21 @@ type TournamentsListData struct {
 	Name              string `json:"name"`
 	CompetitionRegion string `json:"competitionRegion"`
 }
+
+//session
+
+type FancyList struct {
+	Back       PriceRate `json:"Back"`
+	Lay        PriceRate `json:"Lay"`
+	RunnerId   string    `json:"RunnerId"`
+	RunnerName string    `json:"RunnerName"`
+	Status     string    `json:"Status"`
+	Eventname  string    `json:"eventName"`
+	EventId    string    `json:"eventId"`
+	Run        int64     `json:"run"`
+}
+
+type GetRunnerResults struct {
+	RunnerId string `json:"runnerId" validate:"required"`
+	Run      int64  `json:"run" validate:"required,gte=0"`
+}

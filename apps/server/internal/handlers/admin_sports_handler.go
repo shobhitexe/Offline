@@ -75,3 +75,39 @@ func (h *AdminHandler) GetTournamentsList(w http.ResponseWriter, r *http.Request
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: list})
 }
+
+func (h *AdminHandler) GetRunners(w http.ResponseWriter, r *http.Request) {
+
+	eventId := r.URL.Query().Get("eventId")
+
+	if len(eventId) == 0 || eventId == "" {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch no event id provided", Data: []string{}})
+		return
+	}
+
+	list, err := h.service.GetRunnersofEvent(r.Context(), eventId)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: list})
+}
+
+func (h *AdminHandler) SetRunnerResult(w http.ResponseWriter, r *http.Request) {
+
+	var payload models.SetRunnerResultRequest
+
+	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	if err := h.service.SetRunnerResult(r.Context(), payload); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: true})
+}
