@@ -52,9 +52,6 @@ func (c *Cron) StartCron(ctx context.Context) {
 				if err := c.GetMatchOddsResult(taskCtx); err != nil {
 					log.Printf("Error in auto declaring results: %v", err)
 				}
-				if err := c.DeclareFancyResult(taskCtx); err != nil {
-					log.Printf("Error in declaring fancy results: %v", err)
-				}
 			case <-ctx.Done():
 				log.Println("Stopping 600-second cron tasks...")
 				return
@@ -64,7 +61,7 @@ func (c *Cron) StartCron(ctx context.Context) {
 	}()
 
 	go func() {
-		ticker := time.NewTicker(1 * time.Second)
+		ticker := time.NewTicker(500 * time.Millisecond)
 		defer ticker.Stop()
 
 		for {

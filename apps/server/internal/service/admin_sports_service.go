@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"server/internal/models"
 	"server/pkg/utils"
+	"sync"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -18,6 +20,7 @@ type AdminSportsService interface {
 	GetTournamentsList(ctx context.Context, game string) ([]models.TournamentsListData, error)
 	GetRunnersofEvent(ctx context.Context, eventId string) ([]models.FancyList, error)
 	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
+	SaveActiveEvents(ctx context.Context, sportsid, competitionid string) error
 }
 
 func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error) {
@@ -99,6 +102,7 @@ func (s *adminService) GetTournamentsList(ctx context.Context, game string) ([]m
 			ID:                item.Competition.ID,
 			Name:              item.Competition.Name,
 			CompetitionRegion: item.CompetitionRegion,
+			SportsId:          game,
 		}
 
 		data = append(data, t)
@@ -157,6 +161,82 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 
 	if err := s.store.SetRunnerResult(ctx, payload); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *adminService) SaveActiveEvents(ctx context.Context, sportsid, competitionid string) error {
+	r, err := http.Get("https://leisurebuzz.in/api/v2/competition/listEvents/" + sportsid + "/" + competitionid)
+	if err != nil {
+		return fmt.Errorf("failed to fetch events: %w", err)
+	}
+	defer r.Body.Close()
+
+	if r.StatusCode != http.StatusOK {
+		return fmt.Errorf("error: invalid status code %d returned", r.StatusCode)
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error reading response body for competition %s: %v", competitionid, err)
+		return err
+	}
+
+	var events []models.ListEvents
+	if err := json.Unmarshal(body, &events); err != nil {
+		return fmt.Errorf("failed to unmarshal events: %w", err)
+	}
+
+	var wg sync.WaitGroup
+	var errors []error
+
+	for _, event := range events {
+		wg.Add(1)
+		go func(e models.ListEvents) {
+			defer wg.Done()
+			if err := saveMarketOdds(ctx, e, sportsid, s); err != nil {
+				errors = append(errors, err)
+			}
+		}(event)
+	}
+
+	wg.Wait()
+
+	if len(errors) > 0 {
+		for _, err := range errors {
+			return err
+		}
+		return err
+	}
+
+	return nil
+}
+
+func saveMarketOdds(ctx context.Context, event models.ListEvents, sportsid string, s *adminService) error {
+	res, err := http.Get("https://alp.playunlimited9.co.in/api/v2/competition/getEventDetail/" + event.Event.ID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch event details: %w", err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code %d for event %s", res.StatusCode, event.Event.ID)
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body for event %s: %w", event.Event.ID, err)
+	}
+
+	var payload models.Odds
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return fmt.Errorf("failed to unmarshal odds for event %s: %w", event.Event.ID, err)
+	}
+
+	if err := s.store.SaveActiveEvents(ctx, event, sportsid, payload.MatchOdds); err != nil {
+		log.Printf("Failed to save active event %s: %v", event.Event.ID, err)
+		return fmt.Errorf("failed to save active event %s: %w", event.Event.ID, err)
 	}
 
 	return nil

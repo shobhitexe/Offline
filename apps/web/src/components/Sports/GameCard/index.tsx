@@ -3,10 +3,11 @@ import Link from "next/link";
 
 export default function GameCard({ event }: { event: EventType }) {
   return (
-    <Link href={`/sports/match/${event.eventId}/all`} className="sm:py-5 py-1">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 cursor-pointer">
+    <Link href={`/sports/match//${event.eventId}/all`} className="sm:py-5 py-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:p-4 p-2 cursor-pointer">
         <div className="flex flex-col gap-1">
           <span className="font-medium hover:underline">{event.eventName}</span>
+          <div className="text-sm text-muted-foreground">{event.category}</div>
           <div className="text-sm text-muted-foreground">{event.eventTime}</div>
         </div>
         <div className="sm:flex grid grid-cols-3 gap-4 mt-4 sm:mt-0">

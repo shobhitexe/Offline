@@ -44,7 +44,7 @@ func (c *Cron) processEventsForKey(ctx context.Context, key string) error {
 	ev, err := c.redis.Get(ctx, key).Result()
 	if err != nil {
 		if err == redis.Nil {
-			log.Printf("No active events found in Redis for key: %s", key)
+			// log.Printf("No active events found in Redis for key: %s", key)
 			return nil
 		}
 		log.Printf("Error retrieving data from Redis for key %s: %v", key, err)
@@ -66,15 +66,27 @@ func (c *Cron) processEventsForKey(ctx context.Context, key string) error {
 
 	for _, event := range events {
 		event := event
-		semaphore <- struct{}{}
-		g.Go(func() error {
-			defer func() { <-semaphore }()
-			if err := c.fetchAndCacheEventDetails(gCtx, event); err != nil {
-				log.Printf("Failed to process event %s: %v", event.EventId, err)
+
+		eventKey := "sports:active:" + event.EventId
+
+		active, err := c.redis.Get(ctx, eventKey).Result()
+
+		if err != nil && err != redis.Nil {
+			return err
+		}
+
+		if active == "true" {
+			semaphore <- struct{}{}
+			g.Go(func() error {
+				defer func() { <-semaphore }()
+				if err := c.fetchAndCacheEventDetails(gCtx, event); err != nil {
+					log.Printf("Failed to process event %s: %v", event.EventId, err)
+					return nil
+				}
 				return nil
-			}
-			return nil
-		})
+			})
+		}
+
 	}
 
 	if err := g.Wait(); err != nil {

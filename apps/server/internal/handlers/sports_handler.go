@@ -74,24 +74,6 @@ func (h *SportsHandler) GetEventDetail(w http.ResponseWriter, r *http.Request) {
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: data})
 }
 
-func (h *SportsHandler) SaveActiveEvents(w http.ResponseWriter, r *http.Request) {
-
-	id := r.URL.Query().Get("id")
-
-	if len(id) == 0 || id == "" {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch id provided", Data: false})
-		return
-	}
-
-	if err := h.service.SaveActiveEvents(r.Context(), id); err != nil {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: err.Error()})
-		return
-	}
-
-	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: true})
-
-}
-
 func (h *SportsHandler) PlaceBet(w http.ResponseWriter, r *http.Request) {
 
 	var payload models.PlaceBet

@@ -16,7 +16,6 @@ type SportsStore interface {
 	PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error
 	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
 	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error)
-	SaveActiveEvents(ctx context.Context, payload models.ActiveEvents, id string) error
 	TransferBetValueToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
 	BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, id string) error
 	BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error
@@ -43,7 +42,8 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 		match_name, 
 		event_id,
 		competition_id,
-		match_odds_runners, 
+		match_odds, 
+		category,
 		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
@@ -61,7 +61,14 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 
 	for rows.Next() {
 		var event models.ActiveEvents
-		if err := rows.Scan(&event.EventName, &event.EventId, &event.CompetitionId, &event.MatchOdds, &event.EventTime); err != nil {
+		if err := rows.Scan(
+			&event.EventName,
+			&event.EventId,
+			&event.CompetitionId,
+			&event.MatchOdds,
+			&event.Category,
+			&event.EventTime,
+		); err != nil {
 			return nil, err
 		}
 		events = append(events, event)
@@ -78,7 +85,7 @@ func (s *sportsStore) GetInPlayEvents(ctx context.Context, id string) (*[]models
 		match_name, 
 		event_id,
 		competition_id,
-		match_odds_runners, 
+		match_odds, 
 		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
@@ -220,27 +227,6 @@ func (s *sportsStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, 
 	}
 
 	return &allbets, nil
-}
-
-func (s *sportsStore) SaveActiveEvents(ctx context.Context, payload models.ActiveEvents, id string) error {
-
-	query := `INSERT INTO active_events 
-	(sports_id, match_name, event_id, competition_id, match_odds_runners, opening_time) 
-	VALUES ($1, $2, $3, $4, $5, $6)`
-
-	_, err := s.db.Exec(ctx, query, id,
-		payload.EventName,
-		payload.EventId,
-		payload.CompetitionId,
-		payload.MatchOdds,
-		payload.EventTime,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (s *sportsStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, userID string) error {

@@ -12,6 +12,7 @@ type AdminSportsStore interface {
 	FancyBetsPerEventId(ctx context.Context, eventId string) ([]models.FancyBets, error)
 	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
 	GetRunnerResults(ctx context.Context, eventId string) (map[string]int64, error)
+	SaveActiveEvents(ctx context.Context, payload models.ListEvents, id string, MatchOdds models.MarketInfo) error
 }
 
 func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {
@@ -142,6 +143,29 @@ func (s *adminStore) SetRunnerResult(ctx context.Context, payload models.SetRunn
 	VALUES ($1, $2, $3, $4, $5)`
 
 	_, err := s.db.Exec(ctx, query, payload.EventId, payload.EventName, payload.RunnerName, payload.RunnerId, payload.Run)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEvents, id string, MatchOdds models.MarketInfo) error {
+
+	query := `INSERT INTO active_events 
+	(sports_id, match_name, event_id, competition_id, runners, match_odds, category, opening_time) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+
+	_, err := s.db.Exec(ctx, query, id,
+		payload.Event.Name,
+		payload.Event.ID,
+		payload.Competition.ID,
+		payload.Runners,
+		MatchOdds,
+		payload.Competition.Name,
+		payload.Event.OpenDate,
+	)
 
 	if err != nil {
 		return err

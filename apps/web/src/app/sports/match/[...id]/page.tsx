@@ -78,7 +78,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
             payload: { eventId: params.id[0], connectionId: connId },
           })
         );
-      }, 1000);
+      }, 500);
 
       return () => {
         clearInterval(intervalId);

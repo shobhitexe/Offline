@@ -116,3 +116,10 @@ type SetRunnerResultRequest struct {
 	RunnerId   string `json:"runnerId" validate:"required"`
 	Run        int64  `json:"run" validate:"required,gte=0"`
 }
+
+// save events
+
+type SaveActiveEvents struct {
+	SportsId      string `json:"sportsid"`
+	CompetitionId string `json:"competitionid"`
+}

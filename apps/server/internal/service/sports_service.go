@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"server/internal/models"
 	"server/internal/store"
 	"server/pkg/utils"
@@ -21,7 +19,6 @@ type SportsService interface {
 	// GetMarketList(id string) (interface{}, error)
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
-	SaveActiveEvents(ctx context.Context, id string) error
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
 	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
 	GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error)
@@ -42,7 +39,7 @@ func NewSportsService(store store.SportsStore, redis *redis.Client) SportsServic
 
 func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
 	var jsonData []models.ActiveEvents
-	key := "sports:activeEvents:" + id
+	key := "sports:events:" + id
 
 	r, err := s.redis.Get(ctx, key).Result()
 	if err == nil {
@@ -74,38 +71,6 @@ func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]mode
 	}
 
 	return events, nil
-}
-
-func (s *sportsService) SaveActiveEvents(ctx context.Context, id string) error {
-
-	r, err := http.Get("https://alp.playunlimited9.co.in/api/v2/competition/getMarketList/" + id)
-
-	if err != nil {
-		return err
-	}
-
-	defer r.Body.Close()
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Printf("Error reading response body for event : %v", err)
-		return err
-	}
-
-	var events []models.ActiveEvents
-
-	if err := json.Unmarshal(body, &events); err != nil {
-		return err
-	}
-
-	for _, event := range events {
-		if err := s.store.SaveActiveEvents(ctx, event, id); err != nil {
-			log.Printf("Failed to save event : %v", err)
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (s *sportsService) GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error) {

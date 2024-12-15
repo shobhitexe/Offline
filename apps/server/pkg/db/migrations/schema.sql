@@ -106,13 +106,15 @@ CREATE TABLE IF NOT EXISTS admin_txns (
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS active_events (
     id SERIAL PRIMARY KEY,
-    sports_id INTEGER CHECK (sports_id IN (4, 2, 1)) DEFAULT 4,
+    sports_id INTEGER CHECK (sports_id IN (4, 2, 1)) NOT NULL,
     match_name TEXT NOT NULL,
-    event_id INTEGER NOT NULL,
+    category TEXT NOT NULL,
+    event_id INTEGER NOT NULL UNIQUE,
     competition_id TEXT NOT NULL,
     is_declared BOOLEAN DEFAULT FALSE,
     opening_time TIMESTAMP NOT NULL,
-    match_odds_runners JSON,
+    runners JSON,
+    match_odds JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- +goose StatementEnd

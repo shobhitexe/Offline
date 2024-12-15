@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"server/internal/models"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
@@ -33,6 +34,14 @@ func (s *WebsocketStore) UserBalance(ctx context.Context, id string) (*models.Us
 }
 
 func (s *WebsocketStore) GetEventDetails(ctx context.Context, eventId string) (map[string]interface{}, error) {
+
+	go func(eventId string) {
+		eventKey := "sports:active:" + eventId
+		if err := s.redis.Set(ctx, eventKey, []byte("true"), 5*time.Minute).Err(); err != nil {
+			log.Printf("Failed to cache active event to redis: %s", err)
+		}
+
+	}(eventId)
 
 	key := "sports:eventDetails:" + eventId
 

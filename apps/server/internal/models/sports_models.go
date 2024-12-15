@@ -5,6 +5,7 @@ type ActiveEvents struct {
 	CompetitionId string `json:"competitionId"`
 	EventName     string `json:"eventName"`
 	EventTime     string `json:"eventTime"`
+	Category      string `json:"category"`
 	MatchOdds     MarketInfo
 }
 
@@ -138,6 +139,7 @@ type TournamentsListData struct {
 	ID                string `json:"id"`
 	Name              string `json:"name"`
 	CompetitionRegion string `json:"competitionRegion"`
+	SportsId          string `json:"sportsId"`
 }
 
 //session
@@ -156,4 +158,16 @@ type FancyList struct {
 type GetRunnerResults struct {
 	RunnerId string `json:"runnerId" validate:"required"`
 	Run      int64  `json:"run" validate:"required,gte=0"`
+}
+
+type Event struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	OpenDate string `json:"openDate"`
+}
+
+type ListEvents struct {
+	Competition competitionData  `json:"competition"`
+	Event       Event            `json:"event"`
+	Runners     []map[string]any `json:"runners"`
 }

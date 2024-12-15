@@ -111,3 +111,21 @@ func (h *AdminHandler) SetRunnerResult(w http.ResponseWriter, r *http.Request) {
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: true})
 }
+
+func (h *AdminHandler) SaveActiveEvents(w http.ResponseWriter, r *http.Request) {
+
+	var payload models.SaveActiveEvents
+
+	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	if err := h.service.SaveActiveEvents(r.Context(), payload.SportsId, payload.CompetitionId); err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: true})
+
+}
