@@ -37,10 +37,9 @@ func (s *WebsocketStore) GetEventDetails(ctx context.Context, eventId string) (m
 
 	go func(eventId string) {
 		eventKey := "sports:active:" + eventId
-		if err := s.redis.Set(ctx, eventKey, []byte("true"), 5*time.Minute).Err(); err != nil {
+		if err := s.redis.Set(ctx, eventKey, true, 5*time.Minute).Err(); err != nil {
 			log.Printf("Failed to cache active event to redis: %s", err)
 		}
-
 	}(eventId)
 
 	key := "sports:eventDetails:" + eventId

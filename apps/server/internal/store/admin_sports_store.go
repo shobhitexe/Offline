@@ -13,6 +13,7 @@ type AdminSportsStore interface {
 	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
 	GetRunnerResults(ctx context.Context, eventId string) (map[string]int64, error)
 	SaveActiveEvents(ctx context.Context, payload models.ListEvents, id string, MatchOdds models.MarketInfo) error
+	GetActiveSession(ctx context.Context, eventId string) ([]models.ActiveSession, error)
 }
 
 func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {
@@ -172,4 +173,36 @@ func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEv
 	}
 
 	return nil
+}
+
+func (s *adminStore) GetActiveSession(ctx context.Context, eventId string) ([]models.ActiveSession, error) {
+	var session []models.ActiveSession
+
+	query := `SELECT runner_id, 
+       MAX(market_name) AS market_name, 
+       MAX(runner_name) AS runner_name,
+	   MAX(event_id) AS event_id
+       FROM sport_bets
+	   WHERE settled = false
+	   AND event_id = $1
+       GROUP BY runner_id`
+
+	rows, err := s.db.Query(ctx, query, eventId)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var item models.ActiveSession
+		if err := rows.Scan(&item.RunnerId, &item.MarketName, &item.RunnerName, &item.EventId); err != nil {
+			return nil, err
+		}
+		session = append(session, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return session, nil
 }

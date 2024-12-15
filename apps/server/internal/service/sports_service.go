@@ -39,13 +39,17 @@ func NewSportsService(store store.SportsStore, redis *redis.Client) SportsServic
 
 func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
 	var jsonData []models.ActiveEvents
-	key := "sports:events:" + id
+	key := "sports:activeEvents:" + id
 
 	r, err := s.redis.Get(ctx, key).Result()
 	if err == nil {
 		if err := json.Unmarshal([]byte(r), &jsonData); err != nil {
 			log.Printf("Error unmarshaling cached data from Redis: %v", err)
 			return nil, err
+		}
+
+		if err := s.redis.Expire(ctx, key, 1*time.Hour).Err(); err != nil {
+			log.Printf("Error extending expiration time for key %s: %v", key, err)
 		}
 		return &jsonData, nil
 	}
@@ -66,7 +70,7 @@ func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]mode
 		return nil, err
 	}
 
-	if err := s.redis.Set(ctx, key, serializedEvents, 24*time.Hour).Err(); err != nil {
+	if err := s.redis.Set(ctx, key, serializedEvents, 1*time.Hour).Err(); err != nil {
 		log.Printf("Error storing data in Redis: %v", err)
 	}
 

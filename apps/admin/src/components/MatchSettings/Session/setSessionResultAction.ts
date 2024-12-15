@@ -18,6 +18,8 @@ export async function setSessionResultAction(
       run,
     });
 
+    console.log(res);
+
     if (res.data !== true) {
       return false;
     }

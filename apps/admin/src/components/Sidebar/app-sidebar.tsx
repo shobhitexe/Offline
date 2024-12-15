@@ -81,14 +81,8 @@ const items = [
   {
     title: "Events",
     icon: SquareChartGantt,
-    url: "/reports",
-    childrens: [
-      {
-        title: "Add Event",
-        url: "/events/add-event?game=cricket",
-        base: "/events/add-event",
-      },
-    ],
+    url: "/events/add-event?game=cricket",
+    base: "/events/add-event",
   },
   {
     title: "Match Settings",
@@ -104,6 +98,11 @@ const items = [
         title: "Match",
         url: "/match-settings/result-market",
         base: "/match-settings/result-market",
+      },
+      {
+        title: "Session History",
+        url: "/match-settings/session-history",
+        base: "/match-settings/session-history",
       },
       {
         title: "Match History",

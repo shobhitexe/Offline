@@ -145,14 +145,11 @@ type TournamentsListData struct {
 //session
 
 type FancyList struct {
-	Back       PriceRate `json:"Back"`
-	Lay        PriceRate `json:"Lay"`
-	RunnerId   string    `json:"RunnerId"`
-	RunnerName string    `json:"RunnerName"`
-	Status     string    `json:"Status"`
-	Eventname  string    `json:"eventName"`
-	EventId    string    `json:"eventId"`
-	Run        int64     `json:"run"`
+	RunnerName string `json:"RunnerName"`
+	Eventname  string `json:"eventName"`
+	RunnerId   string `json:"runnerId"`
+	Run        int64  `json:"run"`
+	EventId    string `json:"eventId"`
 }
 
 type GetRunnerResults struct {
@@ -170,4 +167,11 @@ type ListEvents struct {
 	Competition competitionData  `json:"competition"`
 	Event       Event            `json:"event"`
 	Runners     []map[string]any `json:"runners"`
+}
+
+type ActiveSession struct {
+	MarketName string `json:"marketName"`
+	RunnerName string `json:"runnerName"`
+	RunnerId   string `json:"runnerId"`
+	EventId    string `json:"eventId"`
 }

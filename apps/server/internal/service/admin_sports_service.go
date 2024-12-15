@@ -10,8 +10,6 @@ import (
 	"server/internal/models"
 	"server/pkg/utils"
 	"sync"
-
-	"github.com/redis/go-redis/v9"
 )
 
 type AdminSportsService interface {
@@ -112,17 +110,6 @@ func (s *adminService) GetTournamentsList(ctx context.Context, game string) ([]m
 }
 
 func (s *adminService) GetRunnersofEvent(ctx context.Context, eventId string) ([]models.FancyList, error) {
-	key := `sports:eventDetails:` + eventId
-
-	e, err := s.redis.Get(ctx, key).Result()
-
-	if err == redis.Nil {
-		return nil, fmt.Errorf("no value found for key: %s", key)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch key %s from Redis: %v", key, err)
-	}
 
 	results, err := s.store.GetRunnerResults(ctx, eventId)
 
@@ -130,24 +117,22 @@ func (s *adminService) GetRunnersofEvent(ctx context.Context, eventId string) ([
 		return nil, err
 	}
 
-	var data models.Odds
-	if err := json.Unmarshal([]byte(e), &data); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Redis value: %v", err)
+	session, err := s.store.GetActiveSession(ctx, eventId)
+
+	if err != nil {
+		return nil, err
 	}
 
 	var list []models.FancyList
 
-	for _, runner := range data.Fancy.Runners {
+	for _, item := range session {
 
 		r := models.FancyList{
-			Back:       runner.Back,
-			Lay:        runner.Lay,
-			RunnerId:   runner.RunnerId,
-			RunnerName: runner.RunnerName,
-			Status:     runner.Status,
-			Eventname:  data.EventName,
-			EventId:    data.EventId,
-			Run:        results[runner.RunnerId],
+			RunnerName: item.RunnerName,
+			Eventname:  item.MarketName,
+			RunnerId:   item.RunnerId,
+			EventId:    item.EventId,
+			Run:        results[item.RunnerId],
 		}
 
 		list = append(list, r)
@@ -200,6 +185,15 @@ func (s *adminService) SaveActiveEvents(ctx context.Context, sportsid, competiti
 			}
 		}(event)
 	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		key := "sports:activeEvents:" + sportsid
+		if err := s.redis.Del(ctx, key).Err(); err != nil {
+			errors = append(errors, err)
+		}
+	}()
 
 	wg.Wait()
 

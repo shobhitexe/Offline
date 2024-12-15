@@ -21,7 +21,7 @@ export const sessionColumns: ColumnDef<any>[] = [
     header: "Session Name",
   },
   {
-    accessorKey: "RunnerId",
+    accessorKey: "runnerId",
     header: "",
     cell: () => <></>,
   },
@@ -34,7 +34,7 @@ export const sessionColumns: ColumnDef<any>[] = [
       const eventId = row.getValue("eventId") as string;
       const eventName = row.getValue("eventName") as string;
       const RunnerName = row.getValue("RunnerName") as string;
-      const RunnerId = row.getValue("RunnerId") as string;
+      const RunnerId = row.getValue("runnerId") as string;
       const runVal = row.getValue("run") as number;
 
       const [run, setRun] = useState(0);
@@ -58,6 +58,10 @@ export const sessionColumns: ColumnDef<any>[] = [
           }
 
           toast({ description: `Result set successfull` });
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
         } catch (error) {
           toast({
             description: "Failed to set result",

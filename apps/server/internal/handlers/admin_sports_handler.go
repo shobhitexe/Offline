@@ -14,7 +14,7 @@ func (h *AdminHandler) GetActiveBetsListByMarketID(w http.ResponseWriter, r *htt
 	if len(eventId) == 0 || eventId == "" {
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
 			Message: "Failed, no Event ID provided",
-			Data:    "[]",
+			Data:    []string{},
 		})
 		return
 	}

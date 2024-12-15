@@ -69,13 +69,14 @@ func (c *Cron) processEventsForKey(ctx context.Context, key string) error {
 
 		eventKey := "sports:active:" + event.EventId
 
-		active, err := c.redis.Get(ctx, eventKey).Result()
+		active, err := c.redis.Get(ctx, eventKey).Bool()
 
 		if err != nil && err != redis.Nil {
 			return err
 		}
 
-		if active == "true" {
+		if active == true {
+
 			semaphore <- struct{}{}
 			g.Go(func() error {
 				defer func() { <-semaphore }()
