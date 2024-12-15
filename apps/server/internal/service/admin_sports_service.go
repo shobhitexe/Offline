@@ -135,20 +135,18 @@ func (s *adminService) GetRunnersofEvent(ctx context.Context, eventId string) ([
 
 	for _, runner := range data.Fancy.Runners {
 
-		if runner.Status == "true" {
-			r := models.FancyList{
-				Back:       runner.Back,
-				Lay:        runner.Lay,
-				RunnerId:   runner.RunnerId,
-				RunnerName: runner.RunnerName,
-				Status:     runner.Status,
-				Eventname:  data.EventName,
-				EventId:    data.EventId,
-				Run:        results[runner.RunnerId],
-			}
-
-			list = append(list, r)
+		r := models.FancyList{
+			Back:       runner.Back,
+			Lay:        runner.Lay,
+			RunnerId:   runner.RunnerId,
+			RunnerName: runner.RunnerName,
+			Status:     runner.Status,
+			Eventname:  data.EventName,
+			EventId:    data.EventId,
+			Run:        results[runner.RunnerId],
 		}
+
+		list = append(list, r)
 
 	}
 

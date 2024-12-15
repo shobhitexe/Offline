@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui";
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 
 export default function SelectComponent({
   data,
@@ -21,8 +21,13 @@ export default function SelectComponent({
   const searchParams = useSearchParams();
   const game = searchParams.get(param) as string;
 
+  const router = useRouter();
+
   return (
-    <Select defaultValue={game} onValueChange={(e) => redirect(`${link}${e}`)}>
+    <Select
+      defaultValue={game}
+      onValueChange={(e) => router.push(`${link}${e}`)}
+    >
       <SelectTrigger className="max-w-[180px]">
         <SelectValue />
       </SelectTrigger>

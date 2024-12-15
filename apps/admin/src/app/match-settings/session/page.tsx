@@ -31,7 +31,5 @@ export default async function page({
 
   const data = await getRunners(eventId);
 
-  console.log(data);
-
   return <DataTable columns={sessionColumns} data={data} />;
 }

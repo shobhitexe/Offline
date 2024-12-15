@@ -36,7 +36,7 @@ func NewScheduler(sportsStore store.SportsStore, redis *redis.Client) *Cron {
 
 func (c *Cron) StartCron(ctx context.Context) {
 	go func() {
-		ticker := time.NewTicker(6 * time.Second)
+		ticker := time.NewTicker(600 * time.Second)
 		defer ticker.Stop()
 
 		for {
@@ -63,26 +63,26 @@ func (c *Cron) StartCron(ctx context.Context) {
 		}
 	}()
 
-	// go func() {
-	// 	ticker := time.NewTicker(1 * time.Second)
-	// 	defer ticker.Stop()
+	go func() {
+		ticker := time.NewTicker(1 * time.Second)
+		defer ticker.Stop()
 
-	// 	for {
-	// 		select {
-	// 		case <-ticker.C:
-	// 			taskCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	// 			defer cancel()
+		for {
+			select {
+			case <-ticker.C:
+				taskCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+				defer cancel()
 
-	// 			if err := c.UpdateMatchOdds(taskCtx); err != nil {
-	// 				log.Printf("Error updating match odds: %v", err)
-	// 			}
-	// 			cancel()
+				if err := c.UpdateMatchOdds(taskCtx); err != nil {
+					log.Printf("Error updating match odds: %v", err)
+				}
+				cancel()
 
-	// 		case <-ctx.Done():
-	// 			log.Println("Stopping 1-second cron tasks...")
-	// 			return
-	// 		}
-	// 	}
-	// }()
+			case <-ctx.Done():
+				log.Println("Stopping 1-second cron tasks...")
+				return
+			}
+		}
+	}()
 
 }
