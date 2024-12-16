@@ -3,12 +3,16 @@ package store
 import (
 	"context"
 	"fmt"
+	"log"
 	"server/internal/models"
 )
 
 type AdminSettingsStore interface {
 	GetSportsSettings(ctx context.Context) ([]models.SportsSettings, error)
 	UpdateSportsSettings(ctx context.Context, payload models.SportsSettings) error
+	GetTournamentSettings(ctx context.Context, game string) ([]models.TournamentSettings, error)
+	GetSingleTournamentSettings(ctx context.Context, game string) (*models.TournamentSettings, error)
+	UpdateTournamentSettings(ctx context.Context, payload models.TournamentSettings) error
 }
 
 func (s *adminStore) GetSportsSettings(ctx context.Context) ([]models.SportsSettings, error) {
@@ -79,5 +83,190 @@ func (s *adminStore) UpdateSportsSettings(ctx context.Context, payload models.Sp
 		return fmt.Errorf("failed to update sports settings: %w", err)
 	}
 
+	return nil
+}
+
+func (s *adminStore) GetTournamentSettings(ctx context.Context, game string) ([]models.TournamentSettings, error) {
+
+	var settings []models.TournamentSettings
+
+	query := `SELECT id, tournament_name, sports_id,
+		pre_mo_stakes_min, pre_mo_stakes_max, 
+		post_mo_stakes_min, post_mo_stakes_max, 
+		pre_bm_stakes_min, pre_bm_stakes_max, 
+		post_bm_stakes_min, post_bm_stakes_max, 
+		pre_fancy_stakes_min, pre_fancy_stakes_max, 
+		post_fancy_stakes_min, post_fancy_stakes_max, 
+		toss_stakes_min, toss_stakes_max,
+		bet_delay_mo, bet_delay_bm, bet_delay_to, bet_delay_fa,
+		max_profit_mo, max_profit_bm, max_profit_to, max_profit_fa, 
+		max_odds, active 
+		FROM tournament_settings WHERE sports_id = $1`
+
+	rows, err := s.db.Query(ctx, query, game)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var setting models.TournamentSettings
+
+		if err := rows.Scan(
+			&setting.ID,
+			&setting.TournamentName,
+			&setting.SportsID,
+			&setting.PreMOStakesMin,
+			&setting.PreMOStakesMax,
+			&setting.PostMOStakesMin,
+			&setting.PostMOStakesMax,
+			&setting.PreBMStakesMin,
+			&setting.PreBMStakesMax,
+			&setting.PostBMStakesMin,
+			&setting.PostBMStakesMax,
+			&setting.PreFancyStakesMin,
+			&setting.PreFancyStakesMax,
+			&setting.PostFancyStakesMin,
+			&setting.PostFancyStakesMax,
+			&setting.TossStakesMin,
+			&setting.TossStakesMax,
+			&setting.BetDelayMO,
+			&setting.BetDelayBM,
+			&setting.BetDelayTO,
+			&setting.BetDelayFA,
+			&setting.MaxProfitMO,
+			&setting.MaxProfitBM,
+			&setting.MaxProfitTO,
+			&setting.MaxProfitFA,
+			&setting.MaxOdds,
+			&setting.Active,
+		); err != nil {
+			return nil, err
+		}
+
+		settings = append(settings, setting)
+	}
+
+	return settings, nil
+}
+
+func (s *adminStore) GetSingleTournamentSettings(ctx context.Context, game string) (*models.TournamentSettings, error) {
+
+	var setting models.TournamentSettings
+
+	query := `SELECT id, tournament_name, sports_id,
+		pre_mo_stakes_min, pre_mo_stakes_max, 
+		post_mo_stakes_min, post_mo_stakes_max, 
+		pre_bm_stakes_min, pre_bm_stakes_max, 
+		post_bm_stakes_min, post_bm_stakes_max, 
+		pre_fancy_stakes_min, pre_fancy_stakes_max, 
+		post_fancy_stakes_min, post_fancy_stakes_max, 
+		toss_stakes_min, toss_stakes_max,
+		bet_delay_mo, bet_delay_bm, bet_delay_to, bet_delay_fa,
+		max_profit_mo, max_profit_bm, max_profit_to, max_profit_fa, 
+		max_odds, active 
+		FROM tournament_settings WHERE id = $1`
+
+	err := s.db.QueryRow(ctx, query, game).Scan(
+		&setting.ID,
+		&setting.TournamentName,
+		&setting.SportsID,
+		&setting.PreMOStakesMin,
+		&setting.PreMOStakesMax,
+		&setting.PostMOStakesMin,
+		&setting.PostMOStakesMax,
+		&setting.PreBMStakesMin,
+		&setting.PreBMStakesMax,
+		&setting.PostBMStakesMin,
+		&setting.PostBMStakesMax,
+		&setting.PreFancyStakesMin,
+		&setting.PreFancyStakesMax,
+		&setting.PostFancyStakesMin,
+		&setting.PostFancyStakesMax,
+		&setting.TossStakesMin,
+		&setting.TossStakesMax,
+		&setting.BetDelayMO,
+		&setting.BetDelayBM,
+		&setting.BetDelayTO,
+		&setting.BetDelayFA,
+		&setting.MaxProfitMO,
+		&setting.MaxProfitBM,
+		&setting.MaxProfitTO,
+		&setting.MaxProfitFA,
+		&setting.MaxOdds,
+		&setting.Active,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &setting, nil
+}
+
+func (s *adminStore) UpdateTournamentSettings(ctx context.Context, payload models.TournamentSettings) error {
+
+	log.Println(payload.ID)
+
+	query := `
+		UPDATE tournament_settings
+		SET
+			tournament_name = $1,
+			sports_id = $2,
+			pre_mo_stakes_min = $3,
+			pre_mo_stakes_max = $4,
+			post_mo_stakes_min = $5,
+			post_mo_stakes_max = $6,
+			pre_bm_stakes_min = $7,
+			pre_bm_stakes_max = $8,
+			post_bm_stakes_min = $9,
+			post_bm_stakes_max = $10,
+			pre_fancy_stakes_min = $11,
+			pre_fancy_stakes_max = $12,
+			post_fancy_stakes_min = $13,
+			post_fancy_stakes_max = $14,
+			toss_stakes_min = $15,
+			toss_stakes_max = $16,
+			bet_delay_mo = $17,
+			bet_delay_bm = $18,
+			bet_delay_to = $19,
+			bet_delay_fa = $20,
+			max_profit_mo = $21,
+			max_profit_bm = $22,
+			max_profit_to = $23,
+			max_profit_fa = $24,
+			max_odds = $25,
+			active = true
+		WHERE id = $26`
+
+	if _, err := s.db.Exec(ctx, query,
+		payload.TournamentName,
+		payload.SportsID,
+		payload.PreMOStakesMin,
+		payload.PreMOStakesMax,
+		payload.PostMOStakesMin,
+		payload.PostMOStakesMax,
+		payload.PreBMStakesMin,
+		payload.PreBMStakesMax,
+		payload.PostBMStakesMin,
+		payload.PostBMStakesMax,
+		payload.PreFancyStakesMin,
+		payload.PreFancyStakesMax,
+		payload.PostFancyStakesMin,
+		payload.PostFancyStakesMax,
+		payload.TossStakesMin,
+		payload.TossStakesMax,
+		payload.BetDelayMO,
+		payload.BetDelayBM,
+		payload.BetDelayTO,
+		payload.BetDelayFA,
+		payload.MaxProfitMO,
+		payload.MaxProfitBM,
+		payload.MaxProfitTO,
+		payload.MaxProfitFA,
+		payload.MaxOdds,
+		payload.ID,
+	); err != nil {
+		return err
+	}
 	return nil
 }

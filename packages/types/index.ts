@@ -32,6 +32,7 @@ import {
   GroupedBetHistoryPerGame,
   Fancy,
   SportsSettings,
+  TournamentSettings,
 } from "./Sports";
 
 export type {
@@ -57,4 +58,5 @@ export type {
   GroupedBetHistoryPerGame,
   Fancy,
   SportsSettings,
+  TournamentSettings,
 };

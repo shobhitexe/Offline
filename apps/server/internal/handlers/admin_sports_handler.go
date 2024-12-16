@@ -121,7 +121,7 @@ func (h *AdminHandler) SaveActiveEvents(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := h.service.SaveActiveEvents(r.Context(), payload.SportsId, payload.CompetitionId); err != nil {
+	if err := h.service.SaveActiveEvents(r.Context(), payload.SportsId, payload.CompetitionId, payload.CompetitionName); err != nil {
 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: err.Error(), Data: false})
 		return
 	}

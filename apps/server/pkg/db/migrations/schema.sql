@@ -110,13 +110,14 @@ CREATE TABLE IF NOT EXISTS active_events (
     match_name TEXT NOT NULL,
     category TEXT NOT NULL,
     event_id INTEGER NOT NULL UNIQUE,
-    competition_id TEXT NOT NULL,
+    competition_id INTEGER NOT NULL,
     is_declared BOOLEAN DEFAULT FALSE,
     opening_time TIMESTAMP NOT NULL,
     runners JSON,
     match_odds JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    CONSTRAINT fk_sports_id FOREIGN KEY (sports_id) REFERENCES sports_settings(id) ON DELETE CASCADE
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_sports_id FOREIGN KEY (sports_id) REFERENCES sports_settings(id) ON DELETE CASCADE,
+    CONSTRAINT fk_competition_id FOREIGN KEY (competition_id) REFERENCES tournament_settings(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
 
@@ -178,3 +179,53 @@ VALUES
   (4, 'Cricket', 100000, 100, 100000, 100, 10, 1);
 
 -- +goose StatementEnd
+
+CREATE TABLE IF NOT EXISTS tournament_settings (
+    id INTEGER PRIMARY KEY,
+    tournament_name TEXT NOT NULL,
+    sports_id INTEGER NOT NULL,
+    active BOOLEAN DEFAULT false NOT NULL,
+    
+    -- Pre MO stakes
+    pre_mo_stakes_min INTEGER,
+    pre_mo_stakes_max INTEGER,
+    
+    -- Post MO stakes
+    post_mo_stakes_min INTEGER,
+    post_mo_stakes_max INTEGER,
+    
+    -- Pre BM stakes
+    pre_bm_stakes_min INTEGER,
+    pre_bm_stakes_max INTEGER,
+    
+    -- Post BM stakes
+    post_bm_stakes_min INTEGER,
+    post_bm_stakes_max INTEGER,
+    
+    -- Pre Fancy stakes
+    pre_fancy_stakes_min INTEGER,
+    pre_fancy_stakes_max INTEGER,
+    
+    -- Post Fancy stakes
+    post_fancy_stakes_min INTEGER,
+    post_fancy_stakes_max INTEGER,
+
+    -- Toss stakes
+    toss_stakes_min INTEGER,
+    toss_stakes_max INTEGER,
+    
+    -- Bet Delay    
+    bet_delay_mo INTEGER,
+    bet_delay_bm INTEGER,
+    bet_delay_to INTEGER,
+    bet_delay_fa INTEGER,
+
+    -- Max Profit
+    max_profit_mo INTEGER,
+    max_profit_bm INTEGER,
+    max_profit_to INTEGER,
+    max_profit_fa INTEGER,
+
+    -- Max Odds
+    max_odds INTEGER
+);

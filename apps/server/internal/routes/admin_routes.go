@@ -83,6 +83,11 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 			r.Get("/sports", h.GetSportsSettings)
 			r.Post("/sports", h.UpdateSportsSettings)
 
+			r.Get("/tournament", h.GetTournamentSettings)
+			r.Post("/tournament", h.UpdateTournamentSettings)
+
+			r.Get("/tournamentdata", h.GetSingleTournamentSettings)
+
 		})
 
 	})

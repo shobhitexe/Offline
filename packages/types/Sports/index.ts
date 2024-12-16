@@ -30,3 +30,51 @@ export type SportsSettings = {
   maxOdds: number;
   betDelay: number;
 };
+
+export type TournamentSettings = {
+  id: number;
+  tournamentName: string;
+
+  // Pre MO stakes
+  preMOStakesMin: number;
+  preMOStakesMax: number;
+
+  // Post MO stakes
+  postMOStakesMin: number;
+  postMOStakesMax: number;
+
+  // Pre BM stakes
+  preBMStakesMin: number;
+  preBMStakesMax: number;
+
+  // Post BM stakes
+  postBMStakesMin: number;
+  postBMStakesMax: number;
+
+  // Pre Fancy stakes
+  preFancyStakesMin: number;
+  preFancyStakesMax: number;
+
+  // Post Fancy stakes
+  postFancyStakesMin: number;
+  postFancyStakesMax: number;
+
+  // Toss stakes
+  tossStakesMin: number;
+  tossStakesMax: number;
+
+  // Bet Delay
+  betDelayMO: number;
+  betDelayBM: number;
+  betDelayTO: number;
+  betDelayFA: number;
+
+  // Max Profit
+  maxProfitMO: number;
+  maxProfitBM: number;
+  maxProfitTO: number;
+  maxProfitFA: number;
+
+  // Max Odds
+  maxOdds: number;
+};

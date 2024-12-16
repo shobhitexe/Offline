@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"server/internal/models"
+	"strconv"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -23,6 +24,7 @@ type AdminSportsStore interface {
 	BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error
 	ChangeActiveBetStatus(ctx context.Context, tx pgx.Tx, id, result string) error
 	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error)
+	InitTournamentSettings(ctx context.Context, tournamentID, sportsId, tournamentName string) error
 }
 
 func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {
@@ -208,14 +210,20 @@ func (s *adminStore) SaveRunnerResultHistory(ctx context.Context, payload models
 
 func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEvents, id string, MatchOdds models.MarketInfo) error {
 
+	competitionId, err := strconv.Atoi(payload.Competition.ID)
+
+	if err != nil {
+		return err
+	}
+
 	query := `INSERT INTO active_events 
 	(sports_id, match_name, event_id, competition_id, runners, match_odds, category, opening_time) 
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-	_, err := s.db.Exec(ctx, query, id,
+	_, err = s.db.Exec(ctx, query, id,
 		payload.Event.Name,
 		payload.Event.ID,
-		payload.Competition.ID,
+		competitionId,
 		payload.Runners,
 		MatchOdds,
 		payload.Competition.Name,
@@ -335,4 +343,62 @@ func (s *adminStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, r
 	}
 
 	return &allbets, nil
+}
+
+func (s *adminStore) InitTournamentSettings(ctx context.Context, tournamentID, sportsId, tournamentName string) error {
+	checkQuery := `
+		SELECT 1 FROM tournament_settings WHERE id = $1
+	`
+
+	var exists int
+	err := s.db.QueryRow(ctx, checkQuery, tournamentID).Scan(&exists)
+	if err != nil && err != pgx.ErrNoRows {
+		log.Println(err)
+		return fmt.Errorf("failed to check if tournament settings exist: %w", err)
+	}
+
+	if err == pgx.ErrNoRows {
+		log.Println("Tournament settings not found, proceeding with insert.")
+	} else {
+		log.Println("Tournament settings already exist, skipping insert.")
+		return nil
+	}
+
+	if exists > 0 {
+		log.Println("Tournament settings already exist, skipping insert.")
+		return nil
+	}
+
+	insertQuery := `INSERT INTO tournament_settings (
+    id, tournament_name, sports_id,
+    pre_mo_stakes_min, pre_mo_stakes_max, 
+    post_mo_stakes_min, post_mo_stakes_max, 
+    pre_bm_stakes_min, pre_bm_stakes_max, 
+    post_bm_stakes_min, post_bm_stakes_max, 
+    pre_fancy_stakes_min, pre_fancy_stakes_max,
+    post_fancy_stakes_min, post_fancy_stakes_max,  
+    toss_stakes_min, toss_stakes_max, 
+    bet_delay_mo, bet_delay_bm, bet_delay_to, bet_delay_fa, 
+    max_profit_mo, max_profit_bm, max_profit_to, max_profit_fa,
+	max_odds
+) 
+VALUES (
+    $1, $2, $3,
+    100, 100000,
+    100, 100000, 
+    100, 100000, 
+    100, 100000, 
+    100, 100000, 
+    100, 100000, 
+	100, 100000, 
+    1, 1, 1, 1,
+    100000, 100000, 100000, 100000,
+	10 )`
+
+	_, err = s.db.Exec(ctx, insertQuery, tournamentID, tournamentName, sportsId)
+	if err != nil {
+		return fmt.Errorf("failed to insert default tournament settings: %w", err)
+	}
+
+	return nil
 }

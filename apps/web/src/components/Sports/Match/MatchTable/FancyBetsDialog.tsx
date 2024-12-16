@@ -33,7 +33,8 @@ export default function FancyBetsDialog({ fancyData }: { fancyData: Fancy }) {
                 {Array.from({ length: 11 }, (_, i) => {
                   const offset = i - 5;
                   const oddsRate = fancyData.OddsRate + offset;
-                  const isNegative = fancyData.BetType === "no" ? i > 5 : i < 5;
+                  const isNegative =
+                    fancyData.BetType === "no" ? i >= 5 : i < 5;
                   return (
                     <tr key={oddsRate} className="border">
                       <td className="border border-black p-1 text-black">

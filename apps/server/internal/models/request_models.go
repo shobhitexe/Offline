@@ -120,6 +120,7 @@ type SetRunnerResultRequest struct {
 // save events
 
 type SaveActiveEvents struct {
-	SportsId      string `json:"sportsid"`
-	CompetitionId string `json:"competitionid"`
+	SportsId        string `json:"sportsid" validate:"required"`
+	CompetitionId   string `json:"competitionid" validate:"required"`
+	CompetitionName string `json:"CompetitionName" validate:"required"`
 }

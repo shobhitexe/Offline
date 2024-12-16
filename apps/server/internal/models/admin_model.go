@@ -26,3 +26,53 @@ type SportsSettings struct {
 	MaxOdds              uint64 `json:"maxOdds" validate:"required"`
 	BetDelay             uint16 `json:"betDelay" validate:"required"`
 }
+
+type TournamentSettings struct {
+	ID             int    `json:"id"`
+	TournamentName string `json:"tournamentName"`
+	SportsID       int    `json:"sportsId"`
+	Active         bool   `json:"active"`
+
+	// Pre MO stakes
+	PreMOStakesMin int `json:"preMOStakesMin"`
+	PreMOStakesMax int `json:"preMOStakesMax"`
+
+	// Post MO stakes
+	PostMOStakesMin int `json:"postMOStakesMin"`
+	PostMOStakesMax int `json:"postMOStakesMax"`
+
+	// Pre BM stakes
+	PreBMStakesMin int `json:"preBMStakesMin"`
+	PreBMStakesMax int `json:"preBMStakesMax"`
+
+	// Post BM stakes
+	PostBMStakesMin int `json:"postBMStakesMin"`
+	PostBMStakesMax int `json:"postBMStakesMax"`
+
+	// Pre Fancy stakes
+	PreFancyStakesMin int `json:"preFancyStakesMin"`
+	PreFancyStakesMax int `json:"preFancyStakesMax"`
+
+	// Post Fancy stakes
+	PostFancyStakesMin int `json:"postFancyStakesMin"`
+	PostFancyStakesMax int `json:"postFancyStakesMax"`
+
+	// Toss stakes
+	TossStakesMin int `json:"tossStakesMin"`
+	TossStakesMax int `json:"tossStakesMax"`
+
+	// Bet Delay
+	BetDelayMO int `json:"betDelayMO"`
+	BetDelayBM int `json:"betDelayBM"`
+	BetDelayTO int `json:"betDelayTO"`
+	BetDelayFA int `json:"betDelayFA"`
+
+	// Max Profit
+	MaxProfitMO int `json:"maxProfitMO"`
+	MaxProfitBM int `json:"maxProfitBM"`
+	MaxProfitTO int `json:"maxProfitTO"`
+	MaxProfitFA int `json:"maxProfitFA"`
+
+	// Max Odds
+	MaxOdds int `json:"maxOdds"`
+}

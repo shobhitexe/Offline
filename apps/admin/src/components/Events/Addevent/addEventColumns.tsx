@@ -35,6 +35,7 @@ export const addEventColumn: ColumnDef<any>[] = [
 
       const sportsid = row.getValue("sportsId") as string;
       const competitionid = row.getValue("id") as string;
+      const name = row.getValue("name") as string;
 
       async function saveEvents() {
         try {
@@ -42,7 +43,7 @@ export const addEventColumn: ColumnDef<any>[] = [
 
           const res = await universalPOST(
             `/admin/sports/saveActiveEvents?sportsid=${sportsid}&competitionid=${competitionid}`,
-            { sportsid, competitionid }
+            { sportsid, competitionid: competitionid, competitionName: name }
           );
 
           if (res.data !== true) {

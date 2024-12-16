@@ -1,10 +1,9 @@
-import { addEventColumn, tournamentSettingsColumns } from "@/components";
+import { TournamentSettingsComponent } from "@/components";
 import { universalGET } from "@/lib/requests";
-import { DataTable } from "@repo/ui";
 
 async function getData(game: number) {
   try {
-    const res = await universalGET(`/admin/sports/events/getlist?game=${game}`);
+    const res = await universalGET(`/admin/settings/tournament?game=${game}`);
 
     if (!res.data) {
       return [];
@@ -27,9 +26,5 @@ export default async function page({
 
   const data = await getData(gamemap[game]);
 
-  return (
-    <div className="sm:max-w-[85vw] overflow-x-auto">
-      <DataTable columns={tournamentSettingsColumns} data={data} />;
-    </div>
-  );
+  return <TournamentSettingsComponent data={data} />;
 }

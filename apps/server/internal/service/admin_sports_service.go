@@ -18,7 +18,7 @@ type AdminSportsService interface {
 	GetTournamentsList(ctx context.Context, game string) ([]models.TournamentsListData, error)
 	GetRunnersofEvent(ctx context.Context, eventId string) ([]models.FancyList, error)
 	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
-	SaveActiveEvents(ctx context.Context, sportsid, competitionid string) error
+	SaveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error
 }
 
 func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error) {
@@ -179,14 +179,14 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 			if result.RunnerID == payload.RunnerId {
 				if result.BetType == "no" {
 					switch {
-					case result.OddsRate < float64(payload.Run):
+					case result.OddsRate <= float64(payload.Run):
 						if err := s.store.BetResultLose(goroutineCtx, tx, result.Exposure, result.UserId); err != nil {
 							errChan <- fmt.Errorf("BetResultLose failed: %w", err)
 						}
 						if err := s.store.ChangeActiveBetStatus(ctx, tx, result.ID, "loss"); err != nil {
 							errChan <- fmt.Errorf("Bet change status Failed: %w", err)
 						}
-					case result.OddsRate >= float64(payload.Run):
+					case result.OddsRate > float64(payload.Run):
 						if err := s.store.BetResultWin(goroutineCtx, tx, result.Profit, result.Exposure, result.UserId); err != nil {
 							errChan <- fmt.Errorf("BetResultWin failed: %w", err)
 						}
@@ -237,7 +237,12 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 	return nil
 }
 
-func (s *adminService) SaveActiveEvents(ctx context.Context, sportsid, competitionid string) error {
+func (s *adminService) SaveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error {
+
+	if err := s.store.InitTournamentSettings(ctx, competitionid, sportsid, competitionName); err != nil {
+		return err
+	}
+
 	r, err := http.Get("https://leisurebuzz.in/api/v2/competition/listEvents/" + sportsid + "/" + competitionid)
 	if err != nil {
 		return fmt.Errorf("failed to fetch events: %w", err)

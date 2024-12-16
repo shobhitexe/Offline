@@ -14,7 +14,7 @@ export default function layout({ children }: { children: ReactNode }) {
 
       <SelectComponent
         data={Games}
-        link={"/tournament-list?game="}
+        link={"/tournament-list/view?game="}
         param="game"
       />
 

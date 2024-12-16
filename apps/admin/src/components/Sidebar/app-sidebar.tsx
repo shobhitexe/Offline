@@ -75,7 +75,7 @@ const items = [
   {
     title: "Tournament List",
     icon: List,
-    url: "/tournament-list?game=cricket",
+    url: "/tournament-list/view?game=cricket",
     base: "/tournament-list",
   },
   {
