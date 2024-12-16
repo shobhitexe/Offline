@@ -12,7 +12,7 @@ import (
 
 type SportsStore interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
-	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
+	GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error)
 	PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error
 	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
 	TransferBetValueToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
@@ -29,43 +29,108 @@ func NewSportsStore(db *pgxpool.Pool) SportsStore {
 	return &sportsStore{BaseStore: NewBaseStore(db)}
 }
 
-func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
-	var events []models.ActiveEvents
+func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error) {
+	var events []models.MatchDataWithSettings
 
-	query := `
-	SELECT 
-		match_name, 
-		event_id,
-		competition_id,
-		match_odds, 
-		category,
-		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
-	FROM 
-		active_events
-	WHERE 
-		sports_id = $1 AND is_declared = false`
+	query := `SELECT 
+    e.match_name, 
+    e.event_id,
+    e.competition_id,
+    e.category,
+    TO_CHAR(e.opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time,
+    ss.name AS sport_name,
+    ss.max_stake,
+    ss.min_stake,
+    ss.before_max_stake,
+    ss.before_min_stake,
+    ss.max_odds,
+    ss.bet_delay,
+    ts.tournament_name,
+    ts.active AS tournament_active,
+    ts.pre_mo_stakes_min,
+    ts.pre_mo_stakes_max,
+    ts.post_mo_stakes_min,
+    ts.post_mo_stakes_max,
+    ts.pre_bm_stakes_min,
+    ts.pre_bm_stakes_max,
+    ts.post_bm_stakes_min,
+    ts.post_bm_stakes_max,
+    ts.pre_fancy_stakes_min,
+    ts.pre_fancy_stakes_max,
+    ts.post_fancy_stakes_min,
+    ts.post_fancy_stakes_max,
+    ts.toss_stakes_min,
+    ts.toss_stakes_max,
+    ts.bet_delay_mo,
+    ts.bet_delay_bm,
+    ts.bet_delay_to,
+    ts.bet_delay_fa,
+    ts.max_profit_mo,
+    ts.max_profit_bm,
+    ts.max_profit_to,
+    ts.max_profit_fa,
+    ts.max_odds AS tournament_max_odds
+FROM 
+    active_events e
+LEFT JOIN 
+    sports_settings ss ON e.sports_id = ss.id
+LEFT JOIN 
+    tournament_settings ts ON e.sports_id = ts.sports_id
+WHERE 
+    e.sports_id = $1 
+    AND e.is_declared = false`
 
 	rows, err := s.db.Query(ctx, query, id)
 
 	if err != nil {
-
-		log.Println(err)
 		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var event models.ActiveEvents
+		var event models.MatchDataWithSettings
 		if err := rows.Scan(
-			&event.EventName,
-			&event.EventId,
-			&event.CompetitionId,
-			&event.MatchOdds,
-			&event.Category,
-			&event.EventTime,
+			&event.EventName,            // 1
+			&event.EventId,              // 2
+			&event.CompetitionId,        // 3
+			&event.Category,             // 5
+			&event.EventTime,            // 6
+			&event.Name,                 // 7
+			&event.MaxStake,             // 8
+			&event.MinStake,             // 9
+			&event.BeforeInPlayMaxStake, // 10
+			&event.BeforeInPlayMinStake,
+			&event.MaxOdds,            // 11
+			&event.BetDelay,           // 12
+			&event.TournamentName,     // 13
+			&event.Active,             // 14
+			&event.PreMOStakesMin,     // 15
+			&event.PreMOStakesMax,     // 16
+			&event.PostMOStakesMin,    // 17
+			&event.PostMOStakesMax,    // 18
+			&event.PreBMStakesMin,     // 19
+			&event.PreBMStakesMax,     // 20
+			&event.PostBMStakesMin,    // 21
+			&event.PostBMStakesMax,    // 22
+			&event.PreFancyStakesMin,  // 23
+			&event.PreFancyStakesMax,  // 24
+			&event.PostFancyStakesMin, // 25
+			&event.PostFancyStakesMax, // 26
+			&event.TossStakesMin,      // 27
+			&event.TossStakesMax,      // 28
+			&event.BetDelayMO,         // 29
+			&event.BetDelayBM,         // 30
+			&event.BetDelayTO,         // 31
+			&event.BetDelayFA,         // 32
+			&event.MaxProfitMO,        // 33
+			&event.MaxProfitBM,        // 34
+			&event.MaxProfitTO,        // 35
+			&event.MaxProfitFA,        // 36         // 37
+			&event.TournamentMaxOdds,  // 38
 		); err != nil {
 			return nil, err
 		}
+
 		events = append(events, event)
 	}
 

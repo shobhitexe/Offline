@@ -3,7 +3,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"log"
 	"server/internal/models"
 )
 
@@ -205,42 +204,38 @@ func (s *adminStore) GetSingleTournamentSettings(ctx context.Context, game strin
 
 func (s *adminStore) UpdateTournamentSettings(ctx context.Context, payload models.TournamentSettings) error {
 
-	log.Println(payload.ID)
-
 	query := `
 		UPDATE tournament_settings
 		SET
 			tournament_name = $1,
-			sports_id = $2,
-			pre_mo_stakes_min = $3,
-			pre_mo_stakes_max = $4,
-			post_mo_stakes_min = $5,
-			post_mo_stakes_max = $6,
-			pre_bm_stakes_min = $7,
-			pre_bm_stakes_max = $8,
-			post_bm_stakes_min = $9,
-			post_bm_stakes_max = $10,
-			pre_fancy_stakes_min = $11,
-			pre_fancy_stakes_max = $12,
-			post_fancy_stakes_min = $13,
-			post_fancy_stakes_max = $14,
-			toss_stakes_min = $15,
-			toss_stakes_max = $16,
-			bet_delay_mo = $17,
-			bet_delay_bm = $18,
-			bet_delay_to = $19,
-			bet_delay_fa = $20,
-			max_profit_mo = $21,
-			max_profit_bm = $22,
-			max_profit_to = $23,
-			max_profit_fa = $24,
-			max_odds = $25,
+			pre_mo_stakes_min = $2,
+			pre_mo_stakes_max = $3,
+			post_mo_stakes_min = $4,
+			post_mo_stakes_max = $5,
+			pre_bm_stakes_min = $6,
+			pre_bm_stakes_max = $7,
+			post_bm_stakes_min = $8,
+			post_bm_stakes_max = $9,
+			pre_fancy_stakes_min = $10,
+			pre_fancy_stakes_max = $11,
+			post_fancy_stakes_min = $12,
+			post_fancy_stakes_max = $13,
+			toss_stakes_min = $14,
+			toss_stakes_max = $15,
+			bet_delay_mo = $16,
+			bet_delay_bm = $17,
+			bet_delay_to = $18,
+			bet_delay_fa = $19,
+			max_profit_mo = $20,
+			max_profit_bm = $21,
+			max_profit_to = $22,
+			max_profit_fa = $23,
+			max_odds = $24,
 			active = true
-		WHERE id = $26`
+		WHERE id = $25`
 
 	if _, err := s.db.Exec(ctx, query,
 		payload.TournamentName,
-		payload.SportsID,
 		payload.PreMOStakesMin,
 		payload.PreMOStakesMax,
 		payload.PostMOStakesMin,

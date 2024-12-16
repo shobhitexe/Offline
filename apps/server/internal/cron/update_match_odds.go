@@ -39,7 +39,7 @@ func (c *Cron) UpdateMatchOdds(ctx context.Context) error {
 }
 
 func (c *Cron) processEventsForKey(ctx context.Context, key string) error {
-	var events []models.ActiveEvents
+	var events []models.MatchDataWithSettings
 
 	ev, err := c.redis.Get(ctx, key).Result()
 	if err != nil {
@@ -97,7 +97,7 @@ func (c *Cron) processEventsForKey(ctx context.Context, key string) error {
 
 	return nil
 }
-func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, event models.ActiveEvents) error {
+func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, event models.MatchDataWithSettings) error {
 
 	url := "https://alp.playunlimited9.co.in/api/v2/competition/getEventDetail/" + event.EventId
 

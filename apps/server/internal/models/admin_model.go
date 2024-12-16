@@ -76,3 +76,45 @@ type TournamentSettings struct {
 	// Max Odds
 	MaxOdds int `json:"maxOdds"`
 }
+
+type MatchDataWithSettings struct {
+	EventName            string
+	EventId              string
+	CompetitionId        string
+	MatchOdds            string
+	Category             string
+	EventTime            string
+	Name                 string
+	MaxStake             float64
+	MinStake             float64
+	BeforeInPlayMaxStake float64
+	BeforeInPlayMinStake float64
+	BetDelay             string
+	TournamentName       string
+	Active               bool
+	PreMOStakesMin       float64
+	PreMOStakesMax       float64
+	PostMOStakesMin      float64
+	PostMOStakesMax      float64
+	PreBMStakesMin       float64
+	PreBMStakesMax       float64
+	PostBMStakesMin      float64
+	PostBMStakesMax      float64
+	PreFancyStakesMin    float64
+	PreFancyStakesMax    float64
+	PostFancyStakesMin   float64
+	PostFancyStakesMax   float64
+	TossStakesMin        float64
+	TossStakesMax        float64
+	BetDelayMO           string
+	BetDelayBM           string
+	BetDelayTO           string
+	BetDelayFA           string
+	MaxProfitMO          float64
+	MaxProfitBM          float64
+	MaxProfitTO          float64
+	MaxProfitFA          float64
+	MaxOdds              float64
+	TournamentActive     bool
+	TournamentMaxOdds    float64
+}

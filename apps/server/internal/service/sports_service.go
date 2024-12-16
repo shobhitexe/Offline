@@ -17,7 +17,7 @@ type SportsService interface {
 	// GetList(id string) (interface{}, error)
 	// ListEvents(sportsId, competitionId string) (interface{}, error)
 	// GetMarketList(id string) (interface{}, error)
-	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
+	GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error)
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
 	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
@@ -37,8 +37,8 @@ func NewSportsService(store store.SportsStore, redis *redis.Client) SportsServic
 	}
 }
 
-func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
-	var jsonData []models.ActiveEvents
+func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error) {
+	var jsonData []models.MatchDataWithSettings
 	key := "sports:activeEvents:" + id
 
 	r, err := s.redis.Get(ctx, key).Result()
