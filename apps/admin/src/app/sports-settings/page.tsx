@@ -1,14 +1,22 @@
-import { PageHeading, sportsSettingsColumns } from "@/components";
-import { DataTable } from "@repo/ui";
+import { SportsSettingsTable } from "@/components";
+import { universalGET } from "@/lib/requests";
 
-const games = [{ name: "Cricket" }, { name: "Tennis" }, { name: "Football" }];
+async function getData() {
+  try {
+    const res = await universalGET(`/admin/settings/sports`);
 
-export default function page() {
-  return (
-    <div className="w-full flex flex-col gap-5">
-      <PageHeading>Sports Settings</PageHeading>
+    if (!res.data) {
+      return null;
+    }
 
-      <DataTable columns={sportsSettingsColumns} data={games} />
-    </div>
-  );
+    return res.data;
+  } catch (error) {
+    return [];
+  }
+}
+
+export default async function page() {
+  const data = await getData();
+
+  return <SportsSettingsTable settingsdata={data} />;
 }

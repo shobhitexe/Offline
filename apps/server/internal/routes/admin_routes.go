@@ -77,6 +77,14 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 			r.Get("/balancesheet", h.GetBalanceSheetReport)
 		})
 
+		// settings
+		r.Route("/settings", func(r chi.Router) {
+
+			r.Get("/sports", h.GetSportsSettings)
+			r.Post("/sports", h.UpdateSportsSettings)
+
+		})
+
 	})
 
 }

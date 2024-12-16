@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS active_events (
     runners JSON,
     match_odds JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    CONSTRAINT fk_sports_id FOREIGN KEY (sports_id) REFERENCES sports_settings(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
 
@@ -144,8 +145,6 @@ CREATE TABLE IF NOT EXISTS sport_bets (
 );
 -- +goose StatementEnd
 
-
-
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS runner_results (
     id SERIAL PRIMARY KEY,
@@ -157,4 +156,25 @@ CREATE TABLE IF NOT EXISTS runner_results (
     is_declared BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- +goose StatementEnd
+
+-- +goose StatementBegin
+CREATE TABLE IF NOT EXISTS sports_settings (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  max_stake INTEGER NOT NULL,
+  min_stake INTEGER NOT NULL,
+  before_max_stake INTEGER NOT NULL,
+  before_min_stake INTEGER NOT NULL,
+  max_odds INTEGER NOT NULL,
+  bet_delay INTEGER NOT NULL
+);
+
+INSERT INTO sports_settings 
+(id, name, max_stake, min_stake, before_max_stake, before_min_stake, max_odds, bet_delay)
+VALUES 
+  (1, 'Soccer', 100000, 100, 100000, 100, 10, 1),
+  (2, 'Tennis', 100000, 100, 100000, 100, 10, 1),
+  (4, 'Cricket', 100000, 100, 100000, 100, 10, 1);
+
 -- +goose StatementEnd

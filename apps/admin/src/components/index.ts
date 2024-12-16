@@ -18,8 +18,8 @@ import { resultMarketHistoryColumns } from "./MatchSettings/ResultHiistory/resul
 import SelectComponent from "./Select";
 import { sessionColumns } from "./MatchSettings/Session/sessionColumns";
 import { resultMarketColumns } from "./MatchSettings/ResultMarket/resultmarketColumns";
-import { sportsSettingsColumns } from "./SportsSettings/sportsSettingsColumns";
 import { tournamentSettingsColumns } from "./TournamentList/tournamentSettingColumns";
+import SportsSettingsTable from "./SportsSettings";
 
 export {
   Signin,
@@ -42,6 +42,6 @@ export {
   SelectComponent,
   sessionColumns,
   resultMarketColumns,
-  sportsSettingsColumns,
   tournamentSettingsColumns,
+  SportsSettingsTable,
 };

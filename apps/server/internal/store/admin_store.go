@@ -25,6 +25,7 @@ type AdminStore interface {
 	AdminUserStore
 	AdminSportsStore
 	AdminReportsStore
+	AdminSettingsStore
 }
 
 type adminStore struct {

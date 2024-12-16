@@ -22,6 +22,7 @@ type AdminService interface {
 	AdminUserService
 	AdminSportsService
 	AdminReportsService
+	AdminSettingsService
 }
 
 type adminService struct {
