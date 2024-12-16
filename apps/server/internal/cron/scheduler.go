@@ -12,12 +12,12 @@ import (
 )
 
 type Cron struct {
-	sportsStore store.SportsStore
+	sportsStore store.AdminSportsStore
 	redis       *redis.Client
 	http        *http.Client
 }
 
-func NewScheduler(sportsStore store.SportsStore, redis *redis.Client) *Cron {
+func NewScheduler(sportsStore store.AdminSportsStore, redis *redis.Client) *Cron {
 
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,

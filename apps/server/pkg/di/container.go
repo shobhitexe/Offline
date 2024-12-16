@@ -40,7 +40,7 @@ func NewContainer(db *pgxpool.Pool, redis *redis.Client) *Container {
 
 	// cron jobs
 	ctx := context.Background()
-	c := cron.NewScheduler(sportsStore, redis)
+	c := cron.NewScheduler(adminStore, redis)
 	c.StartCron(ctx)
 
 	return &Container{

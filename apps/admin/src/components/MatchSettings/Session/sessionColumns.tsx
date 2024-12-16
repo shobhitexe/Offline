@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, useToast } from "@repo/ui";
+import { Button, Input, LoadingSpinner, useToast } from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
 import { CircleCheck, CircleOff } from "lucide-react";
 import { useState } from "react";
@@ -38,9 +38,12 @@ export const sessionColumns: ColumnDef<any>[] = [
       const runVal = row.getValue("run") as number;
 
       const [run, setRun] = useState(0);
+      const [loading, setLoading] = useState(false);
 
       async function submitResultClient() {
         try {
+          setLoading(true);
+
           const res = await setSessionResultAction(
             eventId,
             eventName,
@@ -67,6 +70,8 @@ export const sessionColumns: ColumnDef<any>[] = [
             description: "Failed to set result",
             variant: "destructive",
           });
+        } finally {
+          setLoading(false);
         }
       }
 
@@ -85,11 +90,11 @@ export const sessionColumns: ColumnDef<any>[] = [
             defaultValue={runVal}
             onChange={(e) => setRun(Number(e.target.value))}
           />
-          <Button>
-            <CircleCheck />
-          </Button>
-
-          <CircleOff />
+          {run >= 0 ? (
+            <Button>{loading ? <LoadingSpinner /> : <CircleCheck />}</Button>
+          ) : (
+            <CircleOff />
+          )}
         </form>
       );
     },

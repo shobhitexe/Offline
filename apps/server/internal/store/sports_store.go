@@ -15,15 +15,10 @@ type SportsStore interface {
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	PlaceBet(ctx context.Context, tx pgx.Tx, payload models.PlaceBet, id string, profit, exposure float64) error
 	FindMatchIDByEventID(ctx context.Context, tx pgx.Tx, id string) (string, error)
-	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error)
 	TransferBetValueToExposure(ctx context.Context, tx pgx.Tx, id string, amount float64) error
-	BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, id string) error
-	BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error
-	ChangeActiveBetStatus(ctx context.Context, id, result string) error
 	BetHistoryPerGamePerUser(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error)
 	GetInPlayEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	FancyBetsPerEventIdSports(ctx context.Context, eventId, userId string) ([]models.FancyBets, error)
-	GetActiveFancyBets(ctx context.Context) ([]models.ActiveBet, error)
 }
 
 type sportsStore struct {
@@ -182,82 +177,6 @@ func (s *sportsStore) PlaceBet(ctx context.Context, tx pgx.Tx, payload models.Pl
 	return nil
 }
 
-func (s *sportsStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error) {
-
-	var allbets []models.ActiveBet
-
-	query := `SELECT 
-	id, match_id, event_id, user_id, odds_price, odds_rate, bet_type, market_name, market_id, runner_name, runner_id, profit, exposure 
-	from sport_bets
-	WHERE event_id = $1 AND runner_id = $2 AND market_id = $3 AND settled = false AND market_type = 'Match Odds'`
-
-	bets, err := s.db.Query(ctx, query, eventID, runnerID, marketId)
-
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	for bets.Next() {
-
-		var bet models.ActiveBet
-
-		if err := bets.Scan(
-			&bet.ID,
-			&bet.MatchId,
-			&bet.EventId,
-			&bet.UserId,
-			&bet.OddsPrice,
-			&bet.OddsRate,
-			&bet.BetType,
-			&bet.MarketName,
-			&bet.MarketId,
-			&bet.RunnerName,
-			&bet.RunnerID,
-			&bet.Profit,
-			&bet.Exposure,
-		); err != nil {
-			log.Println(err)
-
-			return nil, err
-		}
-
-		allbets = append(allbets, bet)
-
-	}
-
-	return &allbets, nil
-}
-
-func (s *sportsStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, userID string) error {
-	query := `UPDATE users SET settlement = settlement + $1, exposure = exposure - $2 WHERE id = $3`
-	if _, err := s.db.Exec(ctx, query, profit, exposure, userID); err != nil {
-		return fmt.Errorf("failed to update settlement and exposure for user %s: %w", userID, err)
-	}
-
-	return nil
-}
-
-func (s *sportsStore) BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error {
-	query := `UPDATE users SET exposure = exposure - $1, settlement = settlement - $1 WHERE id = $2`
-	if _, err := s.db.Exec(ctx, query, exposure, userID); err != nil {
-		return fmt.Errorf("failed to update balance and exposure for user %s: %w", userID, err)
-	}
-	return nil
-}
-
-func (s *sportsStore) ChangeActiveBetStatus(ctx context.Context, id, result string) error {
-
-	query := `UPDATE sport_bets SET settled = true, result = $1 WHERE id = $2`
-
-	if _, err := s.db.Exec(ctx, query, result, id); err != nil {
-		return fmt.Errorf("failed to status for bet %s: %w", id, err)
-
-	}
-
-	return nil
-}
-
 func (s *sportsStore) BetHistoryPerGamePerUser(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, error) {
 
 	var history []models.BetHistoryPerGame
@@ -318,37 +237,6 @@ func (s *sportsStore) FancyBetsPerEventIdSports(ctx context.Context, eventId, us
 
 		bets = append(bets, bet)
 
-	}
-
-	return bets, nil
-}
-
-func (s *sportsStore) GetActiveFancyBets(ctx context.Context) ([]models.ActiveBet, error) {
-
-	var bets []models.ActiveBet
-
-	query := `SELECT 
-	id, match_id, event_id, user_id, odds_price, odds_rate, bet_type, market_name, market_id, runner_name, runner_id, profit, exposure 
-	from sport_bets
-	WHERE settled = false AND market_type = 'Fancy'`
-
-	rows, err := s.db.Query(ctx, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-
-		var item models.ActiveBet
-
-		if err := rows.Scan(); err != nil {
-			return nil, err
-		}
-
-		bets = append(bets, item)
 	}
 
 	return bets, nil
