@@ -78,43 +78,43 @@ type TournamentSettings struct {
 }
 
 type MatchDataWithSettings struct {
-	EventName            string
-	EventId              string
-	CompetitionId        string
-	MatchOdds            string
-	Category             string
-	EventTime            string
-	Name                 string
-	MaxStake             float64
-	MinStake             float64
-	BeforeInPlayMaxStake float64
-	BeforeInPlayMinStake float64
-	BetDelay             string
-	TournamentName       string
-	Active               bool
-	PreMOStakesMin       float64
-	PreMOStakesMax       float64
-	PostMOStakesMin      float64
-	PostMOStakesMax      float64
-	PreBMStakesMin       float64
-	PreBMStakesMax       float64
-	PostBMStakesMin      float64
-	PostBMStakesMax      float64
-	PreFancyStakesMin    float64
-	PreFancyStakesMax    float64
-	PostFancyStakesMin   float64
-	PostFancyStakesMax   float64
-	TossStakesMin        float64
-	TossStakesMax        float64
-	BetDelayMO           string
-	BetDelayBM           string
-	BetDelayTO           string
-	BetDelayFA           string
-	MaxProfitMO          float64
-	MaxProfitBM          float64
-	MaxProfitTO          float64
-	MaxProfitFA          float64
-	MaxOdds              float64
-	TournamentActive     bool
-	TournamentMaxOdds    float64
+	EventId              string `json:"eventId"`
+	CompetitionId        string `json:"competitionId"`
+	EventName            string `json:"eventName"`
+	EventTime            string `json:"eventTime"`
+	Category             string `json:"category"`
+	MatchOdds            MarketInfo
+	Name                 string  `json:"name"`
+	MaxStake             float64 `json:"maxStake"`
+	MinStake             float64 `json:"minStake"`
+	BeforeInPlayMaxStake float64 `json:"beforeInPlayMaxStake"`
+	BeforeInPlayMinStake float64 `json:"beforeInPlayMinStake"`
+	BetDelay             string  `json:"betDelay"`
+	TournamentName       string  `json:"tournamentName"`
+	Active               bool    `json:"active"`
+	PreMOStakesMin       float64 `json:"preMOStakesMin"`
+	PreMOStakesMax       float64 `json:"preMOStakesMax"`
+	PostMOStakesMin      float64 `json:"postMOStakesMin"`
+	PostMOStakesMax      float64 `json:"postMOStakesMax"`
+	PreBMStakesMin       float64 `json:"preBMStakesMin"`
+	PreBMStakesMax       float64 `json:"preBMStakesMax"`
+	PostBMStakesMin      float64 `json:"postBMStakesMin"`
+	PostBMStakesMax      float64 `json:"postBMStakesMax"`
+	PreFancyStakesMin    float64 `json:"preFancyStakesMin"`
+	PreFancyStakesMax    float64 `json:"preFancyStakesMax"`
+	PostFancyStakesMin   float64 `json:"postFancyStakesMin"`
+	PostFancyStakesMax   float64 `json:"postFancyStakesMax"`
+	TossStakesMin        float64 `json:"tossStakesMin"`
+	TossStakesMax        float64 `json:"tossStakesMax"`
+	BetDelayMO           string  `json:"betDelayMO"`
+	BetDelayBM           string  `json:"betDelayBM"`
+	BetDelayTO           string  `json:"betDelayTO"`
+	BetDelayFA           string  `json:"betDelayFA"`
+	MaxProfitMO          float64 `json:"maxProfitMO"`
+	MaxProfitBM          float64 `json:"maxProfitBM"`
+	MaxProfitTO          float64 `json:"maxProfitTO"`
+	MaxProfitFA          float64 `json:"maxProfitFA"`
+	MaxOdds              float64 `json:"maxOdds"`
+	TournamentActive     bool    `json:"tournamentActive"`
+	TournamentMaxOdds    float64 `json:"tournamentMaxOdds"`
 }

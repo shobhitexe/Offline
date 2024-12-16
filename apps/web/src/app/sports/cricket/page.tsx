@@ -21,6 +21,8 @@ async function getData() {
 export default async function page() {
   const data: EventType[] = await getData();
 
+  console.log(data);
+
   return (
     <div>
       <div className="text-lg font-bold">Cricket</div>
@@ -31,7 +33,7 @@ export default async function page() {
 
       <div className="flex flex-col divide-y divide-[#444446]">
         {data.map((item) => (
-          <GameCard key={item.eventId} event={item} />
+          <GameCard key={item.eventTime} event={item} />
         ))}
       </div>
     </div>

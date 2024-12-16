@@ -32,11 +32,12 @@ func NewSportsStore(db *pgxpool.Pool) SportsStore {
 func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error) {
 	var events []models.MatchDataWithSettings
 
-	query := `SELECT 
+	query := `SELECT DISTINCT ON (e.event_id) 
     e.match_name, 
     e.event_id,
     e.competition_id,
     e.category,
+	e.match_odds,
     TO_CHAR(e.opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time,
     ss.name AS sport_name,
     ss.max_stake,
@@ -90,10 +91,11 @@ WHERE
 	for rows.Next() {
 		var event models.MatchDataWithSettings
 		if err := rows.Scan(
-			&event.EventName,            // 1
-			&event.EventId,              // 2
-			&event.CompetitionId,        // 3
-			&event.Category,             // 5
+			&event.EventName,     // 1
+			&event.EventId,       // 2
+			&event.CompetitionId, // 3
+			&event.Category,
+			&event.MatchOdds,            // 5
 			&event.EventTime,            // 6
 			&event.Name,                 // 7
 			&event.MaxStake,             // 8
