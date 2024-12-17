@@ -14,16 +14,7 @@ import { options } from "./api/auth/[...nextauth]/options";
 import { Toaster } from "@repo/ui";
 import { Poppins } from "next/font/google";
 
-import dynamic from "next/dynamic";
 import { chatSupportEnabled, metadataMap } from "@/lib/constants/config";
-
-const Tawkto = dynamic(
-  () =>
-    chatSupportEnabled.includes(process.env.NEXT_PUBLIC_CASINO_NAME as string)
-      ? import("../components/Chatbots/Tawkto")
-      : Promise.resolve(() => null),
-  { ssr: false }
-);
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -153,9 +144,8 @@ export default async function RootLayout({
               {children}
 
               <Dock />
-              <Footer />
+              {/* <Footer /> */}
               <Toaster />
-              <Tawkto />
               <ThemeToggles />
             </ThemeProviders>
           </StoreProviders>

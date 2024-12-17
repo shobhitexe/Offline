@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"server/internal/models"
@@ -10,6 +11,7 @@ import (
 	"server/pkg/utils"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -17,16 +19,16 @@ type SportsService interface {
 	// GetList(id string) (interface{}, error)
 	// ListEvents(sportsId, competitionId string) (interface{}, error)
 	// GetMarketList(id string) (interface{}, error)
-	GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error)
+	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	GetEventDetail(ctx context.Context, eventId string) (map[string]interface{}, error)
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
 	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
 	GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error)
+	GetMatchSettings(ctx context.Context, sportsId, competitionId string) (*models.CombinedMatchSettings, error)
 }
 
 type sportsService struct {
 	store store.SportsStore
-	admin store.AdminSportsStore
 	redis *redis.Client
 }
 
@@ -37,8 +39,8 @@ func NewSportsService(store store.SportsStore, redis *redis.Client) SportsServic
 	}
 }
 
-func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error) {
-	var jsonData []models.MatchDataWithSettings
+func (s *sportsService) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
+	var jsonData []models.ActiveEvents
 	key := "sports:activeEvents:" + id
 
 	r, err := s.redis.Get(ctx, key).Result()
@@ -248,6 +250,27 @@ func (s *sportsService) GetInPlayEvents(ctx context.Context) (*[]models.ActiveEv
 	}
 
 	return cricket, tennis, football, nil
+}
+
+func (s *sportsService) GetMatchSettings(ctx context.Context, sportsId, competitionId string) (*models.CombinedMatchSettings, error) {
+
+	ts, err := s.store.GetSingleTournamentSettings(ctx, competitionId)
+
+	if err == nil {
+		return ts, nil
+	}
+
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return nil, err
+	}
+
+	ss, err := s.store.GetSportsSettings(ctx, sportsId)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return ss, nil
 }
 
 // func getPriceAndOdds(eventId, runnerId, marketName, betType string) (price, rate float64, err error) {

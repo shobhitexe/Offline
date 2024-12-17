@@ -18,9 +18,10 @@ import {
 import { useState } from "react";
 import { submitBetAction } from "./submitBetAction";
 import { useSession } from "next-auth/react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/root-reducer";
+// import { useSelector } from "react-redux";
+// import { RootState } from "@/store/root-reducer";
 import { KeyedMutator } from "swr";
+import { Minus, Plus } from "lucide-react";
 
 const amountsList = [100, 200, 500, 1000, 5000, 10000, 20000, 50000, 100000];
 
@@ -35,6 +36,9 @@ export default function Betslip({
   runnerID,
   marketType,
   mutate,
+  minStake,
+  maxStake,
+  betDelay,
 }: {
   rate: number;
   price: number;
@@ -46,6 +50,9 @@ export default function Betslip({
   runnerID: string;
   marketType: string;
   mutate: KeyedMutator<any>;
+  minStake: number;
+  maxStake: number;
+  betDelay: number;
 }) {
   const { toast } = useToast();
 
@@ -53,18 +60,44 @@ export default function Betslip({
 
   const [loading, setIsLoading] = useState(false);
 
-  const balance = useSelector(
-    (state: RootState) => state.walletBalance.balance
-  );
+  // const balance = useSelector(
+  //   (state: RootState) => state.walletBalance.balance
+  // );
 
   const [amount, setAmount] = useState(0);
 
-  async function submitBetClient() {
-    setIsLoading(true);
+  const adjustAmount = (increment: boolean) => {
+    const currentAmount = Number(amount);
+    const newAmount = increment ? currentAmount + 100 : currentAmount - 100;
+    if (newAmount >= 0) {
+      setAmount(newAmount);
+    }
+  };
 
+  async function submitBetClient() {
     try {
+      setIsLoading(true);
+
       const exposure =
         betType === "back" || betType === "yes" ? amount : (rate - 1) * amount;
+
+      if (exposure < minStake) {
+        toast({
+          title: "Failed to place bet",
+          description: `Min stake is ${minStake}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (exposure > maxStake) {
+        toast({
+          title: "Failed to place bet",
+          description: `Max stake is ${maxStake}`,
+          variant: "destructive",
+        });
+        return;
+      }
 
       if (exposure <= 0) {
         toast({
@@ -74,14 +107,7 @@ export default function Betslip({
         return;
       }
 
-      // if (exposure > balance) {
-      //   toast({
-      //     title: "Failed to place bet",
-      //     description: "insufficient balance",
-      //     variant: "destructive",
-      //   });
-      //   return;
-      // }
+      await new Promise((resolve) => setTimeout(resolve, betDelay * 1000));
 
       const res = await submitBetAction(
         eventId,
@@ -149,64 +175,68 @@ export default function Betslip({
         className="ui-bg-[#232325]"
         style={{ backgroundColor: "#232325", border: "#232325" }}
       >
-        {loading && (
+        {/* {loading && (
           <div className="fixed w-full h-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/40">
             <LoadingSpinner className="w-1/2 h-1/2 mx-auto" />
           </div>
-        )}
+        )} */}
 
-        <DrawerHeader>
-          <DrawerTitle>
-            {(betType === "back" || betType === "lay") && (
-              <div className="flex items-center justify-center gap-5">
-                <div className="text-green-400">
-                  {"Profit: "}
+        <DrawerHeader className="border-b pb-4">
+          <DrawerTitle>Place Bet</DrawerTitle>
+        </DrawerHeader>
+
+        <form method="POST" className="p-4 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-sm text-muted-foreground">Exposure:</span>
+              <div className="text-xl font-semibold text-red-500">
+                {(betType === "back" || betType === "lay") && (
+                  <>
+                    {betType === "back"
+                      ? amount
+                      : ((rate - 1) * amount).toFixed(2)}
+                  </>
+                )}
+
+                {(betType === "no" || betType === "yes") && (
+                  <>{betType === "no" ? price * (amount / 100) : amount}</>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <span className="text-sm text-muted-foreground">Rate:</span>
+              <div className="text-xl font-semibold text-white">{rate}</div>
+            </div>
+          </div>
+
+          <div className="bg-emerald-500 text-white p-3 rounded-lg space-y-1">
+            <span className="text-sm">Potential Win</span>
+            <div className="text-xl font-semibold">
+              {" "}
+              {(betType === "back" || betType === "lay") && (
+                <>
                   {betType === "back"
                     ? ((rate - 1) * amount).toFixed(2)
                     : amount}
-                </div>
-                <div className="text-red-400">
-                  {"Exposure: "}
-                  {betType === "back"
-                    ? amount
-                    : ((rate - 1) * amount).toFixed(2)}
-                </div>
-              </div>
-            )}
-
-            {(betType === "no" || betType === "yes") && (
-              <div className="flex items-center justify-center gap-5">
-                <div className="text-green-400">
-                  {"Profit: "}
-                  {betType === "no" ? amount : price * (amount / 100)}
-                </div>
-                <div className="text-red-400">
-                  {"Exposure: "}
-                  {betType === "no" ? price * (amount / 100) : amount}
-                </div>
-              </div>
-            )}
-          </DrawerTitle>
-        </DrawerHeader>
-
-        <div className="flex flex-col p-5 gap-5">
-          <div className="flex items-center flex-wrap sm:gap-5 gap-2">
-            {amountsList.map((item) => (
-              <Button
-                variant="secondary"
-                className="sm:ui-text-sm ui-text-xs"
-                onClick={() => setAmount(item)}
-              >
-                {item.toLocaleString()}
-              </Button>
-            ))}
+                </>
+              )}
+              {(betType === "no" || betType === "yes") && (
+                <> {betType === "no" ? amount : price * (amount / 100)}</>
+              )}
+            </div>
           </div>
 
-          <form
-            method="POST"
-            action={submitBetClient}
-            className="flex flex-col gap-5"
-          >
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => adjustAmount(false)}
+              className="text-black"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
             <Input
               name="amount"
               type="number"
@@ -215,12 +245,51 @@ export default function Betslip({
               required
               value={amount}
               onChange={(e) => setAmount(e.target.value as unknown as number)}
+              className="text-center"
             />
-            <Button variant={"yellow"} className="w-fit">
-              {loading ? <LoadingSpinner /> : <span>Place Bet</span>}
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => adjustAmount(true)}
+              className="text-black"
+            >
+              <Plus className="h-4 w-4" />
             </Button>
-          </form>
-        </div>
+          </div>
+
+          <div className="grid grid-cols-5 gap-2">
+            {amountsList.map((bet) => (
+              <Button
+                type="button"
+                key={bet}
+                variant="outline"
+                onClick={() => setAmount(bet)}
+                className="text-sm text-black"
+              >
+                {bet.toLocaleString()}
+              </Button>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setAmount(0)}
+              className="text-sm text-black"
+            >
+              CLEAR
+            </Button>
+          </div>
+
+          <Button
+            type="button"
+            variant={"yellow"}
+            className="sm:w-fit w-full"
+            onClick={submitBetClient}
+            disabled={loading}
+          >
+            {loading ? <LoadingSpinner /> : <span>Place Bet</span>}
+          </Button>
+        </form>
 
         <DrawerFooter>
           <DrawerClose>

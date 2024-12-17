@@ -21,8 +21,6 @@ async function getData() {
 export default async function page() {
   const data: EventType[] = await getData();
 
-  console.log(data);
-
   return (
     <div>
       <div className="text-lg font-bold">Cricket</div>

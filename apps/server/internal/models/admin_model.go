@@ -77,20 +77,13 @@ type TournamentSettings struct {
 	MaxOdds int `json:"maxOdds"`
 }
 
-type MatchDataWithSettings struct {
-	EventId              string `json:"eventId"`
-	CompetitionId        string `json:"competitionId"`
-	EventName            string `json:"eventName"`
-	EventTime            string `json:"eventTime"`
-	Category             string `json:"category"`
-	MatchOdds            MarketInfo
-	Name                 string  `json:"name"`
+type CombinedMatchSettings struct {
+	TournamentName       string  `json:"tournamentName"`
 	MaxStake             float64 `json:"maxStake"`
 	MinStake             float64 `json:"minStake"`
 	BeforeInPlayMaxStake float64 `json:"beforeInPlayMaxStake"`
 	BeforeInPlayMinStake float64 `json:"beforeInPlayMinStake"`
 	BetDelay             string  `json:"betDelay"`
-	TournamentName       string  `json:"tournamentName"`
 	Active               bool    `json:"active"`
 	PreMOStakesMin       float64 `json:"preMOStakesMin"`
 	PreMOStakesMax       float64 `json:"preMOStakesMax"`
@@ -115,6 +108,4 @@ type MatchDataWithSettings struct {
 	MaxProfitTO          float64 `json:"maxProfitTO"`
 	MaxProfitFA          float64 `json:"maxProfitFA"`
 	MaxOdds              float64 `json:"maxOdds"`
-	TournamentActive     bool    `json:"tournamentActive"`
-	TournamentMaxOdds    float64 `json:"tournamentMaxOdds"`
 }

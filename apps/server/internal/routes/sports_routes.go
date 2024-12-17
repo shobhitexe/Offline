@@ -25,6 +25,8 @@ func RegisterSportsRoutes(r chi.Router, h *handlers.SportsHandler) {
 
 		r.Get("/bethistory/pergame", h.BetHistoryPerGame)
 
+		r.Get("/matchsettings", h.GetMatchSettings)
+
 	})
 
 }

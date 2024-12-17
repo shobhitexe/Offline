@@ -123,6 +123,32 @@ func (h *SportsHandler) BetHistoryPerGame(w http.ResponseWriter, r *http.Request
 	}})
 }
 
+func (h *SportsHandler) GetMatchSettings(w http.ResponseWriter, r *http.Request) {
+
+	sportsId := r.URL.Query().Get("sportsId")
+
+	if len(sportsId) == 0 || sportsId == "" {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch no sports id provided", Data: []any{}})
+		return
+	}
+
+	competitionId := r.URL.Query().Get("competitionId")
+
+	if len(competitionId) == 0 || competitionId == "" {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed to fetch no competition id provided", Data: []any{}})
+		return
+	}
+
+	settings, err := h.service.GetMatchSettings(r.Context(), sportsId, competitionId)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: []any{}})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: settings})
+}
+
 // func (h *SportsHandler) GetList(w http.ResponseWriter, r *http.Request) {
 
 // 	id := r.URL.Query().Get("id")

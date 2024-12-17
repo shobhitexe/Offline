@@ -1,8 +1,23 @@
-import { Market } from "@/types";
-import Betslip from "../BetSlip";
+"use client";
 
-import { ArrowRight } from "lucide-react";
+import { CombinedMatchSettings, Market } from "@/types";
+import Betslip from "../BetSlip";
+import { ArrowRight, Info } from "lucide-react";
 import { KeyedMutator } from "swr";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui";
+import { useEffect, useState } from "react";
+
+type MatchSettings = {
+  minStake: number;
+  maxStake: number;
+  maxProfit: number;
+  betDelay: number;
+};
 
 export default function MarketTableComponent({
   data,
@@ -11,6 +26,7 @@ export default function MarketTableComponent({
   marketId,
   type,
   bets,
+  settings,
   mutate,
 }: {
   data: Market;
@@ -19,14 +35,60 @@ export default function MarketTableComponent({
   marketId: string;
   type: string;
   bets?: Record<string, number>;
+  settings?: CombinedMatchSettings;
   mutate: KeyedMutator<any>;
 }) {
+  const [matchSettings, setMatchSettings] = useState<MatchSettings | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (settings) {
+      if (settings.active) {
+        if (type === "Match Odds") {
+          setMatchSettings({
+            minStake: settings.preMOStakesMin,
+            maxStake: settings.preMOStakesMax,
+            maxProfit: settings.maxProfitMO,
+            betDelay: Number(settings.betDelayMO),
+          });
+        } else {
+          setMatchSettings({
+            minStake: settings.preBMStakesMin,
+            maxStake: settings.preBMStakesMax,
+            maxProfit: settings.maxProfitBM,
+            betDelay: Number(settings.betDelayBM),
+          });
+        }
+      } else {
+        setMatchSettings({
+          minStake: settings.minStake,
+          maxStake: settings.minStake,
+          maxProfit: Number(settings.maxStake) * 5,
+          betDelay: Number(settings.betDelay),
+        });
+      }
+    }
+  }, [settings, type]);
   return (
     <div className="flex flex-col gap-3 ">
       <div className="flex items-center gap-2 text-purple-600 sm:text-lg text-sm">
         <span className="inline-block w-3 h-3 bg-green-400 rounded-full"></span>
         {data.MarketName}
-        {/* <span className="text-gray-400">(53636091.28)</span> */}
+        <TooltipProvider delayDuration={0.5}>
+          <Tooltip>
+            <TooltipTrigger>
+              <Info className="w-4 h-4" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="flex flex-col text-xs">
+                <div>Min stake: {matchSettings?.maxStake}</div>
+                <div>Max stake: {matchSettings?.maxStake}</div>
+                <div>Max profit: {matchSettings?.maxProfit}</div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       {data.runners.map((item) => {
         const currbets =
@@ -64,6 +126,9 @@ export default function MarketTableComponent({
               runnerID={item.RunnerId}
               marketType={type}
               mutate={mutate}
+              minStake={matchSettings?.minStake || 0}
+              maxStake={matchSettings?.maxStake || 0}
+              betDelay={matchSettings?.betDelay || 0}
             />
 
             {/* Betslip for 'lay' */}
@@ -78,6 +143,9 @@ export default function MarketTableComponent({
               runnerID={item.RunnerId}
               mutate={mutate}
               marketType={type}
+              minStake={matchSettings?.minStake || 0}
+              maxStake={matchSettings?.maxStake || 0}
+              betDelay={matchSettings?.betDelay || 0}
             />
           </div>
         );

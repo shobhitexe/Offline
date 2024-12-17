@@ -114,6 +114,8 @@ export default function Match({ params }: { params: { id: string[] } }) {
         matchName={info.EventName}
         marketId={info.MatchOdds.MarketId}
         tabType={params.id[1]}
+        sportsId={info.SportsId}
+        competitionId={info.CompetitionId}
       />
     </div>
   );

@@ -29,7 +29,6 @@ import Dock from "./Dock/Dock";
 import CasinoGameCard from "./Home/Gamecard.tsx/CasinoGameCard";
 import AllGamesLoading from "./Home/AllGames/AllGamesLoading";
 import ColorPrediction from "./ColorPrediction";
-import Tawkto from "./Chatbots/Tawkto";
 import SportsSidebar from "./Sports/Sidebar";
 import GameCard from "./Sports/GameCard";
 import Timer from "./Sports/Match/Timer";
@@ -71,7 +70,6 @@ export {
   CasinoGameCard,
   AllGamesLoading,
   ColorPrediction,
-  Tawkto,
   SportsSidebar,
   GameCard,
   Timer,

@@ -1,9 +1,26 @@
-import { Market } from "@/types";
+"use client";
+
+import { CombinedMatchSettings, Market } from "@/types";
 import Betslip from "../BetSlip";
 import { KeyedMutator } from "swr";
 import { Fancy } from "@repo/types";
+import { Info } from "lucide-react";
 
 import FancyBetsDialog from "./FancyBetsDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui";
+import { useEffect, useState } from "react";
+
+type MatchSettings = {
+  minStake: number;
+  maxStake: number;
+  maxProfit: number;
+  betDelay: number;
+};
 
 export default function FancyTableComponent({
   data,
@@ -13,6 +30,7 @@ export default function FancyTableComponent({
   type,
   mutate,
   FancyBets,
+  settings,
 }: {
   data: Market;
   eventId: string;
@@ -21,13 +39,59 @@ export default function FancyTableComponent({
   type: string;
   mutate: KeyedMutator<any>;
   FancyBets?: Fancy[];
+  settings?: CombinedMatchSettings;
 }) {
+  const [matchSettings, setMatchSettings] = useState<MatchSettings | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (settings) {
+      if (settings.active) {
+        setMatchSettings({
+          minStake: settings.preFancyStakesMin,
+          maxStake: settings.preFancyStakesMax,
+          maxProfit: settings.maxProfitFA,
+          betDelay: Number(settings.betDelayFA),
+        });
+      } else {
+        setMatchSettings({
+          minStake: settings.minStake,
+          maxStake: settings.minStake,
+          maxProfit: Number(settings.maxStake) * 5,
+          betDelay: Number(settings.betDelay),
+        });
+      }
+    }
+  }, [settings, type]);
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 text-purple-600 sm:text-lg text-sm">
         <span className="inline-block w-3 h-3 bg-green-400 rounded-full"></span>
         {data.MarketName}
-        {/* <span className="text-gray-400">(53636091.28)</span> */}
+        <TooltipProvider delayDuration={0.5}>
+          <Tooltip>
+            <TooltipTrigger>
+              <Info className="w-4 h-4" />
+            </TooltipTrigger>
+            <TooltipContent>
+              {settings?.active ? (
+                <div className="flex flex-col text-xs">
+                  <div>Min stake: {settings.preFancyStakesMin}</div>
+                  <div>Max stake: {settings.preFancyStakesMax}</div>
+                  <div>Max profit: {settings.maxProfitFA}</div>
+                </div>
+              ) : (
+                <div className="flex flex-col text-xs">
+                  <div>Min stake: {settings?.minStake}</div>
+                  <div>Max stake: {settings?.minStake}</div>
+                  <div>Max profit: {Number(settings?.maxStake) * 5}</div>
+                </div>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       {data.runners.map((item) => {
         const fancyData = FancyBets?.filter(
@@ -64,6 +128,9 @@ export default function FancyTableComponent({
               runnerID={item.RunnerId}
               marketType={type}
               mutate={mutate}
+              minStake={matchSettings?.minStake || 0}
+              maxStake={matchSettings?.maxStake || 0}
+              betDelay={matchSettings?.betDelay || 0}
             />
 
             <Betslip
@@ -77,6 +144,9 @@ export default function FancyTableComponent({
               runnerID={item.RunnerId}
               marketType={type}
               mutate={mutate}
+              minStake={matchSettings?.minStake || 0}
+              maxStake={matchSettings?.maxStake || 0}
+              betDelay={matchSettings?.betDelay || 0}
             />
           </div>
         );

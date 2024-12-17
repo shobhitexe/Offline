@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { BackendURL } from "@/config/env";
 import fetcher from "@/lib/data/setup";
 import useSWR from "swr";
-import { Market } from "@/types";
+import { CombinedMatchSettings, Market } from "@/types";
 
 export default function MatchTable({
   matchOdds,
@@ -17,6 +17,8 @@ export default function MatchTable({
   matchName,
   marketId,
   tabType,
+  sportsId,
+  competitionId,
 }: {
   matchOdds: Market;
   Bookmaker: Market;
@@ -25,6 +27,8 @@ export default function MatchTable({
   matchName: string;
   marketId: string;
   tabType: string;
+  sportsId: string;
+  competitionId: string;
 }) {
   const session = useSession();
 
@@ -32,6 +36,11 @@ export default function MatchTable({
     data: { history: BetHistoryPerGame[]; grouped: GroupedBetHistoryPerGame };
   }>(
     `${BackendURL}/api/v1/sports/bethistory/pergame?userId=${session.data?.user.id}&eventId=${eventId}`,
+    fetcher
+  );
+
+  const { data: settings } = useSWR<{ data: CombinedMatchSettings }>(
+    `${BackendURL}/api/v1/sports/matchsettings?sportsId=${sportsId}&competitionId=${competitionId}`,
     fetcher
   );
 
@@ -69,6 +78,7 @@ export default function MatchTable({
             marketId={marketId}
             type="Match Odds"
             bets={data?.data.grouped.MatchOdds}
+            settings={settings?.data}
             mutate={mutate}
           />
         )}
@@ -83,6 +93,7 @@ export default function MatchTable({
             marketId={marketId}
             type="Bookmaker"
             mutate={mutate}
+            settings={settings?.data}
             bets={data?.data.grouped.Bookmaker}
           />
         )}
@@ -125,6 +136,7 @@ export default function MatchTable({
               type="Fancy"
               mutate={mutate}
               FancyBets={data?.data.grouped.Fancy}
+              settings={settings?.data}
             />
           )}
       </div>
