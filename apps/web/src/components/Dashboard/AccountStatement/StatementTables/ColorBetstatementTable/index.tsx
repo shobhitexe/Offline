@@ -14,8 +14,8 @@ export default function BetStatementTable() {
     <DataTable
       columns={ColorBetstatementColumn}
       data={betTableData}
-      isSearch={false}
-      varient="brown"
+      // isSearch={false}
+      // varient="brown"
     />
   );
 }

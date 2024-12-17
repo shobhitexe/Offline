@@ -54,14 +54,16 @@ function CalendarWhite({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: ({ ...props }) => (
-          <ChevronLeft className="ui-min-h-4 ui-min-w-4" />
-        ),
-        IconRight: ({ ...props }) => (
-          <ChevronRight className="ui-min-h-4 ui-min-w-4" />
-        ),
-      }}
+      components={
+        {
+          // IconLeft: ({ ...props }) => (
+          //   <ChevronLeft className="ui-min-h-4 ui-min-w-4" />
+          // ),
+          // IconRight: ({ ...props }) => (
+          //   <ChevronRight className="ui-min-h-4 ui-min-w-4" />
+          // ),
+        }
+      }
       {...props}
     />
   );

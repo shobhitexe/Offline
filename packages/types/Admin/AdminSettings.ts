@@ -6,7 +6,7 @@ export type AdminSettings = {
 };
 
 export type BannerType = {
-  _id: string;
+  id: string;
   position: number;
   ctaName: string;
   ctaLink: string;

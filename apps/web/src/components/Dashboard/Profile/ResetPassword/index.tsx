@@ -46,22 +46,22 @@ export default function ResetPassword() {
             return;
           }
 
-          const res = await changePassword({
-            ...data,
-            email: session.data?.user.email!,
-            phone: session.data?.user.phone!,
-          });
-          if (res === true) {
-            toast({
-              variant: "default",
-              description: "Password changed",
-            });
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
-          } else {
-            toast({ variant: "destructive", description: res.toString() });
-          }
+          // const res = await changePassword({
+          //   ...data,
+          //   email: session.data?.user.email!,
+          //   phone: session.data?.user.phone!,
+          // });
+          // if (res === true) {
+          //   toast({
+          //     variant: "default",
+          //     description: "Password changed",
+          //   });
+          //   setTimeout(() => {
+          //     window.location.reload();
+          //   }, 2000);
+          // } else {
+          //   toast({ variant: "destructive", description: res.toString() });
+          // }
         }}
       >
         {!isOTPRequested && (
@@ -132,23 +132,23 @@ export default function ResetPassword() {
             onClick={async () => {
               setIsLoading(true);
 
-              const res = await verifyOldPassword(
-                session.data?.user.phone!,
-                session.data?.user.email!,
-                data.password
-              );
+              // const res = await verifyOldPassword(
+              //   session.data?.user.phone!,
+              //   session.data?.user.email!,
+              //   data.password
+              // );
 
-              if (res === true) {
-                toast({
-                  variant: "default",
-                  description: "OTP Requested",
-                });
-                setIsLoading(false);
-                setIsOTPRequested(true);
-              } else {
-                toast({ variant: "destructive", description: res });
-                setIsLoading(false);
-              }
+              // if (res === true) {
+              //   toast({
+              //     variant: "default",
+              //     description: "OTP Requested",
+              //   });
+              //   setIsLoading(false);
+              //   setIsOTPRequested(true);
+              // } else {
+              //   toast({ variant: "destructive", description: res });
+              //   setIsLoading(false);
+              // }
             }}
           >
             {isLoading ? <LoadingSpinner className={"text-main"} /> : "Next"}

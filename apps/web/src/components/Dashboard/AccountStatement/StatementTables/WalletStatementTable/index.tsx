@@ -15,8 +15,8 @@ export default function WalletStatementTable() {
       <DataTable
         columns={WalletStatementColumns}
         data={walletTableDate}
-        isSearch={false}
-        varient="brown"
+        // isSearch={false}
+        // varient="brown"
       />
     </div>
   );

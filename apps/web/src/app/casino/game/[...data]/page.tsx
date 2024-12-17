@@ -38,7 +38,7 @@ async function getGameData(providerName: string, gameId: string) {
   const data = {
     providerName,
     gameId,
-    userId: session?.user.uniqueCode,
+    // userId: session?.user.uniqueCode,
     username: session?.user.name,
     platformId: isDesktop ? "desktop" : "mobile",
     lobby: true,

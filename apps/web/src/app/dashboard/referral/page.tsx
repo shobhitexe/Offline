@@ -46,11 +46,7 @@ export default async function page() {
         Referral & Earn History
       </div>
 
-      <DataTable
-        columns={ReferraltableColumns}
-        data={data || []}
-        varient="brown"
-      />
+      <DataTable columns={ReferraltableColumns} data={data || []} />
     </div>
   );
 }

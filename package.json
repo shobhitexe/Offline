@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "build:web": "turbo --filter web build",
     "dev": "turbo dev",
     "dev:server": "go run ./apps/server/cmd/server/*.go",
     "lint": "turbo lint",
