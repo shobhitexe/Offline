@@ -93,7 +93,7 @@ export default async function Navbar() {
 
               <Link
                 href="/auth/login"
-                className="px-4 py-2 rounded-lg text-sm"
+                className="sm:px-4 px-2 sm:py-2 py-1 rounded-lg text-sm"
                 style={{
                   background:
                     "linear-gradient(180deg, #040B1B 0%, #808080 100%)",

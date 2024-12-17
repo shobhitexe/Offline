@@ -20,27 +20,10 @@ const DockOptions = [
     target: "_self",
   },
   {
-    title: "Sports",
-    image: "/images/dock/offers.svg",
+    title: "In Play",
+    image: "/images/dock/inplay.svg",
     link: "/sports/cricket",
     target: "_self",
-  },
-  {
-    title: "Support",
-    image:
-      process.env.NEXT_PUBLIC_CASINO_NAME === "Pridegains"
-        ? "/images/dock/whatsapp.svg"
-        : "/images/dock/support.svg",
-    link: chatSupportEnabled.includes(
-      process.env.NEXT_PUBLIC_CASINO_NAME as string
-    )
-      ? `javascript:void(Tawk_API.toggle())`
-      : `https://wa.me/+91${process.env.NEXT_PUBLIC_SUPPORT_NUMBER}`,
-    target: chatSupportEnabled.includes(
-      process.env.NEXT_PUBLIC_CASINO_NAME as string
-    )
-      ? "_self"
-      : "_blank",
   },
 ];
 
@@ -62,21 +45,7 @@ export default function Dock() {
           target={item.target}
           className={`z-10 flex flex-col items-center justify-center gap-1 ${pathname === item.link && "border-b"}`}
         >
-          {process.env.NEXT_PUBLIC_CASINO_NAME === "Pridegains" ? (
-            <Image
-              src={item.image}
-              alt={item.title}
-              width={idx === 1 || idx === 3 ? 26 : 25}
-              height={idx === 1 || idx === 3 ? 26 : 25}
-            />
-          ) : (
-            <Image
-              src={item.image}
-              alt={item.title}
-              width={idx === 1 || idx === 3 ? 30 : 25}
-              height={idx === 1 || idx === 3 ? 30 : 25}
-            />
-          )}
+          <Image src={item.image} alt={item.title} width={26} height={26} />
 
           <div className="text-white text-xs font-medium">{item.title}</div>
         </Link>

@@ -33,8 +33,9 @@ export default function MobileSidebar(): JSX.Element {
         <div className="text-white text-xs font-medium">Menu</div>
       </SheetTrigger>
       <SheetContent
-        className="ui-w-full ui-bg-main border-none"
+        className="ui-w-full ui-bg-main border-none ui-p-5"
         side={"bottom"}
+        style={{ padding: "20px" }}
       >
         <SidebarContent />
       </SheetContent>

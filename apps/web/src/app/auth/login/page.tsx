@@ -55,7 +55,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-8 bg-[#01050F] relative -top-10 h-full">
+      <div className="flex items-center justify-center p-8 bg-[#01050F] relative sm:-top-10 -top-20 h-full">
         <div className="w-full max-w-md space-y-8">
           <div className="md:hidden text-center mb-8">
             <h2 className="text-[#00FFC2] text-3xl font-bold">CENTURY99</h2>

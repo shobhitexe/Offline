@@ -162,15 +162,6 @@ export default function SidebarContent({
               <LoginIcon height={25} width={25} stroke="white" />
               Login
             </Link>
-
-            <Link
-              href={"/auth/register"}
-              onClick={() => dispatch(setSideBarOpen(false))}
-              className="flex items-center gap-1 bg-sidebarButtons p-2 w-full rounded-lg"
-            >
-              <RegisterUserIcon height={25} width={25} stroke="white" />
-              Register
-            </Link>
           </div>
         )}
 
