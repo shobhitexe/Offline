@@ -101,8 +101,8 @@ const items = [
       },
       {
         title: "Session History",
-        url: "/match-settings/session-history",
-        base: "/match-settings/session-history",
+        url: "/match-settings/history/session",
+        base: "/match-settings/history/session",
       },
       {
         title: "Match History",

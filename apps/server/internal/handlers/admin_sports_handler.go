@@ -113,6 +113,19 @@ func (h *AdminHandler) SetRunnerResult(w http.ResponseWriter, r *http.Request) {
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: true})
 }
 
+func (h *AdminHandler) GetRunnerHistory(w http.ResponseWriter, r *http.Request) {
+
+	history, err := h.service.GetRunnerHistory(r.Context())
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: []any{}})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: history})
+
+}
+
 func (h *AdminHandler) SaveActiveEvents(w http.ResponseWriter, r *http.Request) {
 
 	var payload models.SaveActiveEvents

@@ -58,7 +58,7 @@ func (c *Cron) GetMatchOddsResult(ctx context.Context) error {
 			runnerList := []models.RunnerResult{}
 			for _, result := range results {
 				for _, runner := range result.MatchOdds.Runners {
-					if runner.Status != "ACTIVE" {
+					if runner.Status != "ACTIVE" && runner.Status != "" {
 						runnerList = append(runnerList, models.RunnerResult{
 							RunnerName: runner.RunnerName,
 							RunnerID:   runner.RunnerID,

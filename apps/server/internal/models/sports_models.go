@@ -176,3 +176,12 @@ type ActiveSession struct {
 	RunnerId   string `json:"runnerId"`
 	EventId    string `json:"eventId"`
 }
+
+// runner history
+
+type RunnerHistory struct {
+	MatchName      string `json:"matchName"`
+	RunnerName     string `json:"runnerName"`
+	Result         int    `json:"result"`
+	SettlementTime string `json:"settlementTime"`
+}

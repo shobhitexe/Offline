@@ -155,7 +155,6 @@ CREATE TABLE IF NOT EXISTS runner_results (
     runner_name TEXT NOT NULL UNIQUE,
     runner_id TEXT NOT NULL UNIQUE,
     run INTEGER NOT NULL,
-    is_declared BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- +goose StatementEnd

@@ -27,6 +27,7 @@ type AdminSportsStore interface {
 	InitTournamentSettings(ctx context.Context, tournamentID, sportsId, tournamentName string) error
 	GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	ChangeOpenMarketStatus(ctx context.Context, eventId string) (int, error)
+	GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error)
 }
 
 func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -84,6 +85,44 @@ func (s *adminStore) ChangeOpenMarketStatus(ctx context.Context, eventId string)
 	}
 
 	return sportsid, nil
+}
+
+func (s *adminStore) GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error) {
+
+	var history []models.RunnerHistory
+
+	query := `SELECT
+	 event_name, runner_name, run, 
+	 TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
+	 FROM runner_results
+	 ORDER BY created_at DESC`
+
+	rows, err := s.db.Query(ctx, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var item models.RunnerHistory
+
+		if err := rows.Scan(
+			&item.MatchName,
+			&item.RunnerName,
+			&item.Result,
+			&item.SettlementTime,
+		); err != nil {
+			return nil, err
+		}
+
+		history = append(history, item)
+
+	}
+
+	return history, nil
 }
 
 func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {

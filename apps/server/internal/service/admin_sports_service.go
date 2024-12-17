@@ -22,6 +22,7 @@ type AdminSportsService interface {
 	SaveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error
 	GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	ChangeOpenMarketStatus(ctx context.Context, eventId string) error
+	GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error)
 }
 
 func (s *adminService) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -50,6 +51,17 @@ func (s *adminService) ChangeOpenMarketStatus(ctx context.Context, eventId strin
 	}
 
 	return nil
+}
+
+func (s *adminService) GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error) {
+
+	h, err := s.store.GetRunnerHistory(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return h, nil
 }
 
 func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error) {
