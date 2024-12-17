@@ -57,7 +57,7 @@ func (c *Cron) processEventsForKey(ctx context.Context, key string) error {
 	}
 
 	if len(events) == 0 {
-		log.Printf("No events to process for key: %s", key)
+		// log.Printf("No events to process for key: %s", key)
 		return nil
 	}
 

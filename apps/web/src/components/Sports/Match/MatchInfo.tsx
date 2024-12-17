@@ -18,7 +18,7 @@ export default function MatchInfo({
       >
         <div className="flex flex-row items-center justify-between sm:gap-5 gap-1 sm:px-6 px-0">
           <div className="flex items-center max-ss:justify-center gap-4">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center sm:text-xl text-base font-bold">
+            <div className="w-12 h-12 bg-gray-100 rounded-full sm:flex hidden items-center justify-center sm:text-xl text-base font-bold">
               {firstTeam.slice(0, 2).toUpperCase()}
             </div>
             <div className="sm:text-lg text-sm">{firstTeam}</div>
@@ -28,7 +28,7 @@ export default function MatchInfo({
           </div>
           <div className="flex items-center gap-4 max-ss:justify-center">
             <div className="sm:text-lg text-sm">{secondTeam}</div>
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center sm:text-xl text-base font-bold">
+            <div className="w-12 h-12 bg-gray-100 rounded-full sm:flex hidden items-center justify-center sm:text-xl text-base font-bold">
               {secondTeam.slice(0, 2).toUpperCase()}
             </div>
           </div>
