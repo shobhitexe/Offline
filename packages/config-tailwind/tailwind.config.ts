@@ -114,7 +114,7 @@ const config: Omit<Config, "content"> = {
           selectors: [".offline", '[data-theme="offline"]'],
           extend: {
             colors: {
-              main: "#1c1817",
+              main: "#040B1B",
               cardBG: "#f5f5f4",
               inputField: "#d6d3d1",
             },

@@ -23,8 +23,6 @@ export default withAuth(
       authorized: ({ req, token }) =>
         req.nextUrl.pathname === "/" ||
         req.nextUrl.pathname.startsWith("/auth/") ||
-        req.nextUrl.pathname.startsWith("/refer/") ||
-        req.nextUrl.pathname.startsWith("/documents") ||
         !!token,
     },
 

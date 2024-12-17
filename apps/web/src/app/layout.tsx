@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 const ThemeArr: Record<string, string> = {
-  Offline: "bg-[#1c1817]",
+  Offline: "bg-[#040B1B]",
 };
 
 export default async function RootLayout({

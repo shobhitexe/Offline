@@ -57,12 +57,13 @@ export default function NavSearch({
   return (
     <Dialog>
       <DialogTrigger
-        className={`${position === "home" && "w-[95%] mx-auto flex justify-center"}`}
+        style={{ backgroundColor: "#334155 " }}
+        className={`${position === "home" && "w-[95%] mx-auto flex justify-center"} rounded-md`}
       >
         <div
-          className={`border border-gray-700 sm:py-2 py-2 text-sm flex items-center gap-1 ${
+          className={`border border-gray-700 sm:py-2 py-2 text-xs flex items-center gap-1 ${
             position === "navbar"
-              ? "lg:pr-28 md:pr-24 sm:pr-14 max-sm:border-none md:flex hidden"
+              ? "lg:pr-20 md:pr-24 sm:pr-14 max-sm:border-none md:flex hidden"
               : ""
           } md:pl-10 pl-8 rounded-lg relative text-left w-full ${position === "home" && "md:hidden flex w-full mt-3.5 h-7"}`}
         >
@@ -78,7 +79,7 @@ export default function NavSearch({
         </div>
       </DialogTrigger>
       <DialogContent
-        style={{ maxWidth: "896px" }}
+        style={{ maxWidth: "800px" }}
         className="ui-max-w-full max-w-4xl"
       >
         <DialogHeader>

@@ -3,9 +3,9 @@
 import { RootState } from "@/store/root-reducer";
 import { setWalletBalance } from "@/store/slices/Wallet/wallet-balance";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { RefreshCcw } from "lucide-react";
 
 export default function NavWallet() {
   const { data: session, status } = useSession();
@@ -26,7 +26,9 @@ export default function NavWallet() {
       return;
     }
 
-    const newSocket = new WebSocket("ws://localhost:8080/ws");
+    const newSocket = new WebSocket(
+      process.env.NEXT_PUBLIC_WEBSOCKET_URL as string
+    );
 
     newSocket.onopen = () => {
       console.log("Connected to the WebSocket server!");
@@ -84,18 +86,34 @@ export default function NavWallet() {
             payload: { id: session?.user.id, connectionId: connId },
           })
         );
-      }, 5000);
+      }, 2000);
     }
   }, [connId, socket, session?.user.id]);
 
   return (
-    <div className="relative md:text-xs text-[10px] flex items-center text-white bg-cardBG/10 sm:px-14 px-3 py-1 sm:rounded-full rounded-md whitespace-nowrap">
-      <div className="pr-2"> Balance: {balance.balance}</div>
-      <div className="sm:h-4 h-2 sm:w-px w-[0.5px] bg-white rounded-xl" />
-      <Link href={"/bonus/casinobonus"} className="pl-2">
-        Exposure: {balance.exposure}
-      </Link>{" "}
-      <div className="inset-x-0 h-px bottom-px w-1/2 mx-auto bg-gradient-to-r from-transparent via-white/50 to-transparent absolute" />
+    <div className="flex items-center gap-2">
+      <RefreshCcw
+        className="w-4 h-4 hover:animate-spin cursor-pointer"
+        onClick={() => {
+          window.location.reload();
+        }}
+      />
+      <div className="xs:text-xs text-xxs font-semibold">
+        <div>
+          {" "}
+          Balance :{" "}
+          <span className="text-[#00EF80] font-semibold">
+            {balance.balance}
+          </span>
+        </div>
+
+        <div>
+          Exposure :{" "}
+          <span className="text-[#FF6372] font-semibold">
+            {balance.exposure}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

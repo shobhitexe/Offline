@@ -25,7 +25,9 @@ export default function Match({ params }: { params: { id: string[] } }) {
       return;
     }
 
-    const newSocket = new WebSocket("ws://localhost:8080/ws");
+    const newSocket = new WebSocket(
+      process.env.NEXT_PUBLIC_WEBSOCKET_URL as string
+    );
 
     newSocket.onopen = () => {
       console.log("Connected to the WebSocket server!");
