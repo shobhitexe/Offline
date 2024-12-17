@@ -65,7 +65,7 @@ const items = [
   {
     title: "Open Market",
     icon: Store,
-    url: "/reports",
+    url: "/open-market",
   },
   {
     title: "Casino",

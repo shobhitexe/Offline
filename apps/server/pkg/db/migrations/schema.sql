@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS active_events (
     category TEXT NOT NULL,
     event_id INTEGER NOT NULL UNIQUE,
     competition_id INTEGER NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     is_declared BOOLEAN DEFAULT FALSE,
     opening_time TIMESTAMP NOT NULL,
     runners JSON,

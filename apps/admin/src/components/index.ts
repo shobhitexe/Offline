@@ -21,6 +21,7 @@ import { resultMarketColumns } from "./MatchSettings/ResultMarket/resultmarketCo
 import SportsSettingsTable from "./SportsSettings";
 import TournamentSettingsComponent from "./TournamentList/tournamentSettingColumns";
 import TournamentEdit from "./TournamentList/tournamentEdit";
+import { openMarketColumns } from "./OpenMarket/openMarketColumns";
 
 export {
   Signin,
@@ -46,4 +47,5 @@ export {
   SportsSettingsTable,
   TournamentSettingsComponent,
   TournamentEdit,
+  openMarketColumns,
 };

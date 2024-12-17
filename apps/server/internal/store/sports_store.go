@@ -45,7 +45,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 	FROM 
 		active_events
 	WHERE 
-		sports_id = $1 AND is_declared = false`
+		sports_id = $1 AND is_declared = false AND active = true`
 
 	rows, err := s.db.Query(ctx, query, id)
 
@@ -89,6 +89,7 @@ func (s *sportsStore) GetInPlayEvents(ctx context.Context, id string) (*[]models
 	WHERE 
 		sports_id = $1 
 		AND is_declared = false
+		AND active = true
 		AND NOW() > opening_time`
 
 	rows, err := s.db.Query(ctx, query, id)

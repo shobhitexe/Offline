@@ -6,6 +6,7 @@ type ActiveEvents struct {
 	EventName     string `json:"eventName"`
 	EventTime     string `json:"eventTime"`
 	Category      string `json:"category"`
+	Active        bool   `json:"active"`
 	MatchOdds     MarketInfo
 }
 

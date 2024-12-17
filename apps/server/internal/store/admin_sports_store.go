@@ -25,6 +25,65 @@ type AdminSportsStore interface {
 	ChangeActiveBetStatus(ctx context.Context, tx pgx.Tx, id, result string) error
 	FindMarketOddsBetsByEventID(ctx context.Context, eventID, runnerID, marketId string) (*[]models.ActiveBet, error)
 	InitTournamentSettings(ctx context.Context, tournamentID, sportsId, tournamentName string) error
+	GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error)
+	ChangeOpenMarketStatus(ctx context.Context, eventId string) (int, error)
+}
+
+func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
+	var events []models.ActiveEvents
+
+	query := `
+	SELECT 
+		match_name, 
+		event_id,
+		competition_id,
+		category,
+		active,
+		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+	FROM 
+		active_events
+	WHERE 
+		sports_id = $1 AND is_declared = false
+	ORDER BY opening_time`
+
+	rows, err := s.db.Query(ctx, query, id)
+
+	if err != nil {
+
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var event models.ActiveEvents
+		if err := rows.Scan(
+			&event.EventName,
+			&event.EventId,
+			&event.CompetitionId,
+			&event.Category,
+			&event.Active,
+			&event.EventTime,
+		); err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	return &events, nil
+}
+
+func (s *adminStore) ChangeOpenMarketStatus(ctx context.Context, eventId string) (int, error) {
+
+	var sportsid int
+
+	query := `UPDATE active_events SET active = NOT active WHERE event_id = $1 RETURNING sports_id`
+
+	if err := s.db.QueryRow(ctx, query, eventId).Scan(&sportsid); err != nil {
+		return 0, err
+	}
+
+	return sportsid, nil
 }
 
 func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error) {

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"server/internal/models"
 	"server/pkg/utils"
+	"strconv"
 	"sync"
 )
 
@@ -19,6 +20,36 @@ type AdminSportsService interface {
 	GetRunnersofEvent(ctx context.Context, eventId string) ([]models.FancyList, error)
 	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
 	SaveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error
+	GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error)
+	ChangeOpenMarketStatus(ctx context.Context, eventId string) error
+}
+
+func (s *adminService) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
+
+	events, err := s.store.GetOpenMarket(ctx, id)
+	if err != nil {
+		log.Printf("Error retrieving events from the store: %v", err)
+		return nil, err
+	}
+
+	return events, nil
+}
+
+func (s *adminService) ChangeOpenMarketStatus(ctx context.Context, eventId string) error {
+
+	sportsid, err := s.store.ChangeOpenMarketStatus(ctx, eventId)
+
+	if err != nil {
+		return err
+	}
+
+	key := "sports:activeEvents:" + strconv.Itoa(sportsid)
+
+	if err := s.redis.Del(ctx, key).Err(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId string) (models.GroupedData, error) {

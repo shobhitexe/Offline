@@ -8,8 +8,6 @@ import (
 
 func RegisterHealthRoutes(r chi.Router, h *handlers.HealthHandler) {
 
-	r.Route("/health", func(r chi.Router) {
-		r.Get("/", h.CheckHealth)
-	})
+	r.Get("/health", h.CheckHealth)
 
 }

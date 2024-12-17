@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"server/internal/models"
 )
@@ -128,4 +129,49 @@ func (h *AdminHandler) SaveActiveEvents(w http.ResponseWriter, r *http.Request) 
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: true})
 
+}
+
+func (h *AdminHandler) GetOpenMarket(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+
+	if len(id) == 0 || id == "" {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No id provided", Data: false})
+		return
+	}
+
+	event, err := h.service.GetOpenMarket(r.Context(), id)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: event})
+
+}
+
+func (h *AdminHandler) ChangeOpenMarketStatus(w http.ResponseWriter, r *http.Request) {
+
+	var payload struct {
+		EventID string `json:"eventId"`
+	}
+
+	defer r.Body.Close()
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to decode id", Data: false})
+		return
+	}
+
+	if len(payload.EventID) == 0 || payload.EventID == "" {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to change No id provided", Data: false})
+		return
+	}
+
+	if err := h.service.ChangeOpenMarketStatus(r.Context(), payload.EventID); err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Status Changed", Data: true})
 }

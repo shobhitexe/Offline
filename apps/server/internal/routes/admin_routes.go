@@ -70,6 +70,10 @@ func RegisterAdminRoutes(r chi.Router, h *handlers.AdminHandler) {
 
 			//runners
 			r.Post("/runner/result", h.SetRunnerResult)
+
+			//open market
+			r.Get("/openMarket", h.GetOpenMarket)
+			r.Post("/openMarket", h.ChangeOpenMarketStatus)
 		})
 
 		//reports
