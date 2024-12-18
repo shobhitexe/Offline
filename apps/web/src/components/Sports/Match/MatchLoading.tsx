@@ -111,7 +111,7 @@ export default function MatchLoading() {
         </div>
 
         <div className="flex flex-col gap-5 h-[200px]">
-          <Skeleton className="w-full h-full" />
+          <Skeleton className="w-full h-full ui-bg-[#18181A]" />
         </div>
       </div>
     </div>

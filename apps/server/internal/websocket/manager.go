@@ -126,6 +126,14 @@ func (m *Manager) subscribeToSportsUpdates() {
 				case targetClient.egress <- outGoingEvent:
 				default:
 					log.Printf("Client %s is not ready to receive the event, skipping.", targetClient.clientId)
+					eventId := m.eventIdMap[targetClient.clientId]
+					clients := m.clientsMapByEventId[eventId]
+					for i, c := range clients {
+						if c.clientId == targetClient.clientId {
+							m.clientsMapByEventId[eventId] = append(clients[:i], clients[i+1:]...)
+							break
+						}
+					}
 				}
 			}
 		}

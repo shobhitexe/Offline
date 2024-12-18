@@ -1,3 +1,3 @@
 export const logoMap = {
-  fallback: "/images/navbar/logo.jpeg",
+  fallback: "/images/logos/logo.webp",
 };

@@ -45,7 +45,7 @@ export default async function Navbar() {
               src={
                 logoMap[casinoName as keyof typeof logoMap] || logoMap.fallback
               }
-              width={100}
+              width={50}
             />
           </Link>
         </div>

@@ -21,9 +21,9 @@ export default function CasinoGameCard({
     <div
       className={`grid sm:grid-cols-5 ss:grid-cols-4 ${casinoName === "pridegains" ? "grid-cols-3" : "grid-cols-2"} gap-3 mt-3`}
     >
-      {casinoName === "jackpot1x" &&
+      {/* {casinoName === "jackpot1x" &&
         category === "TOP GAMES" &&
-        provider === "TOP GAMES" && <ColorTiles />}
+        provider === "TOP GAMES" && <ColorTiles />} */}
 
       {games.map((item) => {
         const validImageSrc = validateImageUrl(item.url_thumb);
@@ -51,7 +51,7 @@ export default function CasinoGameCard({
                       logoMap.fallback;
                   }}
                 />
-                <div className="text-center bg-white text-main py-1 font-medium absolutes bottom-0 w-full z-0 sm:text-sm xs:text-xs text-xxs">
+                <div className="text-center bg-black text-white py-1 font-medium absolutes bottom-0 w-full z-0 sm:text-sm xs:text-xs text-xxs">
                   {item.game_name}
                 </div>
 

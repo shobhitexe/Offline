@@ -27,7 +27,7 @@ export default function AllGames() {
   const { data, error, isLoading } = useSWRImmutable<{
     data: GameType[];
   }>(
-    `${BackendURL}/api/home/allgames?provider=${filters.provider}&category=${filters.category}`,
+    `https://backend.1xbazaar.com/api/home/allgames?provider=${filters.provider}&category=${filters.category}`,
     fetcher
   );
 

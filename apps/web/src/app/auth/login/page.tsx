@@ -47,7 +47,10 @@ export default function LoginPage() {
           />
         </div>
         <div className="text-center mt-8">
-          <h2 className="text-[#00FFC2] text-4xl font-bold mb-2">CENTURY99</h2>
+          <h2 className="text-[#00FFC2] text-4xl font-bold mb-2 flex items-center justify-center">
+            CRIC<span className="text-red-500">BAZAAR</span>
+            <div className="text-yellow-500">99</div>
+          </h2>
           <p className="text-gray-400 text-sm max-w-sm">
             Your favorite games are waiting for you on this platform, play with
             love, win by playing.
