@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"server/internal/models"
 	"sync"
 	"time"
 
@@ -54,9 +53,7 @@ func NewManager(db *pgxpool.Pool, redis *redis.Client) *Manager {
 
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventWallet] = sendWalletBalance
-	m.handlers[MatchDetails] = sendMatchDetails
 	m.handlers[EventId] = mapUserIdToEventId
-
 }
 
 func mapUserIdToEventId(event Event, c *Client) error {
@@ -133,51 +130,6 @@ func (m *Manager) subscribeToSportsUpdates() {
 			}
 		}
 	}()
-}
-
-func sendMatchDetails(event Event, c *Client) error {
-
-	var matchEvent MatchEvent
-
-	if err := json.Unmarshal(event.Payload, &matchEvent); err != nil {
-		return fmt.Errorf("Bad payload in request: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	d, err := c.manager.store.GetEventDetails(ctx, matchEvent.EventId)
-
-	if err != nil {
-		return err
-	}
-
-	broadcastMessage := models.Response{
-		Message: "Details Fetched",
-		Data:    d,
-	}
-
-	data, err := json.Marshal(broadcastMessage)
-
-	if err != nil {
-		return fmt.Errorf("failed to marshal broadcast message: %v", err)
-
-	}
-
-	outGoingEvent := Event{
-		Payload: data,
-		Type:    MatchDetails,
-	}
-
-	targetClient, exists := c.manager.clientsMap[matchEvent.ConnectionId]
-	if !exists {
-		return fmt.Errorf("client not found: %s", matchEvent.ConnectionId)
-	}
-
-	targetClient.egress <- outGoingEvent
-
-	return nil
-
 }
 
 func sendWalletBalance(event Event, c *Client) error {

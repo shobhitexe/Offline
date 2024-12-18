@@ -81,12 +81,14 @@ func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, eventId string) er
 		return err
 	}
 
-	setKey := "sports:eventDetails:" + eventId
-	err = c.redis.Set(ctx, setKey, string(body), 24*time.Hour).Err()
-	if err != nil {
-		log.Printf("Error caching event details for %s: %v", eventId, err)
-		return err
-	}
+	go func() {
+		setKey := "sports:eventDetails:" + eventId
+		err = c.redis.Set(ctx, setKey, string(body), 24*time.Hour).Err()
+		if err != nil {
+			log.Printf("Error caching event details for %s: %v", eventId, err)
+			// return err
+		}
+	}()
 
 	channel := "sports:events"
 	message := map[string]string{

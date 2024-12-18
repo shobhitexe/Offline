@@ -1,13 +1,23 @@
 "use client";
 
-import { MatchInfo, MatchTable, MatchTabs, Timer } from "@/components";
+import {
+  MatchInfo,
+  MatchLoading,
+  MatchTable,
+  MatchTabs,
+  Timer,
+} from "@/components";
 import { SportsData } from "@/types";
+import { useSession } from "next-auth/react";
 import { useEffect, useState, useRef, useCallback } from "react";
 
 export default function Match({ params }: { params: { id: string[] } }) {
+  const session = useSession();
+
   const [info, setInfo] = useState<SportsData | null>(null);
   const socketInitialized = useRef(false);
   const lastUpdatedInfo = useRef<SportsData | null>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const updateInfo = useCallback((newData: SportsData) => {
     if (JSON.stringify(newData) !== JSON.stringify(lastUpdatedInfo.current)) {
@@ -52,6 +62,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
       console.log("Disconnected from the WebSocket server!");
     };
 
+    setSocket(newSocket);
     socketInitialized.current = true;
 
     return () => {
@@ -61,12 +72,39 @@ export default function Match({ params }: { params: { id: string[] } }) {
     };
   }, [params.id, updateInfo]);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (
+        document.visibilityState === "visible" &&
+        socket &&
+        session.data?.user.id
+      ) {
+        socket.send(
+          JSON.stringify({
+            type: "event_id",
+            payload: { eventId: params.id[0] },
+          })
+        );
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [socket, session.data?.user.id]);
+
   if (info === null) {
-    return <div>Loading....</div>;
+    return <MatchLoading />;
   }
 
   if (!info.MatchOdds) {
-    return <div>Loading....</div>;
+    return <MatchLoading />;
+  }
+
+  if (!socket) {
+    return <div>Please Reload</div>;
   }
 
   return (

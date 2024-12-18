@@ -15,7 +15,6 @@ const (
 	EventWallet    = "wallet"
 	SendWalletData = "wallet_balance"
 	EventSendId    = "send_id"
-	MatchDetails   = "event_data"
 	EventId        = "event_id"
 	SportsUpdate   = "sports_update"
 )

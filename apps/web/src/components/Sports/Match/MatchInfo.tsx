@@ -16,7 +16,7 @@ export default function MatchInfo({
         style={{ padding: 0 }}
         className="flex flex-col items-stretch justify-between w-full "
       >
-        <div className="flex flex-row items-center justify-between sm:gap-5 gap-1 sm:px-6 px-0">
+        <div className="flex flex-row items-center justify-between sm:gap-5 gap-1 sm:px-6 px-4 text-center">
           <div className="flex items-center max-ss:justify-center gap-4">
             <div className="w-12 h-12 bg-gray-100 rounded-full sm:flex hidden items-center justify-center sm:text-xl text-base font-bold">
               {firstTeam.slice(0, 2).toUpperCase()}

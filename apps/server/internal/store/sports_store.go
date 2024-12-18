@@ -41,6 +41,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 		competition_id,
 		match_odds, 
 		category,
+		active,
 		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
@@ -64,6 +65,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 			&event.CompetitionId,
 			&event.MatchOdds,
 			&event.Category,
+			&event.Active,
 			&event.EventTime,
 		); err != nil {
 			return nil, err

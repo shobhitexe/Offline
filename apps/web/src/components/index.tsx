@@ -37,6 +37,7 @@ import MatchTabs from "./Sports/Match/MatchTabs";
 import MatchTable from "./Sports/Match/MatchTable/MatchTable";
 import MobileSidebarSports from "./Sports/Sidebar/MobileSidebar";
 import TopBar from "./Sports/Topbar";
+import MatchLoading from "./Sports/Match/MatchLoading";
 
 export {
   Navbar,
@@ -78,4 +79,5 @@ export {
   MatchTable,
   MobileSidebarSports,
   TopBar,
+  MatchLoading,
 };
