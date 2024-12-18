@@ -103,7 +103,7 @@ export default function MarketTableComponent({
               <span className="font-semibold sm:text-base text-sm">
                 {item.RunnerName.slice(0, 2).toUpperCase()}
               </span>
-              <span className="text-white whitespace-nowrap sm:text-base text-sm">
+              <span className="text-white sm:text-base text-sm">
                 {item.RunnerName}
               </span>
               <span

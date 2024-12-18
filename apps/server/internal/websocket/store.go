@@ -36,9 +36,13 @@ func (s *WebsocketStore) UserBalance(ctx context.Context, id string) (*models.Us
 func (s *WebsocketStore) GetEventDetails(ctx context.Context, eventId string) (map[string]interface{}, error) {
 
 	go func(eventId string) {
-		eventKey := "sports:active:" + eventId
-		if err := s.redis.Set(ctx, eventKey, true, 5*time.Minute).Err(); err != nil {
-			log.Printf("Failed to cache active event to redis: %s", err)
+		expiry := time.Now().Add(5 * time.Minute).Unix()
+		z := redis.Z{
+			Score:  float64(expiry),
+			Member: eventId,
+		}
+		if err := s.redis.ZAdd(ctx, "sports:active", z).Err(); err != nil {
+			log.Printf("Failed to update active event in Redis: %s", err)
 		}
 	}(eventId)
 

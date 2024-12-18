@@ -56,6 +56,7 @@ func (c *Client) readMessages() {
 		}
 
 		_, p, err := c.connection.ReadMessage()
+
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("Error reading messages: %v", err)

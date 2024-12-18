@@ -1,5 +1,7 @@
 "use server";
 
+import { BackendURL } from "@/config/env";
+
 export async function submitBetAction(
   matchId: string,
   userId: string,
@@ -14,7 +16,7 @@ export async function submitBetAction(
   marketType: string
 ) {
   try {
-    const res = await fetch(`http://localhost:8080/api/v1/sports/placebet`, {
+    const res = await fetch(`${BackendURL}/api/v1/sports/placebet`, {
       method: "POST",
       body: JSON.stringify({
         matchId,

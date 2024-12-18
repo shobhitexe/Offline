@@ -28,6 +28,7 @@ type AdminSportsStore interface {
 	GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	ChangeOpenMarketStatus(ctx context.Context, eventId string) (int, error)
 	GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error)
+	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 }
 
 func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -64,6 +65,49 @@ func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.Ac
 			&event.CompetitionId,
 			&event.Category,
 			&event.Active,
+			&event.EventTime,
+		); err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	return &events, nil
+}
+
+func (s *adminStore) GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
+	var events []models.ActiveEvents
+
+	query := `
+	SELECT 
+		match_name, 
+		event_id,
+		competition_id,
+		match_odds, 
+		category,
+		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+	FROM 
+		active_events
+	WHERE 
+		sports_id = $1 AND is_declared = false AND active = true`
+
+	rows, err := s.db.Query(ctx, query, id)
+
+	if err != nil {
+
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var event models.ActiveEvents
+		if err := rows.Scan(
+			&event.EventName,
+			&event.EventId,
+			&event.CompetitionId,
+			&event.MatchOdds,
+			&event.Category,
 			&event.EventTime,
 		); err != nil {
 			return nil, err
