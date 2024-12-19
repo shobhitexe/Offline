@@ -15,55 +15,73 @@ func NewConnection() *Connection {
 	return &Connection{}
 }
 
-func (c *Connection) ConnectToPostgres(dsn string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*pgxpool.Pool, error) {
+func (c *Connection) ConnectToPostgres(dsn string, maxConns, minConns int, maxIdleTime string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		log.Printf("Failed to parse database connection string: %v", err)
+		return nil, err
+	}
+
+	config.MaxConns = int32(maxConns)
+	config.MinConns = int32(minConns)
+
+	if maxIdleTime != "" {
+		idleTime, err := time.ParseDuration(maxIdleTime)
+		if err != nil {
+			log.Printf("Invalid maxIdleTime value: %v", err)
+			return nil, err
+		}
+		config.MaxConnIdleTime = idleTime
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	pool, err := pgxpool.New(ctx, dsn)
+	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
-		log.Fatalf("Failed to open database pool :%s", err)
-
+		log.Printf("Failed to create PostgreSQL connection pool: %v", err)
 		return nil, err
 	}
-	pool.Config().MaxConns = int32(maxOpenConns)
-	pool.Config().MinConns = int32(maxIdleConns)
-	d, err := time.ParseDuration(maxIdleTime)
-	if err != nil {
-		log.Fatalf("Failed to parse maxIdleTime string :%s", err)
-		return nil, err
-	}
-	pool.Config().MaxConnIdleTime = d
 
-	err = pool.Ping(ctx)
-	if err != nil {
-		log.Fatalf("Failed to ping database closing connection :%s", err)
+	if err := pool.Ping(ctx); err != nil {
+		log.Printf("Failed to ping PostgreSQL database: %v", err)
 		pool.Close()
 		return nil, err
 	}
 
-	log.Println("Succesfully created database pool")
+	go c.logPoolStats(pool)
 
+	log.Println("Successfully connected to PostgreSQL")
 	return pool, nil
 }
 
-func (c *Connection) ConnectToRedis(Addr, Username, Password string, DB int) (*redis.Client, error) {
+func (c *Connection) logPoolStats(pool *pgxpool.Pool) {
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
 
+	for range ticker.C {
+		stats := pool.Stat()
+		log.Printf("[Postgres Pool Stats] TotalConns: %d, IdleConns: %d, UsedConns: %d, MaxConns: %d",
+			stats.TotalConns(), stats.IdleConns(), stats.AcquiredConns(), stats.MaxConns())
+	}
+}
+
+func (c *Connection) ConnectToRedis(addr, username, password string, db int) (*redis.Client, error) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     Addr,
-		Username: Username,
-		Password: Password,
-		DB:       DB,
+		Addr:     addr,
+		Username: username,
+		Password: password,
+		DB:       db,
 	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	if _, err := rdb.Ping(ctx).Result(); err != nil {
-		log.Fatalf("Failed to connect to Redis: %v", err)
+		log.Printf("Failed to connect to Redis: %v", err)
 		return nil, err
 	}
 
-	log.Println("Succesfully connected to redis")
-
+	log.Println("Successfully connected to Redis")
 	return rdb, nil
-
 }
