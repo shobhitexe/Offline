@@ -105,17 +105,6 @@ func (m *Manager) subscribeToSportsUpdates() {
 				continue
 			}
 
-			go func(eventId string) {
-				expiry := time.Now().Add(5 * time.Minute).Unix()
-				z := redis.Z{
-					Score:  float64(expiry),
-					Member: eventId,
-				}
-				if err := m.store.redis.ZAdd(ctx, "sports:active", z).Err(); err != nil {
-					log.Printf("Failed to update active event in Redis: %s", err)
-				}
-			}(event.EventId)
-
 			outGoingEvent := Event{
 				Payload: json.RawMessage(event.Details),
 				Type:    SportsUpdate,
@@ -124,6 +113,16 @@ func (m *Manager) subscribeToSportsUpdates() {
 			for _, targetClient := range clientsForEventId {
 				select {
 				case targetClient.egress <- outGoingEvent:
+					go func(eventId string) {
+						expiry := time.Now().Add(5 * time.Minute).Unix()
+						z := redis.Z{
+							Score:  float64(expiry),
+							Member: eventId,
+						}
+						if err := m.store.redis.ZAdd(ctx, "sports:active", z).Err(); err != nil {
+							log.Printf("Failed to update active event in Redis: %s", err)
+						}
+					}(event.EventId)
 				default:
 					log.Printf("Client %s is not ready to receive the event, skipping.", targetClient.clientId)
 					eventId := m.eventIdMap[targetClient.clientId]

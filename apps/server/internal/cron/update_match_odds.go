@@ -83,7 +83,7 @@ func (c *Cron) fetchAndCacheEventDetails(ctx context.Context, eventId string) er
 
 	go func() {
 		setKey := "sports:eventDetails:" + eventId
-		err = c.redis.Set(ctx, setKey, string(body), 24*time.Hour).Err()
+		err = c.redis.Set(ctx, setKey, string(body), 1*time.Hour).Err()
 		if err != nil {
 			log.Printf("Error caching event details for %s: %v", eventId, err)
 			// return err
