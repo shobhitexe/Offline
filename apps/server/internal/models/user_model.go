@@ -16,6 +16,7 @@ type User struct {
 }
 
 type UserWallet struct {
+	ID       string  `json:"id"`
 	Balance  float64 `json:"balance"`
 	Exposure float64 `json:"exposure"`
 }

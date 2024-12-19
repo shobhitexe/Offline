@@ -153,7 +153,7 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 		return fmt.Errorf("Invalid Bet Type")
 	}
 
-	if err := s.store.TransferBetValueToExposure(ctx, tx, payload.UserId, exposure); err != nil {
+	if err != nil {
 		return fmt.Errorf("Failed to transfer user balance :%w", err)
 	}
 

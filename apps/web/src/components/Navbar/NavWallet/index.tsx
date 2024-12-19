@@ -1,101 +1,38 @@
 "use client";
 
-import { RootState } from "@/store/root-reducer";
 import { setWalletBalance } from "@/store/slices/Wallet/wallet-balance";
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { RefreshCcw } from "lucide-react";
+import useSWR from "swr";
+import fetcher from "@/lib/data/setup";
+import { BackendURL } from "@/config/env";
 
 export default function NavWallet() {
-  const { data: session, status } = useSession();
+  const session = useSession();
   const dispatch = useDispatch();
-  const balance = useSelector((state: RootState) => state.walletBalance);
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [connId, setConnId] = useState<string>("");
-
-  const socketInitialized = useRef(false);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      return;
-    }
-
-    if (socketInitialized.current) {
-      return;
-    }
-
-    const newSocket = new WebSocket(
-      process.env.NEXT_PUBLIC_WEBSOCKET_URL as string
-    );
-
-    newSocket.onopen = () => {
-      console.log("Connected to the WebSocket server!");
-    };
-
-    newSocket.onmessage = (event) => {
-      const eventData = JSON.parse(event.data);
-      const { type } = eventData;
-
-      if (type === "send_id") {
-        setConnId(eventData.payload.connectionId);
-      } else if (type === "wallet_balance") {
-        if (eventData.payload.to) {
-          dispatch(
-            setWalletBalance({
-              balance: eventData.payload.balance,
-              exposure: eventData.payload.exposure,
-            })
-          );
-        }
-      }
-    };
-
-    newSocket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    newSocket.onclose = () => {
-      console.log("Disconnected from the WebSocket server!");
-    };
-
-    setSocket(newSocket);
-    socketInitialized.current = true;
-
-    return () => {
-      if (newSocket.readyState === WebSocket.OPEN) {
-        // newSocket.close();
-      }
-    };
-  }, [status, dispatch]);
+  const { data, mutate } = useSWR<{
+    data: { balance: number; exposure: number };
+  }>(
+    `${BackendURL}/api/v1/user/wallet/balance?id=${session.data?.user.id}`,
+    fetcher,
+    { refreshInterval: 1000 }
+  );
 
   useEffect(() => {
-    if (connId && socket && session?.user.id) {
-      socket.send(
-        JSON.stringify({
-          type: "wallet",
-          payload: { id: session?.user.id, connectionId: connId },
-        })
-      );
-
-      setInterval(() => {
-        socket.send(
-          JSON.stringify({
-            type: "wallet",
-            payload: { id: session?.user.id, connectionId: connId },
-          })
-        );
-      }, 2000);
+    if (data?.data) {
+      dispatch(setWalletBalance(data?.data));
     }
-  }, [connId, socket, session?.user.id]);
+  }, [data]);
 
   return (
     <div className="flex items-center gap-2">
       <RefreshCcw
         className="w-4 h-4 hover:animate-spin cursor-pointer"
         onClick={() => {
-          window.location.reload();
+          mutate();
         }}
       />
       <div className="xs:text-xs text-xxs font-semibold">
@@ -103,14 +40,14 @@ export default function NavWallet() {
           {" "}
           Balance :{" "}
           <span className="text-[#00EF80] font-semibold">
-            {balance.balance}
+            {data?.data.balance}
           </span>
         </div>
 
         <div>
           Exposure :{" "}
           <span className="text-[#FF6372] font-semibold">
-            {balance.exposure}
+            {data?.data.exposure}
           </span>
         </div>
       </div>

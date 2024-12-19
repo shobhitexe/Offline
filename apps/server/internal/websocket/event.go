@@ -17,6 +17,8 @@ const (
 	EventSendId    = "send_id"
 	EventId        = "event_id"
 	SportsUpdate   = "sports_update"
+
+	UserId = "user_id"
 )
 
 type WalletEvent struct {
@@ -31,6 +33,10 @@ type MatchEvent struct {
 
 type UserIdMap struct {
 	EventId string `json:"eventId"`
+}
+
+type UserWalletIdMap struct {
+	UserId string `json:"userId"`
 }
 
 type SendWalletBalanceEvent struct {

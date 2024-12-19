@@ -43,7 +43,7 @@ func (h *UserHandler) WalletBalance(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Query().Get("id")
 
-	if len(id) == 0 {
+	if len(id) == 0 || id == "" {
 		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "No ID Provided", Data: "NaN"})
 		return
 	}

@@ -70,6 +70,7 @@ export default function MarketTableComponent({
       }
     }
   }, [settings, type]);
+
   return (
     <div className="flex flex-col gap-3 ">
       <div className="flex items-center gap-2 text-purple-600 sm:text-lg text-sm">

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"server/internal/models"
 	"sync"
 	"time"
 
@@ -31,6 +32,8 @@ type Manager struct {
 	eventIdMap          map[string]string
 	clientsMapByEventId map[string][]*Client
 
+	userIdMap map[string]string
+
 	store *WebsocketStore
 }
 
@@ -42,18 +45,23 @@ func NewManager(db *pgxpool.Pool, redis *redis.Client) *Manager {
 		store:               NewWebsocketStore(db, redis),
 		eventIdMap:          make(map[string]string),
 		clientsMapByEventId: make(map[string][]*Client),
+		userIdMap:           make(map[string]string),
 	}
 
 	m.setupEventHandlers()
+
 	m.subscribeToSportsUpdates()
+	m.subscribeToWalletUpdates()
 
 	return m
 
 }
 
 func (m *Manager) setupEventHandlers() {
-	m.handlers[EventWallet] = sendWalletBalance
+	// m.handlers[EventWallet] = sendWalletBalance
 	m.handlers[EventId] = mapUserIdToEventId
+
+	// m.handlers[UserId] = mapUserIdToSocketId
 }
 
 func mapUserIdToEventId(event Event, c *Client) error {
@@ -81,6 +89,97 @@ func mapUserIdToEventId(event Event, c *Client) error {
 	c.manager.clientsMapByEventId[user.EventId] = append(c.manager.clientsMapByEventId[user.EventId], c)
 
 	return nil
+}
+
+func mapUserIdToSocketId(event Event, c *Client) error {
+	var user UserWalletIdMap
+
+	if err := json.Unmarshal(event.Payload, &user); err != nil {
+		return fmt.Errorf("bad payload in request: %v", err)
+	}
+
+	if user.UserId == "" {
+		return fmt.Errorf("missing UserId in payload")
+	}
+
+	c.manager.userIdMap[c.clientId] = user.UserId
+
+	return nil
+}
+
+func (m *Manager) subscribeToWalletUpdates() {
+
+	go func() {
+		ticker := time.NewTicker(1 * time.Second)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+
+				userIds := make([]string, 0, len(m.userIdMap))
+				for _, id := range m.userIdMap {
+					userIds = append(userIds, id)
+				}
+
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+
+				query := `SELECT id, balance, exposure FROM users WHERE id = ANY($1)`
+				rows, err := m.store.db.Query(ctx, query, userIds)
+				if err != nil {
+					log.Printf("failed to fetch balance: %v", err)
+					continue
+				}
+				defer rows.Close()
+
+				var wg sync.WaitGroup
+				for rows.Next() {
+					var wallet models.UserWallet
+					if err := rows.Scan(&wallet.ID, &wallet.Balance, &wallet.Exposure); err != nil {
+						continue
+					}
+
+					wg.Add(1)
+					go func(wallet models.UserWallet) {
+						defer wg.Done()
+
+						data := SendWalletBalanceEvent{
+							To:       wallet.ID,
+							Balance:  wallet.Balance,
+							Exposure: wallet.Exposure,
+						}
+
+						d, err := json.Marshal(&data)
+						if err != nil {
+							return
+						}
+
+						event := Event{
+							Type:    EventWallet,
+							Payload: d,
+						}
+
+						m.RLock()
+						for user := range m.userIdMap {
+							client, exists := m.clientsMap[user]
+							if exists {
+								select {
+								case client.egress <- event:
+									// log.Printf("Sent wallet update to client %s", wallet.ID)
+								default:
+									log.Printf("Client %s is not ready to receive updates, skipping.", wallet.ID)
+								}
+							}
+						}
+						m.RUnlock()
+					}(wallet)
+				}
+
+				wg.Wait()
+			}
+		}
+	}()
 }
 
 func (m *Manager) subscribeToSportsUpdates() {
@@ -138,61 +237,6 @@ func (m *Manager) subscribeToSportsUpdates() {
 			}
 		}
 	}()
-}
-
-func sendWalletBalance(event Event, c *Client) error {
-
-	var walletEvent WalletEvent
-
-	if err := json.Unmarshal(event.Payload, &walletEvent); err != nil {
-		return fmt.Errorf("Bad payload in request: %v", err)
-	}
-
-	if err := broadCastMessage(c, walletEvent); err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
-func broadCastMessage(target *Client, walletEvent WalletEvent) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	wallet, err := target.manager.store.UserBalance(ctx, walletEvent.ID)
-
-	if err != nil {
-		return fmt.Errorf("failed to fetch user balance: %v", err)
-	}
-
-	broadMessage := SendWalletBalanceEvent{
-		Balance:  wallet.Balance,
-		Exposure: wallet.Exposure,
-		To:       walletEvent.ID,
-	}
-
-	data, err := json.Marshal(broadMessage)
-
-	if err != nil {
-		return fmt.Errorf("failed to marshal broadcast message: %v", err)
-
-	}
-
-	outGoingEvent := Event{
-		Payload: data,
-		Type:    SendWalletData,
-	}
-
-	targetClient, exists := target.manager.clientsMap[walletEvent.ConnectionId]
-	if !exists {
-		return fmt.Errorf("client not found: %s", walletEvent.ConnectionId)
-	}
-
-	targetClient.egress <- outGoingEvent
-
-	return nil
-
 }
 
 func (m *Manager) routeEvents(event Event, c *Client) error {
@@ -264,6 +308,8 @@ func (m *Manager) removeClient(client *Client) {
 
 	delete(m.clients, client)
 	delete(m.clientsMap, client.clientId)
+
+	delete(m.userIdMap, client.clientId)
 
 	eventId, exists := m.eventIdMap[client.clientId]
 	if exists {

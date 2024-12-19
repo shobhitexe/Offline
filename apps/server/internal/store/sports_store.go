@@ -198,7 +198,19 @@ func (s *sportsStore) BetHistoryPerGamePerUser(ctx context.Context, userId, even
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
-		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId, &row.EventId)
+
+		if err := rows.Scan(
+			&row.Selection,
+			&row.Odds,
+			&row.Stake,
+			&row.PNL,
+			&row.BetType,
+			&row.MarketName,
+			&row.RunnerId,
+			&row.EventId,
+		); err != nil {
+			return nil, err
+		}
 
 		history = append(history, row)
 	}
@@ -223,7 +235,6 @@ func (s *sportsStore) FancyBetsPerEventIdSports(ctx context.Context, eventId, us
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	for rows.Next() {
