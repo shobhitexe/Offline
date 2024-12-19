@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   search?: { accessorKey: string; header: string };
   SelectFilter?: React.ReactNode;
   isdateFilter?: boolean;
+  buttons?: boolean;
 }
 
 export function LoadingDataTable<TData, TValue>({
@@ -39,6 +40,7 @@ export function LoadingDataTable<TData, TValue>({
   search,
   SelectFilter,
   isdateFilter,
+  buttons = true,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -50,7 +52,7 @@ export function LoadingDataTable<TData, TValue>({
   });
 
   return (
-    <div className="ui-rounded-md ui-flex ui-flex-col ui-overflow-auto">
+    <div className="ui-rounded-md ui-flex ui-flex-col ui-overflow-auto ui-w-full">
       <div className="ui-flex ui-items-center ui-gap-1 ui-mb-3">
         {/* {isdateFilter && (
           <Skeleton className="">
@@ -114,21 +116,23 @@ export function LoadingDataTable<TData, TValue>({
         </TableBody>
       </Table>
 
-      <div className="flex items-center justify-end space-x-2 ui-p-4 gap-2 self-end">
-        <Button
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
+      {buttons && (
+        <div className="flex items-center justify-end space-x-2 ui-p-4 gap-2 self-end">
+          <Button
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
 
-        <Button
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+          <Button
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

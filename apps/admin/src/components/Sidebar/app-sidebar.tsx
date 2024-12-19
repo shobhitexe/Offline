@@ -65,7 +65,8 @@ const items = [
   {
     title: "Open Market",
     icon: Store,
-    url: "/open-market",
+    url: "/open-market?game=cricket",
+    base: "/open-market",
   },
   {
     title: "Casino",

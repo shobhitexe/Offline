@@ -41,7 +41,7 @@ export default async function Navbar() {
               className={
                 sizeMap[casinoName as keyof typeof sizeMap] || sizeMap.offline
               }
-              height={80}
+              height={10}
               src={
                 logoMap[casinoName as keyof typeof logoMap] || logoMap.fallback
               }

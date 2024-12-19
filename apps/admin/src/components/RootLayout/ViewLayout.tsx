@@ -23,7 +23,7 @@ export default async function ViewLayout({
         <AppSidebar />
         <main className="flex w-full relative">
           <SidebarTrigger className="absolute -top-2" />
-          <div className="p-3 w-full sm:mt-5 mt-3 h-screen overflow-auto sm:pb-40 pb-20">
+          <div className="p-3 w-full sm:mt-5 mt-3 h-screen overflow-auto pb-40">
             {children}
           </div>
         </main>

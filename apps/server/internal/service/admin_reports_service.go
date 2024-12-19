@@ -137,12 +137,16 @@ func (s *adminService) GetBalanceSheetReport(ctx context.Context, id string) (*m
 		},
 	}
 
-	switch {
-	case admin.Settlement <= 0:
-		lossreport = append(lossreport, extra...)
+	for _, e := range extra {
+		switch {
+		case e.Balance <= 0:
+			lossreport = append(lossreport, e)
+			break
 
-	case admin.Settlement > 0:
-		profitreport = append(profitreport, extra...)
+		case e.Balance > 0:
+			profitreport = append(profitreport, e)
+			break
+		}
 	}
 
 	return &models.BalanceSheet{

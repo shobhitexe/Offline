@@ -2,6 +2,7 @@ import { RiskAnalysis } from "@/components";
 import { universalGET } from "@/lib/requests";
 import { EventType } from "@/types";
 import Tabs from "../Tabs";
+import { Skeleton } from "@repo/ui";
 
 async function getData() {
   try {

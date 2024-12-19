@@ -1,4 +1,11 @@
-import { Button, buttonVariants, Card, CardContent, Skeleton } from "@repo/ui";
+import {
+  Button,
+  buttonVariants,
+  Card,
+  CardContent,
+  LoadingSpinner,
+  Skeleton,
+} from "@repo/ui";
 import Link from "next/link";
 
 const TabsArr = [
@@ -63,9 +70,6 @@ export default function MatchLoading() {
           <div className="flex items-center justify-between my-4 text-center self-center">
             <div className="text-purple-700 font-medium">
               <Skeleton className="w-24 h-6" />
-              <span className="text-sm text-gray-600 ml-2">
-                <Skeleton className="w-16 h-4 inline-block ml-2" />
-              </span>
             </div>
           </div>
         </CardContent>
@@ -98,14 +102,14 @@ export default function MatchLoading() {
               className="bg-[#72bbef] text-black hover:bg-[#72bbef]/90"
               style={{ backgroundColor: "#72bbef" }}
             >
-              Back
+              Back <LoadingSpinner />
             </Button>
             <Button
               variant="outline"
               className="bg-[#faa9ba] text-black hover:bg-[#faa9ba]/90"
               style={{ backgroundColor: "#faa9ba" }}
             >
-              Lay
+              Lay <LoadingSpinner />
             </Button>
           </div>
         </div>
