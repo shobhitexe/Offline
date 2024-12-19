@@ -102,14 +102,14 @@ export default function MatchLoading() {
               className="bg-[#72bbef] text-black hover:bg-[#72bbef]/90"
               style={{ backgroundColor: "#72bbef" }}
             >
-              Back <LoadingSpinner />
+              Back
             </Button>
             <Button
               variant="outline"
               className="bg-[#faa9ba] text-black hover:bg-[#faa9ba]/90"
               style={{ backgroundColor: "#faa9ba" }}
             >
-              Lay <LoadingSpinner />
+              Lay
             </Button>
           </div>
         </div>

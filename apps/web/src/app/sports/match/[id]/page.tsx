@@ -113,7 +113,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
   ];
 
   return (
-    <div className="w-full mx-auto sm:p-4 p-2 space-y-6">
+    <div className="w-full mx-auto sm:p-4 p-2 space-y-6 pb-40">
       <Timer eventName={info.EventName} eventTime={info.EventTime} />
 
       <MatchInfo
