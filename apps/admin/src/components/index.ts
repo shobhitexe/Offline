@@ -23,6 +23,7 @@ import TournamentSettingsComponent from "./TournamentList/tournamentSettingColum
 import TournamentEdit from "./TournamentList/tournamentEdit";
 import { openMarketColumns } from "./OpenMarket/openMarketColumns";
 import { sessionHistoryColumns } from "./MatchSettings/SessionHistory/sessionHistoryColumns";
+import SignInPage from "./Auth/Signin";
 
 export {
   Signin,
@@ -50,4 +51,5 @@ export {
   TournamentEdit,
   openMarketColumns,
   sessionHistoryColumns,
+  SignInPage,
 };
