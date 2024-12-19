@@ -89,8 +89,6 @@ export default function Match({ params }: { params: { id: string } }) {
     };
   }, [socket, session.data?.user.id]);
 
-  console.log(info);
-
   if (info === null) {
     return <>Loading</>;
   }

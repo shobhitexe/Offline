@@ -154,7 +154,7 @@ export default function Betslip({
         }}
       >
         {price === 0 || rate === 0 ? (
-          <div className="h-10 text-xs flex flex-col items-center justify-center">
+          <div className="h-10 text-xxs flex flex-col items-center justify-center">
             {marketType === "Fancy" ? (
               <div>
                 Ball <br />

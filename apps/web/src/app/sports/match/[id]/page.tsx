@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  MatchInfo,
-  MatchLoading,
-  MatchTable,
-  MatchTabs,
-  Timer,
-} from "@/components";
+import { MatchInfo, MatchLoading, MatchTable, Timer } from "@/components";
 import { SportsData } from "@/types";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui";
 
 export default function Match({ params }: { params: { id: string[] } }) {
   const session = useSession();
@@ -40,7 +35,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
       newSocket.send(
         JSON.stringify({
           type: "event_id",
-          payload: { eventId: params.id[0] },
+          payload: { eventId: params.id },
         })
       );
     };
@@ -82,7 +77,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
         socket.send(
           JSON.stringify({
             type: "event_id",
-            payload: { eventId: params.id[0] },
+            payload: { eventId: params.id },
           })
         );
       }
@@ -107,6 +102,16 @@ export default function Match({ params }: { params: { id: string[] } }) {
     return <div>Please Reload</div>;
   }
 
+  const TabsArr = [
+    { title: "All", value: "all" },
+    { title: "Market", value: "market" },
+    { title: "Fancy", value: "fancy" },
+    { title: "Only Over", value: "onlyover" },
+    { title: "Player Run", value: "playerrun" },
+    { title: "Boundaries", value: "boundaries" },
+    { title: "Wicket", value: "wicket" },
+  ];
+
   return (
     <div className="w-full mx-auto sm:p-4 p-2 space-y-6">
       <Timer eventName={info.EventName} eventTime={info.EventTime} />
@@ -117,19 +122,33 @@ export default function Match({ params }: { params: { id: string[] } }) {
         secondTeam={info.MatchOdds.runners[1].RunnerName}
       />
 
-      <MatchTabs />
+      <Tabs defaultValue="all">
+        <TabsList style={{ overflowX: "auto" }}>
+          {TabsArr.map((item) => (
+            <TabsTrigger key={item.title} value={item.value}>
+              {item.title}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      <MatchTable
-        matchOdds={info.MatchOdds}
-        Bookmaker={info.BookMaker}
-        Fancy={info.Fancy}
-        eventId={info.EventId}
-        matchName={info.EventName}
-        marketId={info.MatchOdds.MarketId}
-        tabType={params.id[1]}
-        sportsId={info.SportsId}
-        competitionId={info.CompetitionId}
-      />
+        <div className="mt-5" />
+
+        {TabsArr.map((item) => (
+          <TabsContent value={item.value}>
+            <MatchTable
+              matchOdds={info.MatchOdds}
+              Bookmaker={info.BookMaker}
+              Fancy={info.Fancy}
+              eventId={info.EventId}
+              matchName={info.EventName}
+              marketId={info.MatchOdds.MarketId}
+              tabType={item.value}
+              sportsId={info.SportsId}
+              competitionId={info.CompetitionId}
+            />
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }

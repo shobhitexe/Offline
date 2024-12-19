@@ -33,7 +33,6 @@ import SportsSidebar from "./Sports/Sidebar";
 import GameCard from "./Sports/GameCard";
 import Timer from "./Sports/Match/Timer";
 import MatchInfo from "./Sports/Match/MatchInfo";
-import MatchTabs from "./Sports/Match/MatchTabs";
 import MatchTable from "./Sports/Match/MatchTable/MatchTable";
 import MobileSidebarSports from "./Sports/Sidebar/MobileSidebar";
 import TopBar from "./Sports/Topbar";
@@ -75,7 +74,6 @@ export {
   GameCard,
   Timer,
   MatchInfo,
-  MatchTabs,
   MatchTable,
   MobileSidebarSports,
   TopBar,

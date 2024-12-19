@@ -24,7 +24,7 @@ export default async function GameCard({ event }: { event: EventType }) {
   const data: Market = await getMatchOddsData(event.eventId);
 
   return (
-    <Link href={`/sports/match/${event.eventId}/all`} className="sm:py-5 py-1">
+    <Link href={`/sports/match/${event.eventId}`} className="sm:py-5 py-1">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:p-4 p-2 cursor-pointer">
         <div className="flex flex-col gap-1">
           <span className="font-medium hover:underline">{event.eventName}</span>
