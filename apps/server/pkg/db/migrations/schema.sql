@@ -1,5 +1,4 @@
--- +goose Up
--- +goose StatementBegin
+
 CREATE TABLE IF NOT EXISTS admins (
   id SERIAL PRIMARY KEY, 
   username TEXT NOT NULL UNIQUE, 
@@ -15,12 +14,11 @@ CREATE TABLE IF NOT EXISTS admins (
   session_commission INT NOT NULL,
   blocked BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL;
+  CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL
 );
--- +goose StatementEnd
 
 
--- +goose StatementBegin
+
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,          
   username TEXT NOT NULL UNIQUE, 
@@ -54,9 +52,9 @@ CREATE TABLE IF NOT EXISTS users (
 -- AFTER UPDATE OF balance ON users
 -- FOR EACH ROW
 -- EXECUTE FUNCTION notify_balance_update();
--- +goose StatementEnd
 
--- +goose StatementBegin
+
+
 CREATE TABLE IF NOT EXISTS login_histories (
   id SERIAL PRIMARY KEY,             
   user_id INTEGER,
@@ -68,10 +66,10 @@ CREATE TABLE IF NOT EXISTS login_histories (
   CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
 );
--- +goose StatementEnd
 
 
--- +goose StatementBegin
+
+
 CREATE TABLE IF NOT EXISTS user_txns (
   id SERIAL PRIMARY KEY,             
   user_id INTEGER,
@@ -84,11 +82,11 @@ CREATE TABLE IF NOT EXISTS user_txns (
   CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
 );
--- +goose StatementEnd
 
 
 
--- +goose StatementBegin
+
+
 CREATE TABLE IF NOT EXISTS admin_txns (
   id SERIAL PRIMARY KEY,             
   from_id INTEGER,
@@ -101,53 +99,9 @@ CREATE TABLE IF NOT EXISTS admin_txns (
   CONSTRAINT fk_from_id FOREIGN KEY (from_id) REFERENCES admins(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (to_id) REFERENCES admins(id) ON DELETE CASCADE
 );
--- +goose StatementEnd
 
--- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS active_events (
-    id SERIAL PRIMARY KEY,
-    sports_id INTEGER CHECK (sports_id IN (4, 2, 1)) NOT NULL,
-    match_name TEXT NOT NULL,
-    category TEXT NOT NULL,
-    event_id INTEGER NOT NULL UNIQUE,
-    competition_id INTEGER NOT NULL,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    is_declared BOOLEAN DEFAULT FALSE,
-    opening_time TIMESTAMP NOT NULL,
-    runners JSON,
-    match_odds JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_sports_id FOREIGN KEY (sports_id) REFERENCES sports_settings(id) ON DELETE CASCADE,
-    CONSTRAINT fk_competition_id FOREIGN KEY (competition_id) REFERENCES tournament_settings(id) ON DELETE CASCADE
-);
--- +goose StatementEnd
 
--- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS sport_bets (
-  id SERIAL PRIMARY KEY,
-  match_id INTEGER NOT NULL,
-  event_id TEXT NOT NULL,
-  user_id INTEGER NOT NULL,
-  market_name TEXT NOT NULL,
-  market_id TEXT NOT NULL,
-  runner_name TEXT NOT NULL,
-  runner_id TEXT NOT NULL,
-  market_type TEXT CHECK (market_type IN ('Bookmaker', 'Match Odds','Fancy')) NOT NULL,
-  odds_price NUMERIC(10, 2) NOT NULL,
-  odds_rate NUMERIC(10, 2) NOT NULL,
-  bet_type TEXT CHECK (bet_type IN ('back', 'lay','no','yes')) NOT NULL,
-  profit NUMERIC(20, 2) NOT NULL CHECK (profit > 0), 
-  exposure NUMERIC(20, 2) NOT NULL DEFAULT 0.0 CHECK (exposure >= 0),
-  settled BOOLEAN DEFAULT FALSE,
-  result TEXT CHECK(result IN ('win','loss')),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-  CONSTRAINT fk_match_id FOREIGN KEY (match_id) REFERENCES active_events(id) ON DELETE CASCADE,
-  CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
--- +goose StatementEnd
-
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS runner_results (
     id SERIAL PRIMARY KEY,
     event_id TEXT NOT NULL,
@@ -157,9 +111,9 @@ CREATE TABLE IF NOT EXISTS runner_results (
     run INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- +goose StatementEnd
 
--- +goose StatementBegin
+
+
 CREATE TABLE IF NOT EXISTS sports_settings (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
@@ -178,7 +132,7 @@ VALUES
   (2, 'Tennis', 100000, 100, 100000, 100, 10, 1),
   (4, 'Cricket', 100000, 100, 100000, 100, 10, 1);
 
--- +goose StatementEnd
+
 
 CREATE TABLE IF NOT EXISTS tournament_settings (
     id INTEGER PRIMARY KEY,
@@ -228,4 +182,49 @@ CREATE TABLE IF NOT EXISTS tournament_settings (
 
     -- Max Odds
     max_odds INTEGER
+);
+
+
+
+CREATE TABLE IF NOT EXISTS active_events (
+    id SERIAL PRIMARY KEY,
+    sports_id INTEGER CHECK (sports_id IN (4, 2, 1)) NOT NULL,
+    match_name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    event_id INTEGER NOT NULL UNIQUE,
+    competition_id INTEGER NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_declared BOOLEAN DEFAULT FALSE,
+    opening_time TIMESTAMP NOT NULL,
+    runners JSON,
+    match_odds JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_sports_id FOREIGN KEY (sports_id) REFERENCES sports_settings(id) ON DELETE CASCADE,
+    CONSTRAINT fk_competition_id FOREIGN KEY (competition_id) REFERENCES tournament_settings(id) ON DELETE CASCADE
+);
+
+
+
+
+CREATE TABLE IF NOT EXISTS sport_bets (
+  id SERIAL PRIMARY KEY,
+  match_id INTEGER NOT NULL,
+  event_id TEXT NOT NULL,
+  user_id INTEGER NOT NULL,
+  market_name TEXT NOT NULL,
+  market_id TEXT NOT NULL,
+  runner_name TEXT NOT NULL,
+  runner_id TEXT NOT NULL,
+  market_type TEXT CHECK (market_type IN ('Bookmaker', 'Match Odds','Fancy')) NOT NULL,
+  odds_price NUMERIC(10, 2) NOT NULL,
+  odds_rate NUMERIC(10, 2) NOT NULL,
+  bet_type TEXT CHECK (bet_type IN ('back', 'lay','no','yes')) NOT NULL,
+  profit NUMERIC(20, 2) NOT NULL CHECK (profit > 0), 
+  exposure NUMERIC(20, 2) NOT NULL DEFAULT 0.0 CHECK (exposure >= 0),
+  settled BOOLEAN DEFAULT FALSE,
+  result TEXT CHECK(result IN ('win','loss')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_match_id FOREIGN KEY (match_id) REFERENCES active_events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

@@ -181,9 +181,10 @@ func (s *adminStore) GetActiveBetsListByMarketID(ctx context.Context, eventId st
 	rows, err := s.db.Query(ctx, query, eventId)
 
 	if err != nil {
-
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
@@ -214,6 +215,8 @@ func (s *adminStore) BetHistoryPerGame(ctx context.Context, eventId string) (*[]
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
@@ -396,6 +399,8 @@ func (s *adminStore) GetActiveSession(ctx context.Context, eventId string) ([]mo
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var item models.ActiveSession
 		if err := rows.Scan(&item.RunnerId, &item.MarketName, &item.RunnerName, &item.EventId); err != nil {
@@ -455,6 +460,8 @@ func (s *adminStore) FindMarketOddsBetsByEventID(ctx context.Context, eventID, r
 		log.Println(err)
 		return nil, err
 	}
+
+	defer bets.Close()
 
 	for bets.Next() {
 
