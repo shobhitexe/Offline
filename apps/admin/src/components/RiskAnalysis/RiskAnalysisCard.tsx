@@ -48,7 +48,7 @@ export default function RiskAnalysisCard({
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-0">
-          {data?.data.runners &&
+          {data?.data.runners ? (
             data.data.runners.map((runner) => (
               <div
                 key={runner.RunnerId}
@@ -61,7 +61,25 @@ export default function RiskAnalysisCard({
                   {runner.Lay.Rate}
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <>
+              {" "}
+              {Array.from({ length: 2 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex gap-2 justify-between sm:justify-start"
+                >
+                  <div className="bg-sky-100 px-4 py-2 rounded w-full sm:w-auto text-center">
+                    -
+                  </div>
+                  <div className="bg-pink-100 px-4 py-2 rounded w-full sm:w-auto text-center">
+                    -
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </div>
       {expandedMatches.includes(event.eventId) && event.MatchOdds && (
