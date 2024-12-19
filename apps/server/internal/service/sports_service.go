@@ -11,6 +11,7 @@ import (
 	"server/internal/models"
 	"server/internal/store"
 	"server/pkg/utils"
+	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -173,26 +174,47 @@ func (s *sportsService) PlaceBet(ctx context.Context, payload models.PlaceBet) e
 
 func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error) {
 
-	d, err := s.store.BetHistoryPerGamePerUser(ctx, userId, eventId)
+	var wg sync.WaitGroup
+	var historyErr, runnerErr, fancybetsErr error
 
-	if err != nil {
-		return nil, models.GroupedData{}, err
+	var betHistory *[]models.BetHistoryPerGame
+	var SavedRunner []models.SavedRunner
+	var fancyBets []models.FancyBets
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		betHistory, historyErr = s.store.BetHistoryPerGamePerUser(ctx, userId, eventId)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		SavedRunner, runnerErr = s.store.GetSavedRunners(ctx, eventId)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fancyBets, fancybetsErr = s.store.FancyBetsPerEventIdSports(ctx, eventId, userId)
+	}()
+
+	wg.Wait()
+
+	if historyErr != nil {
+		return nil, models.GroupedData{}, historyErr
 	}
 
-	r, err := s.store.GetSavedRunners(ctx, eventId)
-
-	if err != nil {
-		return nil, models.GroupedData{}, err
+	if runnerErr != nil {
+		return nil, models.GroupedData{}, runnerErr
 	}
 
-	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds", r)
-	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker", r)
-
-	fancyBets, err := s.store.FancyBetsPerEventIdSports(ctx, eventId, userId)
-
-	if err != nil {
-		return nil, models.GroupedData{}, err
+	if fancybetsErr != nil {
+		return nil, models.GroupedData{}, fancybetsErr
 	}
+
+	matchOddsResults := utils.CalculateActiveBetsOdds(betHistory, "Match Odds", SavedRunner)
+	bookmakerResults := utils.CalculateActiveBetsOdds(betHistory, "Bookmaker", SavedRunner)
 
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
@@ -200,7 +222,7 @@ func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId s
 		Fancy:     fancyBets,
 	}
 
-	return d, grouped, nil
+	return betHistory, grouped, nil
 }
 
 func (s *sportsService) GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error) {
