@@ -6,7 +6,7 @@ export default withAuth(
   async function middleware(req, token) {
     const userId: string | unknown = req.nextauth.token?.id;
 
-    const check = await checkToken(userId);
+    // const check = await checkToken(userId);
 
     // if (
     //   !check &&

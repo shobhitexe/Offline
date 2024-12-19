@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"server/internal/models"
@@ -17,7 +18,7 @@ type AdminSportsStore interface {
 	FancyBetsPerEventId(ctx context.Context, eventId string) ([]models.FancyBets, error)
 	SaveRunnerResultHistory(ctx context.Context, payload models.SetRunnerResultRequest) error
 	GetRunnerResults(ctx context.Context, eventId string) (map[string]int64, error)
-	SaveActiveEvents(ctx context.Context, payload models.ListEvents, id string, MatchOdds models.MarketInfo) error
+	SaveActiveEvents(ctx context.Context, payload models.ListEvents, runners []models.SavedRunner, id string) error
 	GetActiveSession(ctx context.Context, eventId string) ([]models.ActiveSession, error)
 	GetActiveFancyBets(ctx context.Context, eventId string) ([]models.ActiveBet, error)
 	BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, id string) error
@@ -29,6 +30,7 @@ type AdminSportsStore interface {
 	ChangeOpenMarketStatus(ctx context.Context, eventId string) (int, error)
 	GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error)
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
+	GetSavedRunners(ctx context.Context, eventId string) ([]models.SavedRunner, error)
 }
 
 func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -351,7 +353,7 @@ func (s *adminStore) SaveRunnerResultHistory(ctx context.Context, payload models
 	return nil
 }
 
-func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEvents, id string, MatchOdds models.MarketInfo) error {
+func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEvents, runner []models.SavedRunner, id string) error {
 
 	competitionId, err := strconv.Atoi(payload.Competition.ID)
 
@@ -367,7 +369,7 @@ func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEv
 		payload.Event.Name,
 		payload.Event.ID,
 		competitionId,
-		payload.Runners,
+		runner,
 		payload.Competition.Name,
 		payload.Event.OpenDate,
 	)
@@ -547,4 +549,20 @@ VALUES (
 	}
 
 	return nil
+}
+
+func (s *adminStore) GetSavedRunners(ctx context.Context, eventId string) ([]models.SavedRunner, error) {
+	query := `SELECT runners FROM active_events WHERE event_id = $1`
+
+	var runnersJSON []byte
+	if err := s.db.QueryRow(ctx, query, eventId).Scan(&runnersJSON); err != nil {
+		return nil, err
+	}
+
+	var runners []models.SavedRunner
+	if err := json.Unmarshal(runnersJSON, &runners); err != nil {
+		return nil, err
+	}
+
+	return runners, nil
 }

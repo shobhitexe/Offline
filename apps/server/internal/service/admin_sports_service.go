@@ -76,8 +76,14 @@ func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId 
 		return models.GroupedData{}, err
 	}
 
-	matchOddsResults := utils.CalculateActiveBetsOdds(bets, "Match Odds")
-	bookmakerResults := utils.CalculateActiveBetsOdds(bets, "Bookmaker")
+	r, err := s.store.GetSavedRunners(ctx, eventId)
+
+	if err != nil {
+		return models.GroupedData{}, err
+	}
+
+	matchOddsResults := utils.CalculateActiveBetsOdds(bets, "Match Odds", r)
+	bookmakerResults := utils.CalculateActiveBetsOdds(bets, "Bookmaker", r)
 
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
@@ -96,8 +102,14 @@ func (s *adminService) GetBetHistoryPerGame(ctx context.Context, eventId string)
 		return nil, models.GroupedData{}, err
 	}
 
-	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds")
-	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker")
+	r, err := s.store.GetSavedRunners(ctx, eventId)
+
+	if err != nil {
+		return nil, models.GroupedData{}, err
+	}
+
+	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds", r)
+	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker", r)
 
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
@@ -314,7 +326,20 @@ func (s *adminService) SaveActiveEvents(ctx context.Context, sportsid, competiti
 		wg.Add(1)
 		go func(e models.ListEvents) {
 			defer wg.Done()
-			if err := saveMarketOdds(ctx, e, sportsid, s); err != nil {
+
+			var saveRunner []models.SavedRunner
+
+			for _, runner := range event.Runners {
+
+				r := models.SavedRunner{
+					RunnerName: runner.RunnerName,
+					RunnerId:   runner.MetaData.RunnerId,
+				}
+
+				saveRunner = append(saveRunner, r)
+			}
+			if err := s.store.SaveActiveEvents(ctx, event, saveRunner, sportsid); err != nil {
+				log.Printf("Failed to save active event %s: %v", event.Event.ID, err)
 				errors = append(errors, err)
 			}
 		}(event)
@@ -336,35 +361,6 @@ func (s *adminService) SaveActiveEvents(ctx context.Context, sportsid, competiti
 			return err
 		}
 		return err
-	}
-
-	return nil
-}
-
-func saveMarketOdds(ctx context.Context, event models.ListEvents, sportsid string, s *adminService) error {
-	res, err := http.Get("https://alp.playunlimited9.co.in/api/v2/competition/getEventDetail/" + event.Event.ID)
-	if err != nil {
-		return fmt.Errorf("failed to fetch event details: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code %d for event %s", res.StatusCode, event.Event.ID)
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body for event %s: %w", event.Event.ID, err)
-	}
-
-	var payload models.Odds
-	if err := json.Unmarshal(body, &payload); err != nil {
-		return fmt.Errorf("failed to unmarshal odds for event %s: %w", event.Event.ID, err)
-	}
-
-	if err := s.store.SaveActiveEvents(ctx, event, sportsid, payload.MatchOdds); err != nil {
-		log.Printf("Failed to save active event %s: %v", event.Event.ID, err)
-		return fmt.Errorf("failed to save active event %s: %w", event.Event.ID, err)
 	}
 
 	return nil

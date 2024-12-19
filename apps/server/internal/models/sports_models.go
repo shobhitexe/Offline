@@ -164,10 +164,19 @@ type Event struct {
 	OpenDate string `json:"openDate"`
 }
 
+type metaData struct {
+	RunnerId string `json:"runnerId"`
+}
+
+type matchOddsRunners struct {
+	RunnerName string   `json:"runnerName"`
+	MetaData   metaData `json:"metaData"`
+}
+
 type ListEvents struct {
-	Competition competitionData  `json:"competition"`
-	Event       Event            `json:"event"`
-	Runners     []map[string]any `json:"runners"`
+	Competition competitionData    `json:"competition"`
+	Event       Event              `json:"event"`
+	Runners     []matchOddsRunners `json:"runners"`
 }
 
 type ActiveSession struct {
@@ -184,4 +193,9 @@ type RunnerHistory struct {
 	RunnerName     string `json:"runnerName"`
 	Result         int    `json:"result"`
 	SettlementTime string `json:"settlementTime"`
+}
+
+type SavedRunner struct {
+	RunnerName string
+	RunnerId   string
 }

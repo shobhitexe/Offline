@@ -179,29 +179,14 @@ func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId s
 		return nil, models.GroupedData{}, err
 	}
 
-	// matchOddsChan := make(chan map[string]float64)
-	// bookmakerChan := make(chan map[string]float64)
+	r, err := s.store.GetSavedRunners(ctx, eventId)
 
-	// var wg sync.WaitGroup
-	// wg.Add(2)
+	if err != nil {
+		return nil, models.GroupedData{}, err
+	}
 
-	// go func() {
-	// 	defer wg.Done()
-	// 	matchOddsChan <- calculateMatchOddsResults(d, "Match Odds")
-	// }()
-
-	// go func() {
-	// 	defer wg.Done()
-	// 	bookmakerChan <- calculateMatchOddsResults(d, "Bookmaker")
-	// }()
-
-	// wg.Wait()
-
-	// close(matchOddsChan)
-	// close(bookmakerChan)
-
-	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds")
-	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker")
+	matchOddsResults := utils.CalculateActiveBetsOdds(d, "Match Odds", r)
+	bookmakerResults := utils.CalculateActiveBetsOdds(d, "Bookmaker", r)
 
 	fancyBets, err := s.store.FancyBetsPerEventIdSports(ctx, eventId, userId)
 

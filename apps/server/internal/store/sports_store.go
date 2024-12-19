@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"server/internal/models"
@@ -22,6 +23,7 @@ type SportsStore interface {
 	FancyBetsPerEventIdSports(ctx context.Context, eventId, userId string) ([]models.FancyBets, error)
 	GetSingleTournamentSettings(ctx context.Context, game string) (*models.CombinedMatchSettings, error)
 	GetSportsSettings(ctx context.Context, sportsId string) (*models.CombinedMatchSettings, error)
+	GetSavedRunners(ctx context.Context, eventId string) ([]models.SavedRunner, error)
 }
 
 type sportsStore struct {
@@ -363,6 +365,22 @@ func (s *sportsStore) GetSportsSettings(ctx context.Context, sportsId string) (*
 	}
 
 	return &setting, nil
+}
+
+func (s *sportsStore) GetSavedRunners(ctx context.Context, eventId string) ([]models.SavedRunner, error) {
+	query := `SELECT runners FROM active_events WHERE event_id = $1`
+
+	var runnersJSON []byte
+	if err := s.db.QueryRow(ctx, query, eventId).Scan(&runnersJSON); err != nil {
+		return nil, err
+	}
+
+	var runners []models.SavedRunner
+	if err := json.Unmarshal(runnersJSON, &runners); err != nil {
+		return nil, err
+	}
+
+	return runners, nil
 }
 
 // func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models.MatchDataWithSettings, error) {
