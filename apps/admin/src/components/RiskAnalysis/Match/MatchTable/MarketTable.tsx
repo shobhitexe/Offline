@@ -68,7 +68,7 @@ export default function MarketTableComponent({
               }}
             >
               {item.Back.Price === 0 || item.Back.Rate === 0 ? (
-                <div className="h-10 text-xs flex flex-col items-center justify-center">
+                <div className="h-10 text-xs flex flex-col items-center justify-center text-black">
                   {"Suspended"}
                 </div>
               ) : (
@@ -87,7 +87,7 @@ export default function MarketTableComponent({
               }}
             >
               {item.Lay.Price === 0 || item.Lay.Rate === 0 ? (
-                <div className="h-10 text-xs flex flex-col items-center justify-center">
+                <div className="h-10 text-xs flex flex-col items-center justify-center text-black">
                   {"Suspended"}
                 </div>
               ) : (

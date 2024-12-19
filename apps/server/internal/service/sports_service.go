@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"server/internal/models"
 	"server/internal/store"
 	"server/pkg/utils"
@@ -24,6 +26,7 @@ type SportsService interface {
 	PlaceBet(ctx context.Context, payload models.PlaceBet) error
 	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
 	GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error)
+	GetAllEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error)
 	GetMatchSettings(ctx context.Context, sportsId, competitionId string) (*models.CombinedMatchSettings, error)
 	GetMatchOdds(ctx context.Context, eventId string) (*models.MarketInfo, error)
 }
@@ -253,6 +256,44 @@ func (s *sportsService) GetInPlayEvents(ctx context.Context) (*[]models.ActiveEv
 	return cricket, tennis, football, nil
 }
 
+func (s *sportsService) GetAllEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error) {
+	type result struct {
+		data    *[]models.ActiveEvents
+		err     error
+		sportID string
+	}
+
+	resultChan := make(chan result, 3)
+
+	fetch := func(sportID string) {
+		data, err := s.store.GetAllEvents(ctx, sportID)
+		resultChan <- result{data: data, err: err, sportID: sportID}
+	}
+
+	go fetch("4")
+	go fetch("2")
+	go fetch("1")
+
+	var cricket, tennis, football *[]models.ActiveEvents
+
+	for i := 0; i < 3; i++ {
+		res := <-resultChan
+		if res.err != nil {
+			return nil, nil, nil, res.err
+		}
+		switch res.sportID {
+		case "4":
+			cricket = res.data
+		case "2":
+			tennis = res.data
+		case "1":
+			football = res.data
+		}
+	}
+
+	return cricket, tennis, football, nil
+}
+
 func (s *sportsService) GetMatchSettings(ctx context.Context, sportsId, competitionId string) (*models.CombinedMatchSettings, error) {
 
 	ts, err := s.store.GetSingleTournamentSettings(ctx, competitionId)
@@ -275,22 +316,47 @@ func (s *sportsService) GetMatchSettings(ctx context.Context, sportsId, competit
 }
 
 func (s *sportsService) GetMatchOdds(ctx context.Context, eventId string) (*models.MarketInfo, error) {
-
 	key := "sports:eventDetails:" + eventId
 
 	odds, err := s.redis.Get(ctx, key).Result()
+	if err == nil {
+		var matchOdds models.Odds
+		if err := json.Unmarshal([]byte(odds), &matchOdds); err != nil {
+			return nil, err
+		}
 
+		return &matchOdds.MatchOdds, nil
+	}
+
+	url := "https://alp.playunlimited9.co.in/api/v2/competition/getEventDetail/" + eventId
+	res, err := http.Get(url)
 	if err != nil {
+		log.Printf("Error creating request for event %s: %v", eventId, err)
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		log.Printf("Unexpected status code %d for event %s", res.StatusCode, eventId)
+		return nil, errors.New("failed to fetch event details")
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("Error reading response body for event %s: %v", eventId, err)
 		return nil, err
 	}
 
-	var matchOdds models.Odds
-
-	if err := json.Unmarshal([]byte(odds), &matchOdds); err != nil {
+	var apiOdds models.Odds
+	if err := json.Unmarshal(body, &apiOdds); err != nil {
 		return nil, err
 	}
 
-	return &matchOdds.MatchOdds, nil
+	if err := s.redis.Set(ctx, key, body, time.Hour).Err(); err != nil {
+		log.Printf("Error saving event details to Redis for %s: %v", eventId, err)
+	}
+
+	return &apiOdds.MatchOdds, nil
 }
 
 // func getPriceAndOdds(eventId, runnerId, marketName, betType string) (price, rate float64, err error) {

@@ -74,6 +74,23 @@ func (h *SportsHandler) GetInPlayEvents(w http.ResponseWriter, r *http.Request) 
 
 }
 
+func (h *SportsHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
+
+	cricket, tennis, football, err := h.service.GetAllEvents(r.Context())
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: map[string]any{
+		"cricket":  cricket,
+		"tennis":   tennis,
+		"football": football,
+	}})
+
+}
+
 func (h *SportsHandler) GetEventDetail(w http.ResponseWriter, r *http.Request) {
 
 	eventId := r.URL.Query().Get("eventId")

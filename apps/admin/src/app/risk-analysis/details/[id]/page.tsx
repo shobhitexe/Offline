@@ -1,46 +1,50 @@
 "use client";
 
 import { MatchInfo, MatchTable, Timer } from "@/components";
-
 import { SportsData } from "@/types";
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 export default function Match({ params }: { params: { id: string } }) {
-  const { data: session, status } = useSession();
-
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [connId, setConnId] = useState<string>("");
+  const session = useSession();
 
   const [info, setInfo] = useState<SportsData | null>(null);
-
   const socketInitialized = useRef(false);
+  const lastUpdatedInfo = useRef<SportsData | null>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  const updateInfo = useCallback((newData: SportsData) => {
+    if (JSON.stringify(newData) !== JSON.stringify(lastUpdatedInfo.current)) {
+      lastUpdatedInfo.current = newData;
+      setInfo(newData);
+    }
+  }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      return;
-    }
-
     if (socketInitialized.current) {
       return;
     }
 
-    const newSocket = new WebSocket("ws://localhost:8080/ws");
+    const newSocket = new WebSocket(
+      process.env.NEXT_PUBLIC_WEBSOCKET_URL as string
+    );
 
     newSocket.onopen = () => {
       console.log("Connected to the WebSocket server!");
+      newSocket.send(
+        JSON.stringify({
+          type: "event_id",
+          payload: { eventId: params.id },
+        })
+      );
     };
 
     newSocket.onmessage = (event) => {
       const eventData = JSON.parse(event.data);
-      const { type } = eventData;
+      const { type, payload } = eventData;
 
-      if (type === "send_id") {
-        setConnId(eventData.payload.connectionId);
-      } else if (type === "event_data") {
-        if (eventData.payload.data) {
-          setInfo(eventData.payload.data);
-        }
+      if (type === "sports_update" && payload) {
+        updateInfo(payload);
       }
     };
 
@@ -60,38 +64,43 @@ export default function Match({ params }: { params: { id: string } }) {
         newSocket.close();
       }
     };
-  }, [status]);
+  }, [params.id, updateInfo]);
 
   useEffect(() => {
-    if (connId && socket && session?.user.id) {
-      socket.send(
-        JSON.stringify({
-          type: "event_data",
-          payload: { eventId: params.id, connectionId: connId },
-        })
-      );
-
-      const intervalId = setInterval(() => {
+    const handleVisibilityChange = () => {
+      if (
+        document.visibilityState === "visible" &&
+        socket &&
+        session.data?.user.id
+      ) {
         socket.send(
           JSON.stringify({
-            type: "event_data",
-            payload: { eventId: params.id, connectionId: connId },
+            type: "event_id",
+            payload: { eventId: params.id },
           })
         );
-      }, 5000);
+      }
+    };
 
-      return () => {
-        clearInterval(intervalId);
-      };
-    }
-  }, [connId, socket, session?.user.id]);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [socket, session.data?.user.id]);
+
+  console.log(info);
 
   if (info === null) {
-    return <div>Loading....</div>;
+    return <>Loading</>;
   }
 
-  if (!info.EventName) {
-    return <div>No Data yet</div>;
+  if (!info.MatchOdds) {
+    return <>Loading</>;
+  }
+
+  if (!socket) {
+    return <div>Please Reload</div>;
   }
 
   return (
@@ -100,8 +109,8 @@ export default function Match({ params }: { params: { id: string } }) {
 
       <MatchInfo
         matchTime={info.EventTime}
-        firstTeam={info.MatchOdds?.runners[0].RunnerName}
-        secondTeam={info.MatchOdds?.runners[1].RunnerName}
+        firstTeam={info.MatchOdds.runners[0].RunnerName}
+        secondTeam={info.MatchOdds.runners[1].RunnerName}
       />
 
       <MatchTable
@@ -110,7 +119,7 @@ export default function Match({ params }: { params: { id: string } }) {
         Fancy={info.Fancy}
         eventId={info.EventId}
         matchName={info.EventName}
-        marketId={info.MatchOdds?.MarketId}
+        marketId={info.MatchOdds.MarketId}
         tabType={params.id[1]}
       />
     </div>
