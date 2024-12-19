@@ -25,6 +25,7 @@ type SportsService interface {
 	BetHistoryPerGame(ctx context.Context, userId, eventId string) (*[]models.BetHistoryPerGame, models.GroupedData, error)
 	GetInPlayEvents(ctx context.Context) (*[]models.ActiveEvents, *[]models.ActiveEvents, *[]models.ActiveEvents, error)
 	GetMatchSettings(ctx context.Context, sportsId, competitionId string) (*models.CombinedMatchSettings, error)
+	GetMatchOdds(ctx context.Context, eventId string) (*models.MarketInfo, error)
 }
 
 type sportsService struct {
@@ -271,6 +272,25 @@ func (s *sportsService) GetMatchSettings(ctx context.Context, sportsId, competit
 	}
 
 	return ss, nil
+}
+
+func (s *sportsService) GetMatchOdds(ctx context.Context, eventId string) (*models.MarketInfo, error) {
+
+	key := "sports:eventDetails:" + eventId
+
+	odds, err := s.redis.Get(ctx, key).Result()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var matchOdds models.Odds
+
+	if err := json.Unmarshal([]byte(odds), &matchOdds); err != nil {
+		return nil, err
+	}
+
+	return &matchOdds.MatchOdds, nil
 }
 
 // func getPriceAndOdds(eventId, runnerId, marketName, betType string) (price, rate float64, err error) {

@@ -23,6 +23,9 @@ type Client struct {
 
 	egress   chan Event
 	clientId string
+
+	retryCount int
+	maxRetries int
 }
 
 func NewClient(conn *websocket.Conn, manager *Manager) *Client {
@@ -36,7 +39,7 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 
 func (c *Client) readMessages() {
 	defer func() {
-		c.manager.removeCLient(c)
+		c.manager.removeClient(c)
 	}()
 
 	if err := c.connection.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
@@ -79,7 +82,7 @@ func (c *Client) readMessages() {
 
 func (c *Client) writeMessages() {
 	defer func() {
-		c.manager.removeCLient(c)
+		c.manager.removeClient(c)
 	}()
 
 	tickerInterval := time.NewTicker(pingInterval)
@@ -97,7 +100,7 @@ func (c *Client) writeMessages() {
 
 			if c.connection == nil {
 				log.Println("WebSocket connection is nil, stopping write.")
-				c.manager.removeCLient(c)
+				c.manager.removeClient(c)
 				return
 			}
 
@@ -124,7 +127,7 @@ func (c *Client) writeMessages() {
 
 			if err := c.connection.WriteMessage(websocket.PingMessage, []byte("")); err != nil {
 				log.Printf("Failed to send ping message: %v", err)
-				c.manager.removeCLient(c)
+				c.manager.removeClient(c)
 				return
 			}
 		}

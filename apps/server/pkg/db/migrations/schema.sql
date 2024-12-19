@@ -197,12 +197,10 @@ CREATE TABLE IF NOT EXISTS active_events (
     is_declared BOOLEAN DEFAULT FALSE,
     opening_time TIMESTAMP NOT NULL,
     runners JSON,
-    match_odds JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_sports_id FOREIGN KEY (sports_id) REFERENCES sports_settings(id) ON DELETE CASCADE,
     CONSTRAINT fk_competition_id FOREIGN KEY (competition_id) REFERENCES tournament_settings(id) ON DELETE CASCADE
 );
-
 
 
 

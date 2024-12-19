@@ -99,7 +99,9 @@ func (m *Manager) subscribeToSportsUpdates() {
 				continue
 			}
 
+			m.RLock()
 			clientsForEventId, exists := m.clientsMapByEventId[event.EventId]
+			m.RUnlock()
 			if !exists {
 				// log.Printf("No clients found for eventId %s", event.EventId)
 				continue
@@ -125,13 +127,12 @@ func (m *Manager) subscribeToSportsUpdates() {
 					}(event.EventId)
 				default:
 					log.Printf("Client %s is not ready to receive the event, skipping.", targetClient.clientId)
-					eventId := m.eventIdMap[targetClient.clientId]
-					clients := m.clientsMapByEventId[eventId]
-					for i, c := range clients {
-						if c.clientId == targetClient.clientId {
-							m.clientsMapByEventId[eventId] = append(clients[:i], clients[i+1:]...)
-							break
-						}
+					targetClient.retryCount++
+					if targetClient.retryCount > targetClient.maxRetries {
+						log.Printf("Client %s exceeded max retries, removing.", targetClient.clientId)
+						m.removeClient(targetClient)
+					} else {
+						log.Printf("Client %s is not ready, retry %d/%d.", targetClient.clientId, targetClient.retryCount, targetClient.maxRetries)
 					}
 				}
 			}
@@ -249,16 +250,23 @@ func (m *Manager) addClient(client *Client) {
 	m.clientsMap[client.clientId] = client
 }
 
-func (m *Manager) removeCLient(client *Client) {
+func (m *Manager) removeClient(client *Client) {
 	m.Lock()
 	defer m.Unlock()
 
-	if _, ok := m.clients[client]; ok {
-		client.connection.Close()
-		delete(m.clients, client)
-		delete(m.clientsMap, client.clientId)
+	if _, ok := m.clients[client]; !ok {
+		return
+	}
 
-		eventId := m.eventIdMap[client.clientId]
+	if err := client.connection.Close(); err != nil {
+		log.Printf("Failed to close connection for client %s: %v", client.clientId, err)
+	}
+
+	delete(m.clients, client)
+	delete(m.clientsMap, client.clientId)
+
+	eventId, exists := m.eventIdMap[client.clientId]
+	if exists {
 		clients := m.clientsMapByEventId[eventId]
 		for i, c := range clients {
 			if c.clientId == client.clientId {
@@ -266,8 +274,11 @@ func (m *Manager) removeCLient(client *Client) {
 				break
 			}
 		}
-		delete(m.eventIdMap, client.clientId)
 
+		if len(m.clientsMapByEventId[eventId]) == 0 {
+			delete(m.clientsMapByEventId, eventId)
+		}
+		delete(m.eventIdMap, client.clientId)
 	}
 }
 

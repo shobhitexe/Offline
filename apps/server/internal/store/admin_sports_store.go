@@ -83,7 +83,6 @@ func (s *adminStore) GetActiveEvents(ctx context.Context, id string) (*[]models.
 		match_name, 
 		event_id,
 		competition_id,
-		match_odds, 
 		category,
 		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
@@ -106,7 +105,6 @@ func (s *adminStore) GetActiveEvents(ctx context.Context, id string) (*[]models.
 			&event.EventName,
 			&event.EventId,
 			&event.CompetitionId,
-			&event.MatchOdds,
 			&event.Category,
 			&event.EventTime,
 		); err != nil {
@@ -362,15 +360,14 @@ func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEv
 	}
 
 	query := `INSERT INTO active_events 
-	(sports_id, match_name, event_id, competition_id, runners, match_odds, category, opening_time) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	(sports_id, match_name, event_id, competition_id, runners, category, opening_time) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 	_, err = s.db.Exec(ctx, query, id,
 		payload.Event.Name,
 		payload.Event.ID,
 		competitionId,
 		payload.Runners,
-		MatchOdds,
 		payload.Competition.Name,
 		payload.Event.OpenDate,
 	)

@@ -38,6 +38,25 @@ func (h *SportsHandler) GetActiveEvents(w http.ResponseWriter, r *http.Request) 
 
 }
 
+func (h *SportsHandler) GetMatchOdds(w http.ResponseWriter, r *http.Request) {
+
+	eventId := r.URL.Query().Get("eventId")
+
+	if len(eventId) == 0 && eventId == "" {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch no eventid provided", Data: []any{}})
+		return
+	}
+
+	odds, err := h.service.GetMatchOdds(r.Context(), eventId)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: err.Error(), Data: []any{}})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: odds})
+}
+
 func (h *SportsHandler) GetInPlayEvents(w http.ResponseWriter, r *http.Request) {
 
 	cricket, tennis, football, err := h.service.GetInPlayEvents(r.Context())
