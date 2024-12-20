@@ -12,6 +12,7 @@ export type Fancy = {
   TotalExposure: number;
   TotalProfit: number;
   BetType: string;
+  Projections: Record<string, number>;
 };
 
 export type GroupedBetHistoryPerGame = {

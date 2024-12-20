@@ -5,6 +5,9 @@ import {
   CardContent,
   LoadingSpinner,
   Skeleton,
+  Tabs,
+  TabsList,
+  TabsTrigger,
 } from "@repo/ui";
 import Link from "next/link";
 
@@ -75,20 +78,15 @@ export default function MatchLoading() {
         </CardContent>
       </Card>
 
-      <div className="flex items-center gap-5 justify-around bg-inputField rounded-md p-1 overflow-x-auto">
-        {TabsArr.map((item) => (
-          <Link
-            href={`${item.value}`}
-            key={item.title}
-            className={buttonVariants({
-              size: "sm",
-              className: "w-full",
-            })}
-          >
-            {item.title}
-          </Link>
-        ))}
-      </div>
+      <Tabs defaultValue="all">
+        <TabsList style={{ overflowX: "auto" }}>
+          {TabsArr.map((item) => (
+            <TabsTrigger key={item.title} value={item.value}>
+              {item.title}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       <div className="flex flex-col gap-5 w-full relative">
         <div className="space-y-4 sm:text-base text-sm">

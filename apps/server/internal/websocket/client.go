@@ -34,6 +34,8 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 		manager:    manager,
 		egress:     make(chan Event, 100),
 		clientId:   uuid.NewString(),
+		retryCount: 0,
+		maxRetries: 5,
 	}
 }
 

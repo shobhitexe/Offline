@@ -32,6 +32,7 @@ type FancyBets struct {
 	TotalExposure float64
 	TotalProfit   float64
 	BetType       string
+	Projections   map[int]float64
 }
 
 // ///

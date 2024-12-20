@@ -81,23 +81,23 @@ export default function Betslip({
       const exposure =
         betType === "back" || betType === "yes" ? amount : (rate - 1) * amount;
 
-      if (exposure < minStake) {
-        toast({
-          title: "Failed to place bet",
-          description: `Min stake is ${minStake}`,
-          variant: "destructive",
-        });
-        return;
-      }
+      // if (amount < minStake) {
+      //   toast({
+      //     title: "Failed to place bet",
+      //     description: `Min stake is ${minStake}`,
+      //     variant: "destructive",
+      //   });
+      //   return;
+      // }
 
-      if (exposure > maxStake) {
-        toast({
-          title: "Failed to place bet",
-          description: `Max stake is ${maxStake}`,
-          variant: "destructive",
-        });
-        return;
-      }
+      // if (amount > maxStake) {
+      //   toast({
+      //     title: "Failed to place bet",
+      //     description: `Max stake is ${maxStake}`,
+      //     variant: "destructive",
+      //   });
+      //   return;
+      // }
 
       if (exposure <= 0) {
         toast({

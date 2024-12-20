@@ -84,11 +84,12 @@ func (s *adminService) GetActiveBetsListByMarketID(ctx context.Context, eventId 
 
 	matchOddsResults := utils.CalculateActiveBetsOdds(bets, "Match Odds", r)
 	bookmakerResults := utils.CalculateActiveBetsOdds(bets, "Bookmaker", r)
+	fancyProjections := utils.CalculateActiveFancyBetsProjection(fancyBets)
 
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
 		Bookmaker: bookmakerResults,
-		Fancy:     fancyBets,
+		Fancy:     fancyProjections,
 	}
 
 	return grouped, nil

@@ -215,11 +215,12 @@ func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId s
 
 	matchOddsResults := utils.CalculateActiveBetsOdds(betHistory, "Match Odds", SavedRunner)
 	bookmakerResults := utils.CalculateActiveBetsOdds(betHistory, "Bookmaker", SavedRunner)
+	fancyProjections := utils.CalculateActiveFancyBetsProjection(fancyBets)
 
 	grouped := models.GroupedData{
 		MatchOdds: matchOddsResults,
 		Bookmaker: bookmakerResults,
-		Fancy:     fancyBets,
+		Fancy:     fancyProjections,
 	}
 
 	return betHistory, grouped, nil

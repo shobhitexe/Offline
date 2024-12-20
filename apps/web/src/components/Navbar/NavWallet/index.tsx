@@ -40,14 +40,14 @@ export default function NavWallet() {
           {" "}
           Balance :{" "}
           <span className="text-[#00EF80] font-semibold">
-            {data?.data.balance}
+            {data?.data.balance || 0}
           </span>
         </div>
 
         <div>
           Exposure :{" "}
           <span className="text-[#FF6372] font-semibold">
-            {data?.data.exposure}
+            {data?.data.exposure || 0}
           </span>
         </div>
       </div>
