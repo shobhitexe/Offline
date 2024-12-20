@@ -31,6 +31,7 @@ func (c *Connection) ConnectToPostgres(dsn string, maxConns, minConns int, maxId
 			log.Printf("Invalid maxIdleTime value: %v", err)
 			return nil, err
 		}
+		config.MaxConnLifetime = idleTime
 		config.MaxConnIdleTime = idleTime
 	}
 

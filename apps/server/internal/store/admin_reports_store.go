@@ -31,7 +31,9 @@ func (s *adminStore) GetSettledBetsUsers(ctx context.Context, ids []string) (*[]
 
 	for rows.Next() {
 		var u models.PerUserBalanceSheetReport
-		rows.Scan(&u.UserID, &u.UserName, &u.Name, &u.Settlement, &u.Result)
+		if err := rows.Scan(&u.UserID, &u.UserName, &u.Name, &u.Settlement, &u.Result); err != nil {
+			return nil, err
+		}
 		report = append(report, u)
 	}
 

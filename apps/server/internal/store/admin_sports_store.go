@@ -220,7 +220,9 @@ func (s *adminStore) BetHistoryPerGame(ctx context.Context, eventId string) (*[]
 
 	for rows.Next() {
 		var row models.BetHistoryPerGame
-		rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId)
+		if err := rows.Scan(&row.Selection, &row.Odds, &row.Stake, &row.PNL, &row.BetType, &row.MarketName, &row.RunnerId); err != nil {
+			return nil, err
+		}
 
 		history = append(history, row)
 	}

@@ -73,7 +73,6 @@ func (c *Cron) StartCron(ctx context.Context) {
 				if err := c.UpdateMatchOdds(taskCtx); err != nil {
 					log.Printf("Error updating match odds: %v", err)
 				}
-				cancel()
 
 			case <-ctx.Done():
 				log.Println("Stopping 1-second cron tasks...")
