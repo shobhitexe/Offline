@@ -30,11 +30,11 @@ func (c *Cron) AutoDeclareResult(ctx context.Context) error {
 	}
 
 	if err := g.Wait(); err != nil {
-		log.Printf("Error processing events: %v", err)
+		// log.Printf("Error processing events: %v", err)
 		return err
 	}
 
-	log.Println("All events processed successfully.")
+	// log.Println("All events processed successfully.")
 	return nil
 }
 
@@ -65,6 +65,7 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 		}
 
 		if bets == nil || len(*bets) == 0 {
+			// return fmt.Errorf("No active bets")
 			continue
 		}
 
@@ -81,6 +82,11 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 					panic(p)
 				} else if err != nil {
 					_ = tx.Rollback(ctx)
+				} else {
+					// Commit only if no errors
+					if err := tx.Commit(ctx); err != nil {
+						log.Printf("Failed to commit transaction: %v", err)
+					}
 				}
 			}()
 
@@ -97,6 +103,7 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 						return err
 					}
 				}
+				break
 			case "LOSER":
 				if bet.BetType == "back" {
 					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
@@ -109,18 +116,13 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 						return err
 					}
 				}
+				break
 			default:
-				log.Printf("Unrecognized result status: %s for event %s", result.Status, result.EventID)
-				continue
+				// log.Printf("Unrecognized result status: %s for event %s", result.Status, result.EventID)
+				return nil
+
 			}
 
-			if err != nil {
-				return err
-			}
-
-			if err = tx.Commit(ctx); err != nil {
-				return fmt.Errorf("failed to commit transaction: %w", err)
-			}
 		}
 	}
 	return nil

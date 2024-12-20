@@ -51,14 +51,14 @@ func (c *Cron) GetMatchOddsResult(ctx context.Context) error {
 			var results []models.MatchOddsResult
 
 			if err := json.Unmarshal(body, &results); err != nil {
-				log.Printf("Error unmarshaling response body: %v", err)
+				// log.Printf("Error unmarshaling response body: %v", err)
 				return
 			}
 
 			runnerList := []models.RunnerResult{}
 			for _, result := range results {
 				for _, runner := range result.MatchOdds.Runners {
-					if runner.Status != "ACTIVE" && runner.Status != "" {
+					if runner.Status == "WINNER" || runner.Status == "LOSER" {
 						runnerList = append(runnerList, models.RunnerResult{
 							RunnerName: runner.RunnerName,
 							RunnerID:   runner.RunnerID,
@@ -85,7 +85,7 @@ func (c *Cron) GetMatchOddsResult(ctx context.Context) error {
 				return
 			}
 
-			log.Printf("Successfully processed event %s and saved to Redis", key)
+			// log.Printf("Successfully processed event %s and saved to Redis", key)
 		}(key)
 	}
 

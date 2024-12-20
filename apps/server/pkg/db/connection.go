@@ -57,7 +57,7 @@ func (c *Connection) ConnectToPostgres(dsn string, maxConns, minConns int, maxId
 }
 
 func (c *Connection) logPoolStats(pool *pgxpool.Pool) {
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(600 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
