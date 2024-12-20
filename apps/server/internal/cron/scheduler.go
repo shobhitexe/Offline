@@ -36,14 +36,14 @@ func NewScheduler(sportsStore store.AdminSportsStore, redis *redis.Client) *Cron
 
 func (c *Cron) StartCron(ctx context.Context) {
 	go func() {
-		ticker := time.NewTicker(600 * time.Second)
+		ticker := time.NewTicker(60 * time.Second)
 		defer ticker.Stop()
 
 		for {
 			select {
 			case <-ticker.C:
 
-				taskCtx, cancel := context.WithTimeout(ctx, 50*time.Second)
+				taskCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 				defer cancel()
 
 				if err := c.AutoDeclareResult(taskCtx); err != nil {
