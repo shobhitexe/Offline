@@ -46,31 +46,6 @@ export default function FancyBetsDialog({ fancyData }: { fancyData: Fancy }) {
                     );
                   }
                 )}
-                {/* {Array.from({ length: 11 }, (_, i) => {
-                  const offset = i - 5;
-                  const oddsRate = fancyData.OddsRate + offset;
-
-                  const isNegative =
-                    (fancyData.TotalExposure < 0 && i >= 5) ||
-                    (fancyData.TotalExposure >= 0 && i < 5);
-
-                  return (
-                    <tr key={oddsRate} className="border">
-                      <td className="border border-black p-1 text-black">
-                        {oddsRate}
-                      </td>
-                      <td
-                        className={`border border-black p-1 ${
-                          isNegative ? "text-red-600" : "text-green-600"
-                        }`}
-                      >
-                        {isNegative
-                          ? -fancyData.TotalExposure
-                          : fancyData.TotalProfit}
-                      </td>
-                    </tr>
-                  );
-                })} */}
               </tbody>
             </table>
           </div>

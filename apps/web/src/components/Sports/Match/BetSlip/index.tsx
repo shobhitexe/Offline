@@ -146,10 +146,10 @@ export default function Betslip({
     <Drawer>
       <DrawerTrigger
         disabled={price === 0 || rate === 0 ? true : false}
-        className="bg-[#72bbef] text-black hover:bg-white text-xs rounded-md font-medium border border-white"
+        className="text-black hover:bg-white text-xs rounded-sm font-medium px-3 py-1"
         style={{
           backgroundColor:
-            betType === "back" || betType === "yes" ? "#72bbef" : "#faa9ba",
+            betType === "back" || betType === "yes" ? "#039be5" : "#faa9ba",
           gap: 0,
         }}
       >
@@ -165,9 +165,9 @@ export default function Betslip({
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-10 px-4 py-2">
+          <div className="flex flex-col items-center justify-center h-10 px-4 py-2 text-xs font-semibold">
             {rate}
-            <span className="block text-xs">{price}</span>
+            <span className="block text-xxs font-normal">{price}</span>
           </div>
         )}
       </DrawerTrigger>

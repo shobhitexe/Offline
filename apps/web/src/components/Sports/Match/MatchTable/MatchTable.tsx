@@ -45,16 +45,16 @@ export default function MatchTable({
   );
 
   return (
-    <div className="flex flex-col gap-5 w-full relative">
-      <div className="space-y-4 sm:text-base text-sm">
+    <div className="flex flex-col gap-2 w-full relative">
+      {/* <div className="space-y-2 sm:text-base text-sm">
         {(tabType === "all" || tabType === "market") && (
-          <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-2">
+          <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-1">
             <div></div>
             <div className="col-span-3"></div>
             <Button
               variant="outline"
-              className="bg-[#72bbef] text-black hover:bg-[#72bbef]/90"
-              style={{ backgroundColor: "#72bbef" }}
+              className=" text-black hover:bg-[#039be5]/90"
+              style={{ backgroundColor: "#039be5" }}
             >
               Back
             </Button>
@@ -67,9 +67,9 @@ export default function MatchTable({
             </Button>
           </div>
         )}
-      </div>
+      </div> */}
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 mt-1">
         {(tabType === "all" || tabType === "market") && (
           <MarketTableComponent
             data={matchOdds}
@@ -82,8 +82,6 @@ export default function MatchTable({
             mutate={mutate}
           />
         )}
-
-        {(tabType === "all" || tabType === "market") && <BreakLine />}
 
         {(tabType === "all" || tabType === "market") && Bookmaker && (
           <MarketTableComponent
@@ -98,11 +96,7 @@ export default function MatchTable({
           />
         )}
 
-        {tabType === "all" && Fancy && Fancy.runners.length !== 0 && (
-          <BreakLine />
-        )}
-
-        {(tabType === "all" || tabType === "fancy") &&
+        {/* {(tabType === "all" || tabType === "fancy") &&
           Fancy &&
           Fancy.runners.length !== 0 && (
             <div className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(5,60px)] gap-2 sm:text-base text-sm">
@@ -123,7 +117,7 @@ export default function MatchTable({
                 Yes
               </Button>
             </div>
-          )}
+          )} */}
 
         {(tabType === "all" || tabType === "fancy") &&
           Fancy &&
@@ -146,8 +140,4 @@ export default function MatchTable({
       )}
     </div>
   );
-}
-
-function BreakLine() {
-  return <div className="h-px w-full bg-inputField my-5" />;
 }

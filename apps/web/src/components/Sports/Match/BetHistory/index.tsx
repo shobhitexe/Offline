@@ -28,9 +28,9 @@ export default function BetHistory({
 }) {
   return (
     <Dialog>
-      <DialogTrigger className="fixed sm:bottom-5 bottom-16 sm:right-10 right-5 bg-white p-3 rounded-full">
+      <DialogTrigger className="fixed sm:bottom-5 bottom-16 sm:right-10 right-5 bg-main p-3 rounded-full">
         <div className="relative">
-          <Menu className="text-black" />{" "}
+          <Menu className="text-white" />{" "}
           <div className="absolute bg-black -top-4 -right-2 px-2 rounded-full text-sm">
             {data && data.length}
           </div>

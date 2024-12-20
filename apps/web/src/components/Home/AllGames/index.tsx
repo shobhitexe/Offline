@@ -52,9 +52,9 @@ export default function AllGames() {
     <>
       <div
         id="allgames"
-        className="w-[99%] mx-auto bg-sectionBg sm:mt-5 mt-0.5 sm:p-5 p-3 rounded-lg flex flex-col"
+        className="w-[99%] mx-auto bg-sectionBg sm:mt-5 mt-0.5 sm:p-5 p-3 rounded-lg flex flex-col relative -top-2"
       >
-        <div className="flex items-center justify-start w-full mx-auto gap-5 overflow-x-auto overflow-y-hidden no-scrollbar whitespace-nowrap sm:text-base xs:text-sm text-xs">
+        {/* <div className="flex items-center justify-start w-full mx-auto gap-5 overflow-x-auto overflow-y-hidden no-scrollbar whitespace-nowrap sm:text-base xs:text-sm text-xs">
           {categoriesMap[filteredCategory as ProviderKey].map(
             (category, idx) => {
               return (
@@ -89,7 +89,7 @@ export default function AllGames() {
               );
             }
           )}
-        </div>
+        </div> */}
         {/* <div className="w-full h-1 bg-[#636363] relative z-0 mt-3" /> */}
 
         <CasinoGameCard

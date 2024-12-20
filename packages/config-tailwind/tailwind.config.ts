@@ -9,7 +9,10 @@ const config: Omit<Config, "content"> = {
 
       backgroundImage: {},
 
-      fontFamily: {},
+      fontFamily: {
+        montserrat: ["Montserrat", "serif"],
+      },
+
       screens: {
         xs: "480px",
         ss: "620px",

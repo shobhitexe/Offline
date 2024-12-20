@@ -58,14 +58,14 @@ export default function NavSearch({
     <Dialog>
       <DialogTrigger
         style={{ backgroundColor: "#334155 " }}
-        className={`${position === "home" && "w-[95%] mx-auto flex justify-center"} rounded-md`}
+        className={`${position === "home" && "w-[95%] mx-auto flex justify-center"} rounded-md mt-5 relative z-20`}
       >
         <div
           className={`border border-gray-700 sm:py-2 py-2 text-xs flex items-center gap-1 ${
             position === "navbar"
               ? "lg:pr-20 md:pr-24 sm:pr-14 max-sm:border-none md:flex hidden"
               : ""
-          } md:pl-10 pl-8 rounded-lg relative text-left w-full ${position === "home" && "md:hidden flex w-full mt-3.5 h-7"}`}
+          } md:pl-10 pl-8 rounded-lg relative text-left w-full ${position === "home" && "md:hidden flex w-full h-10"}`}
         >
           <SearchIcon
             width={position === "home" ? 15 : 20}

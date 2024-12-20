@@ -113,16 +113,16 @@ export default function Match({ params }: { params: { id: string[] } }) {
   ];
 
   return (
-    <div className="w-full mx-auto sm:p-4 p-2 space-y-6 pb-40">
+    <div className="w-full mx-auto mt-2 space-y-2 pb-40">
       <Timer eventName={info.EventName} eventTime={info.EventTime} />
 
-      <MatchInfo
+      {/* <MatchInfo
         matchTime={info.EventTime}
         firstTeam={info.MatchOdds.runners[0].RunnerName}
         secondTeam={info.MatchOdds.runners[1].RunnerName}
-      />
+      /> */}
 
-      <Tabs defaultValue="all">
+      <Tabs defaultValue="all" className="">
         <TabsList style={{ overflowX: "auto" }}>
           {TabsArr.map((item) => (
             <TabsTrigger key={item.title} value={item.value}>
@@ -131,7 +131,7 @@ export default function Match({ params }: { params: { id: string[] } }) {
           ))}
         </TabsList>
 
-        <div className="mt-5" />
+        <div className="mt-2" />
 
         {TabsArr.map((item) => (
           <TabsContent value={item.value}>

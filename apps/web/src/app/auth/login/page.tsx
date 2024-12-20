@@ -58,21 +58,16 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-8 bg-[#01050F] relative sm:-top-10 -top-20 h-full">
+      <div className="flex justify-center p-8 bg-[#01050F] relative sm:-top-10 h-full">
         <div className="w-full max-w-md space-y-8">
-          <div className="md:hidden text-center mb-8">
-            <h2 className="text-[#00FFC2] text-3xl font-bold">CENTURY99</h2>
-          </div>
-
           <div className="space-y-6">
-            <div className="space-y-2 text-center">
-              <h1 className="text-2xl font-semibold tracking-tight text-white">
-                Log in
-              </h1>
-              <p className="text-sm text-gray-400">
-                Welcome! Please enter your details
-              </p>
-            </div>
+            <Image
+              src={"/images/navbar/logo.svg"}
+              alt={"logo"}
+              width={626}
+              height={102}
+              className="w-1/2 mx-auto"
+            />
 
             <div className="space-y-4">
               <div className="space-y-2">

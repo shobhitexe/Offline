@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const providers = [
-  // "TOP GAMES",
+  "TOP GAMES",
   "Ezugi",
   "Evolution Gaming",
   "Super Spade Games",
@@ -94,7 +94,7 @@ export default function ProviderSelect() {
               provider
             )}
             <div
-              className={`bg-white w-1 group-hover:w-full h-px duration-300 mx-auto ${filterdata.provider === provider && "w-full"}`}
+              className={`bg-white w-1 group-hover:w-fulls h-px duration-300 mx-auto ${filterdata.provider === provider && "w-full"}`}
             />
           </div>
         );

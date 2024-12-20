@@ -2,6 +2,7 @@ import NavSearch from "@/components/Navbar/NavSerach";
 import {
   AllGames,
   Category,
+  Footer,
   Hero,
   // Promotions,
   ProviderSelect,
@@ -24,7 +25,10 @@ export default function Page(): JSX.Element {
       {/* <Sports /> */}
       {/* <TopEvents /> */}
       {/* <Promotions /> */}
-      <div className="sm:mt-20 mt-5" />
+
+      <Footer />
+
+      <div className="sm:mt-40 mt-32" />
     </main>
   );
 }

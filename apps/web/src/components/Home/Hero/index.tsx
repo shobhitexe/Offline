@@ -27,10 +27,10 @@ export default function Hero() {
     return (
       <div className="max-sm:mx-2 flex items-center justify-center">
         <Image
-          src={`/images/games/fallback.png`}
+          src={"/images/sports/sports.png"}
           alt={"bg"}
           width={1280}
-          height={350}
+          height={480}
           className={`w-full h-fit relative max-sm:border max-sm:border-white/10 backdrop-filter backdrop-blur-md shadow-2xl rounded-xl justify-center sm:mt-3 mt-2`}
         />
       </div>
@@ -40,7 +40,7 @@ export default function Hero() {
   return (
     <div className="max-sm:mx-2">
       <Image
-        src={"/images/sports/sports.webp"}
+        src={"/images/sports/sports.png"}
         alt={"banner"}
         width={1280}
         height={480}

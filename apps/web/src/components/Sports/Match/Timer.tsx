@@ -2,6 +2,7 @@
 
 import Countdown, { CountdownRenderProps } from "react-countdown";
 import { Tv } from "lucide-react";
+import { format, isToday, isTomorrow } from "date-fns";
 
 const renderer = ({
   days,
@@ -48,11 +49,22 @@ export default function Timer({
   eventTime: string;
 }) {
   return (
-    <div className="relative">
-      <div className="absolute left-1/2 -translate-x-1/2 -top-4 bg-[#1a1f4d] text-white rounded-lg p-4 min-w-[300px]">
-        <h2 className="text-center text-sm mb-2">{eventName}</h2>
+    <div className="bg-main text-white rounded-lg p-2 min-w-[300px] flex flex-col justify-center items-center">
+      <h2 className="text-center text-sm mb-2">{eventName}</h2>
 
-        <Countdown date={new Date(eventTime)} renderer={renderer} />
+      <Countdown date={new Date(eventTime)} renderer={renderer} />
+
+      <div className="flex items-center justify-between mt-2 text-center self-center">
+        <div className="text-inputBg font-medium">
+          {isToday(new Date(eventTime))
+            ? "TODAY"
+            : isTomorrow(new Date(eventTime))
+              ? "TOMORROW"
+              : format(new Date(eventTime), "eeee, dd MMM yyyy")}
+          <span className="text-sm text-gray-100 ml-2">
+            {format(new Date(eventTime), "hh:mm a")}
+          </span>
+        </div>
       </div>
     </div>
   );

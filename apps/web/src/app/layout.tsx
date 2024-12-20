@@ -12,11 +12,17 @@ import { SessionProviders, StoreProviders, ThemeProviders } from "./providers";
 import { getServerSession } from "next-auth";
 import { options } from "./api/auth/[...nextauth]/options";
 import { Toaster } from "@repo/ui";
-import { Poppins } from "next/font/google";
+import { Poppins, Montserrat } from "next/font/google";
 
 import { chatSupportEnabled, metadataMap } from "@/lib/constants/config";
 
 const poppins = Poppins({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["100", "200", "300", "400", "500"],
+});
+
+const montserrat = Montserrat({
   subsets: ["latin"],
   display: "swap",
   weight: ["100", "200", "300", "400", "500"],
@@ -48,7 +54,7 @@ export default async function RootLayout({
       lang="en"
       data-theme={`${(process.env.NEXT_PUBLIC_CASINO_NAME as string).toLowerCase()}`}
       // className={`${ThemeArr[process.env.NEXT_PUBLIC_CASINO_NAME as string]}`}
-      className={poppins.className}
+      className={`${poppins.className} ${montserrat.className}`}
     >
       <head>
         <link

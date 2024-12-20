@@ -85,38 +85,46 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
         <h3 className="font-semibold mb-2">Fancy</h3>
 
         <div className="flex flex-wrap items-center gap-5">
-          {fancy.map((item) => (
-            <div key={item.RunnerName}>
-              <div className="text-center">
-                {item.RunnerName} ({item.BetType})
+          {fancy.map((fancyData) => (
+            <div className="flex flex-col gap-5">
+              <div className="text-center text-black">
+                {fancyData.RunnerName}
               </div>
               <table>
-                <tbody>
-                  <tr className="border">
-                    {Array.from({ length: 11 }, (_, i) => {
-                      const offset = i - 5;
-                      return (
-                        <th key={offset} className="border border-black p-1">
-                          {item.OddsRate + offset}
-                        </th>
-                      );
-                    })}
-                  </tr>
-
+                <thead>
                   <tr>
-                    {Array.from({ length: 11 }, (_, i) => {
-                      const isNegative = item.BetType === "no" ? i < 5 : i > 5;
-                      return (
+                    <th className="border border-black p-1 text-black">
+                      Odds Rate
+                    </th>
+                    {Object.keys(fancyData.Projections).map((oddsRate) => (
+                      <th
+                        key={oddsRate}
+                        className="border border-black p-1 text-black"
+                      >
+                        {oddsRate}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-black p-1 text-black">
+                      Projections
+                    </td>
+                    {Object.values(fancyData.Projections).map(
+                      (projection, idx) => (
                         <td
-                          key={i}
-                          className={`border border-black p-1 ${isNegative ? "text-red-600" : "text-green-600"}`}
+                          key={idx}
+                          className={`border border-black p-1 ${
+                            reverseSign(projection) <= 0
+                              ? "text-red-600"
+                              : "text-green-600"
+                          }`}
                         >
-                          {isNegative
-                            ? -`${item.TotalExposure}`
-                            : item.TotalProfit}
+                          {reverseSign(projection)}
                         </td>
-                      );
-                    })}
+                      )
+                    )}
                   </tr>
                 </tbody>
               </table>

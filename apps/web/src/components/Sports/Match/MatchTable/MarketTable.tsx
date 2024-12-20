@@ -72,14 +72,14 @@ export default function MarketTableComponent({
   }, [settings, type]);
 
   return (
-    <div className="flex flex-col gap-3 ">
-      <div className="flex items-center gap-2 text-purple-600 sm:text-lg text-sm">
-        <span className="inline-block w-3 h-3 bg-green-400 rounded-full"></span>
+    <div className="flex flex-col gap-0">
+      <div className="flex items-center gap-2 text-main sm:text-lg text-xs font-medium border-b border-inputField pb-1">
+        <span className="inline-block w-2 h-2 bg-red-400 rounded-full"></span>
         {data.MarketName}
         <TooltipProvider delayDuration={0.5}>
           <Tooltip>
             <TooltipTrigger>
-              <Info className="w-4 h-4" />
+              <Info className="w-3 h-3" />
             </TooltipTrigger>
             <TooltipContent>
               <div className="flex flex-col text-xs">
@@ -98,13 +98,13 @@ export default function MarketTableComponent({
         return (
           <div
             key={item.RunnerId}
-            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,60px)] gap-2 items-center"
+            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,65px)] gap-1 items-center mt-1 relative"
           >
-            <div className="flex items-center gap-2">
-              <span className="font-semibold sm:text-base text-sm">
+            <div className="flex items-center gap-2 text-main">
+              {/* <span className="font-semibold sm:text-base text-sm">
                 {item.RunnerName.slice(0, 2).toUpperCase()}
-              </span>
-              <span className="text-white sm:text-base text-sm">
+              </span> */}
+              <span className="text-[#7e7e7e] sm:text-base text-sm font-medium uppercase">
                 {item.RunnerName}
               </span>
               <span
@@ -114,6 +114,15 @@ export default function MarketTableComponent({
               </span>
             </div>
             <div className="col-span-3 max-ss:hidden"></div>
+
+            {(item.Back.Rate === 0 ||
+              item.Back.Price === 0 ||
+              item.Lay.Rate === 0 ||
+              item.Lay.Price === 0) && (
+              <div className="absolute right-0 h-12 bg-main/40 w-[133px] rounded-sm text-sm text-center flex items-center justify-center font-medium">
+                Suspended
+              </div>
+            )}
 
             {/* Betslip for 'back' */}
             <Betslip

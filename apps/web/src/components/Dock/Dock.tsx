@@ -8,15 +8,9 @@ import { chatSupportEnabled } from "@/lib/constants/config";
 
 const DockOptions = [
   {
-    title: "Casino",
-    image: "/images/dock/casino.svg",
+    title: "Home",
+    image: "/images/dock/home.svg",
     link: "/",
-    target: "_self",
-  },
-  {
-    title: "Wallet",
-    image: "/images/dock/wallet.svg",
-    link: "/dashboard/wallet/deposit",
     target: "_self",
   },
   {
@@ -29,6 +23,12 @@ const DockOptions = [
     title: "In Play",
     image: "/images/dock/inplay.svg",
     link: "/sports/inplay",
+    target: "_self",
+  },
+  {
+    title: "Casino",
+    image: "/images/dock/casino.svg",
+    link: "/casino",
     target: "_self",
   },
 ];
@@ -49,8 +49,14 @@ export default function Dock() {
           key={item.title}
           href={item.link}
           target={item.target}
-          className={`z-10 flex flex-col items-center justify-center gap-1 ${pathname === item.link && "border-b"}`}
+          className={`z-10 flex flex-col items-center justify-center gap-1 relative`}
         >
+          {pathname === item.link && (
+            <div
+              className={`w-1.5 h-1.5 bg-red-500 absolute -bottom-1.5 rounded-full`}
+            />
+          )}
+
           <Image src={item.image} alt={item.title} width={26} height={26} />
 
           <div className="text-white text-xs font-medium">{item.title}</div>

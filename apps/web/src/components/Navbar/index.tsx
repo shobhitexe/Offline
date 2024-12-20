@@ -16,7 +16,8 @@ export default async function Navbar() {
   const session = await getServerSession(options);
 
   const sizeMap = {
-    offline: "sm:w-[100px] w-[65px] relative",
+    offline:
+      "sm:w-[120px] w-[90px] relative max-sm:scale-125 max-sm:left-3 -top-1",
   };
 
   const casinoName = (
@@ -41,7 +42,7 @@ export default async function Navbar() {
               className={
                 sizeMap[casinoName as keyof typeof sizeMap] || sizeMap.offline
               }
-              height={10}
+              height={20}
               src={
                 logoMap[casinoName as keyof typeof logoMap] || logoMap.fallback
               }
@@ -93,7 +94,7 @@ export default async function Navbar() {
 
               <Link
                 href="/auth/login"
-                className="sm:px-4 px-2 sm:py-2 py-1 rounded-lg text-sm"
+                className="sm:px-4 px-4 sm:py-2 py-1 rounded-lg text-sm font-semibold"
                 style={{
                   background:
                     "linear-gradient(180deg, #040B1B 0%, #808080 100%)",
