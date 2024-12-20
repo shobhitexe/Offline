@@ -186,8 +186,13 @@ export default function SidebarContent({
         </ScrollArea> */}
 
         {session.status === "authenticated" && (
-          <div className="pb-2 mt-3 text-black" autoFocus={false}>
-            <Button variant={"outline"} size={"xl"} onClick={() => signOut()}>
+          <div className="pb-2 mt-3 text-black w-full" autoFocus={false}>
+            <Button
+              variant={"outline"}
+              className="w-full"
+              size={"xl"}
+              onClick={() => signOut()}
+            >
               Logout
             </Button>
           </div>

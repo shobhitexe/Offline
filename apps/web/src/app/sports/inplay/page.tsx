@@ -26,14 +26,10 @@ export default async function page() {
   } = await getData();
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 text-main min-h-screen">
       {data.cricket && (
         <div>
-          <div className="text-lg font-bold">Cricket</div>
-          <div>In Play</div>
-          <div className="bg-[#444446] h-1 w-full mt-3" />
-
-          <div className="flex flex-col divide-y divide-[#444446]">
+          <div className="flex flex-col divide-y divide-inputField">
             {data.cricket.map((item) => (
               <GameCard key={item.eventId} event={item} />
             ))}
@@ -42,13 +38,9 @@ export default async function page() {
       )}
       {data.tennis && (
         <div>
-          <div className="text-lg font-bold">Tennis</div>
-
-          <div>In Play</div>
-
           <div className="bg-[#444446] h-1 w-full mt-3" />
 
-          <div className="flex flex-col divide-y divide-[#444446]">
+          <div className="flex flex-col divide-y divide-inputField">
             {data.tennis.map((item) => (
               <GameCard key={item.eventId} event={item} />
             ))}
@@ -57,13 +49,7 @@ export default async function page() {
       )}
       {data.football && (
         <div>
-          <div className="text-lg font-bold">Football</div>
-
-          <div>In Play</div>
-
-          <div className="bg-[#444446] h-1 w-full mt-3" />
-
-          <div className="flex flex-col divide-y divide-[#444446]">
+          <div className="flex flex-col divide-y divide-inputField">
             {data.football.map((item) => (
               <GameCard key={item.eventId} event={item} />
             ))}

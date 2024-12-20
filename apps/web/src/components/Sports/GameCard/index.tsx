@@ -26,12 +26,18 @@ export default async function GameCard({ event }: { event: EventType }) {
   return (
     <Link href={`/sports/match/${event.eventId}`} className="sm:py-5 py-1">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:p-4 p-2 cursor-pointer">
-        <div className="flex flex-col gap-1">
-          <span className="font-medium hover:underline">{event.eventName}</span>
-          <div className="text-sm text-muted-foreground">{event.category}</div>
-          <div className="text-sm text-muted-foreground">{event.eventTime}</div>
+        <div className="flex flex-col gap-0 text-main">
+          <span className="font-medium hover:underline sm:text-base text-xs uppercase">
+            {event.eventName}
+          </span>
+          <div className="text-sm text-muted-foreground sm:text-sm text-xxs">
+            {event.category}
+          </div>
+          <div className="text-sm text-muted-foreground sm:text-sm text-xxs">
+            {event.eventTime}
+          </div>
         </div>
-        <div className="sm:flex grid grid-cols-3 gap-4 mt-4 sm:mt-0">
+        <div className="sm:flex hidden gap-4 mt-4 sm:mt-0">
           {data.runners ? (
             data.runners.map((runner) => (
               <div

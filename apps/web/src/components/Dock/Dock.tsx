@@ -57,9 +57,9 @@ export default function Dock() {
             />
           )}
 
-          <Image src={item.image} alt={item.title} width={26} height={26} />
+          <Image src={item.image} alt={item.title} width={25} height={25} />
 
-          <div className="text-white text-xs font-medium">{item.title}</div>
+          <div className="text-white text-xs font-semibold">{item.title}</div>
         </Link>
       ))}
 

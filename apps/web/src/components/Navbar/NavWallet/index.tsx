@@ -28,7 +28,7 @@ export default function NavWallet() {
   }, [data]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 relative -top-px">
       <RefreshCcw
         className="w-4 h-4 hover:animate-spin cursor-pointer"
         onClick={() => {

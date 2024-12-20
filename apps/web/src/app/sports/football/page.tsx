@@ -22,14 +22,8 @@ export default async function page() {
   const data: EventType[] = await getData();
 
   return (
-    <div>
-      <div className="text-lg font-bold">Football</div>
-
-      <div>Featured Matches</div>
-
-      <div className="bg-[#444446] h-1 w-full mt-3" />
-
-      <div className="flex flex-col divide-y divide-[#444446]">
+    <div className="text-main min-h-screen">
+      <div className="flex flex-col divide-y divide-inputField">
         {data.map((item) => (
           <GameCard key={item.eventId} event={item} />
         ))}

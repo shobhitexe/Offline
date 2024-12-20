@@ -14,7 +14,8 @@ import {
 export default function Page(): JSX.Element {
   return (
     <main>
-      <NavSearch position="home" />
+      {/* <NavSearch position="home" /> */}
+      <div className="pt-px" />
       <Hero />
       {/* <Category /> */}
       <div className="md:hidden flex overflow-auto no-scrollbar mt-3 sm:px-5 px-3 w-[99%]">
