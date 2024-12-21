@@ -85,6 +85,7 @@ func (s *sportsStore) GetInPlayEvents(ctx context.Context, id string) (*[]models
 		match_name, 
 		event_id,
 		competition_id,
+		category,
 		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
@@ -105,7 +106,13 @@ func (s *sportsStore) GetInPlayEvents(ctx context.Context, id string) (*[]models
 
 	for rows.Next() {
 		var event models.ActiveEvents
-		if err := rows.Scan(&event.EventName, &event.EventId, &event.CompetitionId, &event.EventTime); err != nil {
+		if err := rows.Scan(
+			&event.EventName,
+			&event.EventId,
+			&event.CompetitionId,
+			&event.Category,
+			&event.EventTime,
+		); err != nil {
 			return nil, err
 		}
 		events = append(events, event)

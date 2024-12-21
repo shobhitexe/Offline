@@ -119,8 +119,8 @@ export default function MarketTableComponent({
               item.Back.Price === 0 ||
               item.Lay.Rate === 0 ||
               item.Lay.Price === 0) && (
-              <div className="absolute right-0 h-12 bg-main/40 w-[133px] rounded-sm text-xs text-center flex items-center justify-center font-semibold">
-                {type === "Fancy" ? " Ball Running" : "Suspended"}
+              <div className="absolute right-0 h-12 bg-main/40 ss:w-[167px] w-[133px] rounded-sm text-xs text-center flex items-center justify-center font-semibold">
+                Suspended
               </div>
             )}
 

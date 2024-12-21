@@ -58,7 +58,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex justify-center p-8 bg-[#01050F] relative sm:-top-10 h-full">
+      <div className="flex justify-center sm:items-center p-8 bg-[#01050F] relative sm:-top-10 h-full">
         <div className="w-full max-w-md space-y-8">
           <div className="space-y-6">
             <Image

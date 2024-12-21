@@ -67,8 +67,8 @@ export default function FancyTableComponent({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-2 text-purple-600 sm:text-lg text-sm">
-        <span className="inline-block w-3 h-3 bg-green-400 rounded-full"></span>
+      <div className="flex items-center gap-2 text-main sm:text-lg text-xs font-medium border-b border-inputField pb-1">
+        <span className="inline-block w-2 h-2 bg-red-400 rounded-full"></span>
         {data.MarketName}
         <TooltipProvider delayDuration={0.5}>
           <Tooltip>
@@ -107,7 +107,7 @@ export default function FancyTableComponent({
               {/* <span className="font-semibold">
               {item.RunnerName.slice(0, 2).toUpperCase()}
             </span> */}
-              <span className="text-white sm:text-lg text-sm">
+              <span className="text-[#7e7e7e] sm:text-base text-sm font-medium uppercase">
                 {item.RunnerName}
               </span>
 
@@ -116,6 +116,15 @@ export default function FancyTableComponent({
               </span>
             </div>
             <div className="col-span-3 max-ss:hidden"></div>
+
+            {(item.Back.Rate === 0 ||
+              item.Back.Price === 0 ||
+              item.Lay.Rate === 0 ||
+              item.Lay.Price === 0) && (
+              <div className="absolute right-0 h-12 bg-main/40 ss:w-[167px] w-[129px] rounded-sm text-xs text-center flex items-center justify-center font-semibold">
+                Ball Running
+              </div>
+            )}
 
             <Betslip
               rate={item.Lay.Rate}
