@@ -58,7 +58,7 @@ export default function NavSearch({
     <Dialog>
       <DialogTrigger
         style={{ backgroundColor: "#334155 " }}
-        className={`${position === "home" && "w-[95%] mx-auto flex justify-center"} rounded-md mt-5 relative`}
+        className={`${position === "home" && "w-[95%] mx-auto flex justify-center mt-5"} rounded-md mt-1 relative`}
       >
         <div
           className={`border border-gray-700 sm:py-2 py-2 text-xs flex items-center gap-1 ${

@@ -1,6 +1,7 @@
 import { BackendURL } from "@/config/env";
 import { EventType, Market } from "@/types";
 import Link from "next/link";
+import PlayAnimation from "./PlayAnimation";
 
 async function getMatchOddsData(eventId: string) {
   try {
@@ -24,19 +25,24 @@ export default async function GameCard({ event }: { event: EventType }) {
   const data: Market = await getMatchOddsData(event.eventId);
 
   return (
-    <Link href={`/sports/match/${event.eventId}`} className="sm:py-5 py-1">
+    <Link href={`/sports/match/${event.eventId}`} className="py-1">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:p-4 p-2 cursor-pointer">
-        <div className="flex flex-col gap-0 text-main">
-          <span className="font-medium hover:underline sm:text-base text-xs uppercase">
-            {event.eventName}
-          </span>
-          <div className="text-sm text-muted-foreground sm:text-sm text-xxs">
-            {event.category}
-          </div>
-          <div className="text-sm text-muted-foreground sm:text-sm text-xxs">
-            {event.eventTime}
+        <div className="flex items-start pt-1 w-full sm:gap-5 gap-3">
+          <PlayAnimation time={event.eventTime} />
+
+          <div className="flex flex-col gap-0 text-main">
+            <span className="font-medium hover:underline sm:text-sm text-xs uppercase">
+              {event.eventName}
+            </span>
+            <div className="text-sm text-muted-foreground sm:text-xs text-xxs">
+              {event.category}
+            </div>
+            {/* <div className="text-sm text-muted-foreground sm:text-sm text-xxs">
+              {event.eventTime}
+            </div> */}
           </div>
         </div>
+
         <div className="sm:flex hidden gap-4 mt-4 sm:mt-0">
           {data.runners ? (
             data.runners.map((runner) => (
