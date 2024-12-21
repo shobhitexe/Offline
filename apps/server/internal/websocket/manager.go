@@ -185,7 +185,8 @@ func (m *Manager) subscribeToWalletUpdates() {
 func (m *Manager) subscribeToSportsUpdates() {
 	go func() {
 
-		ctx := context.Background()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 
 		pubsub := m.store.redis.Subscribe(ctx, "sports:events")
 		defer pubsub.Close()
@@ -226,12 +227,15 @@ func (m *Manager) subscribeToSportsUpdates() {
 					}(event.EventId)
 				default:
 					log.Printf("Client %s is not ready to receive the event, skipping.", targetClient.clientId)
+					m.Lock()
 					targetClient.retryCount++
+					m.Unlock()
 					if targetClient.retryCount > targetClient.maxRetries {
 						log.Printf("Client %s exceeded max retries, removing.", targetClient.clientId)
 						m.removeClient(targetClient)
 					} else {
 						log.Printf("Client %s is not ready, retry %d/%d.", targetClient.clientId, targetClient.retryCount, targetClient.maxRetries)
+						time.Sleep(100 * time.Millisecond)
 					}
 				}
 			}
@@ -308,23 +312,29 @@ func (m *Manager) removeClient(client *Client) {
 
 	delete(m.clients, client)
 	delete(m.clientsMap, client.clientId)
-
 	delete(m.userIdMap, client.clientId)
 
-	eventId, exists := m.eventIdMap[client.clientId]
-	if exists {
-		clients := m.clientsMapByEventId[eventId]
-		for i, c := range clients {
-			if c.clientId == client.clientId {
-				m.clientsMapByEventId[eventId] = append(clients[:i], clients[i+1:]...)
-				break
-			}
-		}
-
-		if len(m.clientsMapByEventId[eventId]) == 0 {
-			delete(m.clientsMapByEventId, eventId)
-		}
+	if eventId, exists := m.eventIdMap[client.clientId]; exists {
+		m.removeFromEventIdMap(client.clientId, eventId)
 		delete(m.eventIdMap, client.clientId)
+	}
+}
+
+func (m *Manager) removeFromEventIdMap(clientId string, eventId string) {
+	clients, exists := m.clientsMapByEventId[eventId]
+	if !exists {
+		return
+	}
+
+	for i, c := range clients {
+		if c.clientId == clientId {
+			m.clientsMapByEventId[eventId] = append(clients[:i], clients[i+1:]...)
+			break
+		}
+	}
+
+	if len(m.clientsMapByEventId[eventId]) == 0 {
+		delete(m.clientsMapByEventId, eventId)
 	}
 }
 
