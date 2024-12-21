@@ -126,24 +126,6 @@ func (h *AdminHandler) GetRunnerHistory(w http.ResponseWriter, r *http.Request) 
 
 }
 
-func (h *AdminHandler) SaveActiveEvents(w http.ResponseWriter, r *http.Request) {
-
-	var payload models.SaveActiveEvents
-
-	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
-		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
-		return
-	}
-
-	if err := h.service.SaveActiveEvents(r.Context(), payload.SportsId, payload.CompetitionId, payload.CompetitionName); err != nil {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: err.Error(), Data: false})
-		return
-	}
-
-	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data Fetched", Data: true})
-
-}
-
 func (h *AdminHandler) GetOpenMarket(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
@@ -187,4 +169,22 @@ func (h *AdminHandler) ChangeOpenMarketStatus(w http.ResponseWriter, r *http.Req
 	}
 
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Status Changed", Data: true})
+}
+
+func (h *AdminHandler) ChangeTournamentStatus(w http.ResponseWriter, r *http.Request) {
+
+	var payload models.ChangeTournamentStatus
+
+	if err := h.utils.DecodeAndValidateJSON(r, &payload, h.validator); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	if err := h.service.ChangeTournamentStatus(r.Context(), payload); err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: err.Error(), Data: false})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Status Changed", Data: true})
+
 }

@@ -52,6 +52,9 @@ func (c *Cron) StartCron(ctx context.Context) {
 				if err := c.AutoDeclareResult(taskCtx); err != nil {
 					log.Printf("Error in auto declaring results: %v", err)
 				}
+				if err := c.AutoAddMatches(ctx); err != nil {
+					log.Printf("Error in auto adding matches: %v", err)
+				}
 
 			case <-ctx.Done():
 				log.Println("Stopping 600-second cron tasks...")

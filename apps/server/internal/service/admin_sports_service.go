@@ -19,7 +19,8 @@ type AdminSportsService interface {
 	GetTournamentsList(ctx context.Context, game string) ([]models.TournamentsListData, error)
 	GetRunnersofEvent(ctx context.Context, eventId string) ([]models.FancyList, error)
 	SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error
-	SaveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error
+	// SaveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error
+	ChangeTournamentStatus(ctx context.Context, payload models.ChangeTournamentStatus) error
 	GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	ChangeOpenMarketStatus(ctx context.Context, eventId string) error
 	GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error)
@@ -121,46 +122,72 @@ func (s *adminService) GetBetHistoryPerGame(ctx context.Context, eventId string)
 }
 
 func (s *adminService) GetTournamentsList(ctx context.Context, game string) ([]models.TournamentsListData, error) {
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://leisurebuzz.in/api/v2/competition/getList/"+game, nil)
-
 	if err != nil {
-		return nil, nil
+		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
 	client := &http.Client{}
 	res, err := client.Do(req)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Unexpected status code %d", res.StatusCode)
-
+	if err != nil {
+		return nil, fmt.Errorf("error performing request: %w", err)
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code %d", res.StatusCode)
+	}
+
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading response body for event: %v", err)
+		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
 
 	var list []models.TournamentsListRaw
-
 	if err := json.Unmarshal(body, &list); err != nil {
-		return nil, err
-
+		return nil, fmt.Errorf("error unmarshalling JSON: %w", err)
 	}
 
 	var data []models.TournamentsListData
+	var wg sync.WaitGroup
+	var errors []error
+	var trueStatusData []models.TournamentsListData
+	var falseStatusData []models.TournamentsListData
 
 	for _, item := range list {
-		t := models.TournamentsListData{
-			ID:                item.Competition.ID,
-			Name:              item.Competition.Name,
-			CompetitionRegion: item.CompetitionRegion,
-			SportsId:          game,
-		}
+		wg.Add(1)
+		go func(CompetitionID, CompetitionName, competitionRegion string) {
+			defer wg.Done()
 
-		data = append(data, t)
+			s, err := s.store.IsTournamentAutoUpdateEnabled(ctx, CompetitionID)
+
+			if err != nil {
+				errors = append(errors, err)
+				return
+			}
+
+			t := models.TournamentsListData{
+				ID:                item.Competition.ID,
+				Name:              item.Competition.Name,
+				CompetitionRegion: item.CompetitionRegion,
+				SportsId:          game,
+				Status:            s,
+			}
+			if s {
+				trueStatusData = append(trueStatusData, t)
+			} else {
+				falseStatusData = append(falseStatusData, t)
+			}
+		}(item.Competition.ID, item.Competition.Name, item.CompetitionRegion)
 	}
+
+	wg.Wait()
+
+	if len(errors) > 0 {
+		return nil, fmt.Errorf("errors occurred: %v", errors)
+	}
+
+	data = append(trueStatusData, falseStatusData...)
 
 	return data, nil
 }
@@ -293,7 +320,27 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 	return nil
 }
 
-func (s *adminService) SaveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error {
+func (s *adminService) ChangeTournamentStatus(ctx context.Context, payload models.ChangeTournamentStatus) error {
+
+	if payload.Status == true {
+		if err := s.saveActiveEvents(ctx, payload.SportsId, payload.CompetitionId, payload.CompetitionName); err != nil {
+			return err
+		}
+	}
+
+	key := "sports:activeEvents:" + payload.SportsId
+	if err := s.redis.Del(ctx, key).Err(); err != nil {
+		return err
+	}
+
+	if err := s.store.ChangeTournamentStatus(ctx, payload.CompetitionId, payload.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *adminService) saveActiveEvents(ctx context.Context, sportsid, competitionid, competitionName string) error {
 
 	if err := s.store.InitTournamentSettings(ctx, competitionid, sportsid, competitionName); err != nil {
 		return err

@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS tournament_settings (
     tournament_name TEXT NOT NULL,
     sports_id INTEGER NOT NULL,
     active BOOLEAN DEFAULT false NOT NULL,
+    auto_update_events BOOLEAN DEFAULT true NOT NULL,
     
     -- Pre MO stakes
     pre_mo_stakes_min INTEGER,

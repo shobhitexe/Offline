@@ -31,6 +31,9 @@ type AdminSportsStore interface {
 	GetRunnerHistory(ctx context.Context) ([]models.RunnerHistory, error)
 	GetActiveEvents(ctx context.Context, id string) (*[]models.ActiveEvents, error)
 	GetSavedRunners(ctx context.Context, eventId string) ([]models.SavedRunner, error)
+	IsTournamentAutoUpdateEnabled(ctx context.Context, id string) (bool, error)
+	ChangeTournamentStatus(ctx context.Context, competitionId string, status bool) error
+	GetAutoUpdatingTournaments(ctx context.Context) ([]models.TournamentsListData, error)
 }
 
 func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -363,6 +366,29 @@ func (s *adminStore) SaveActiveEvents(ctx context.Context, payload models.ListEv
 		return err
 	}
 
+	checkQuery := `
+	SELECT 1 FROM active_events WHERE event_id = $1
+`
+
+	var exists int
+	err = s.db.QueryRow(ctx, checkQuery, payload.Event.ID).Scan(&exists)
+	if err != nil && err != pgx.ErrNoRows {
+		log.Println(err)
+		return fmt.Errorf("failed to check if events exist: %w", err)
+	}
+
+	if err == pgx.ErrNoRows {
+		log.Println("events not found, proceeding with insert.")
+	} else {
+		log.Println("events already exist, skipping insert.")
+		return nil
+	}
+
+	if exists > 0 {
+		log.Println("events, skipping insert.")
+		return nil
+	}
+
 	query := `INSERT INTO active_events 
 	(sports_id, match_name, event_id, competition_id, runners, category, opening_time) 
 	VALUES ($1, $2, $3, $4, $5, $6, $7)`
@@ -567,4 +593,100 @@ func (s *adminStore) GetSavedRunners(ctx context.Context, eventId string) ([]mod
 	}
 
 	return runners, nil
+}
+
+func (s *adminStore) IsTournamentAutoUpdateEnabled(ctx context.Context, id string) (bool, error) {
+
+	var status bool
+
+	query := `SELECT auto_update_events FROM tournament_settings WHERE id = $1`
+
+	err := s.db.QueryRow(ctx, query, id).Scan(&status)
+
+	if err == pgx.ErrNoRows {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return status, nil
+
+}
+
+func (s *adminStore) ChangeTournamentStatus(ctx context.Context, competitionId string, status bool) error {
+
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			if rErr := tx.Rollback(ctx); rErr != nil {
+				fmt.Printf("Rollback failed: %v\n", rErr)
+			}
+			panic(p)
+		} else if err != nil {
+			if rErr := tx.Rollback(ctx); rErr != nil {
+				fmt.Printf("Rollback failed: %v\n", rErr)
+			}
+		}
+	}()
+
+	queryTournament := `
+        UPDATE tournament_settings
+        SET auto_update_events = $1
+        WHERE id = $2
+    `
+	_, err = tx.Exec(ctx, queryTournament, status, competitionId)
+	if err != nil {
+		tx.Rollback(ctx)
+		return fmt.Errorf("error updating tournament_settings: %w", err)
+	}
+
+	queryActiveEvents := `
+        UPDATE active_events
+        SET active = $1
+        WHERE competition_id = $2
+    `
+	_, err = tx.Exec(ctx, queryActiveEvents, status, competitionId)
+	if err != nil {
+		tx.Rollback(ctx)
+		return fmt.Errorf("error updating active_events: %w", err)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return nil
+}
+
+func (s *adminStore) GetAutoUpdatingTournaments(ctx context.Context) ([]models.TournamentsListData, error) {
+
+	var list []models.TournamentsListData
+
+	query := `SELECT id, sports_id FROM tournament_settings WHERE auto_update_events = true`
+
+	rows, err := s.db.Query(ctx, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var row models.TournamentsListData
+
+		if err := rows.Scan(&row.ID, &row.SportsId); err != nil {
+			return nil, err
+		}
+
+		list = append(list, row)
+
+	}
+
+	return list, nil
 }

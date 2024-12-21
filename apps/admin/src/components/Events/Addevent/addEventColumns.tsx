@@ -1,11 +1,10 @@
 "use client";
 
 import { universalPOST } from "@/lib/requests";
-import { LoadingSpinner, useToast } from "@repo/ui";
+import { LoadingSpinner, Switch, useToast } from "@repo/ui";
 import { ColumnDef } from "@tanstack/react-table";
-import { Save } from "lucide-react";
+import { RefreshCcw, Save } from "lucide-react";
 import { useState } from "react";
-import { ro } from "react-day-picker/locale";
 
 export const addEventColumn: ColumnDef<any>[] = [
   {
@@ -26,7 +25,7 @@ export const addEventColumn: ColumnDef<any>[] = [
     header: "Competition Region",
   },
   {
-    accessorKey: "action",
+    accessorKey: "status",
     header: "Action",
     cell: ({ row }) => {
       const { toast } = useToast();
@@ -36,32 +35,28 @@ export const addEventColumn: ColumnDef<any>[] = [
       const sportsid = row.getValue("sportsId") as string;
       const competitionid = row.getValue("id") as string;
       const name = row.getValue("name") as string;
+      const status = row.getValue("status") as boolean;
 
-      async function saveEvents() {
+      async function changeStatus() {
+        console.log(!status);
+
         try {
           setIsLoading(true);
 
-          const res = await universalPOST(
-            `/admin/sports/saveActiveEvents?sportsid=${sportsid}&competitionid=${competitionid}`,
-            { sportsid, competitionid: competitionid, competitionName: name }
-          );
+          const res = await universalPOST(`/admin/sports/tournament/status`, {
+            sportsid,
+            competitionid: competitionid,
+            competitionName: name,
+            Status: !status,
+          });
 
           if (res.data !== true) {
-            if (
-              res.includes("duplicate key value violates unique constraint")
-            ) {
-              toast({
-                title: "Failed",
-                description: "Already Enabled",
-                variant: "destructive",
-              });
-            } else {
-              toast({ description: "Failed", variant: "destructive" });
-            }
+            toast({ description: "Failed", variant: "destructive" });
+
             return;
           }
 
-          toast({ description: "Enabled" });
+          toast({ description: "Tournament List updated" });
         } catch (error) {
           toast({ description: "Failed", variant: "destructive" });
         } finally {
@@ -70,9 +65,13 @@ export const addEventColumn: ColumnDef<any>[] = [
       }
 
       return (
-        <div className="cursor-pointer" onClick={() => saveEvents()}>
-          {loading ? <LoadingSpinner /> : <Save />}
-        </div>
+        <Switch
+          defaultChecked={status}
+          onCheckedChange={() => changeStatus()}
+        />
+        // <div className="cursor-pointer" onClick={() => saveEvents()}>
+        //   {loading ? <LoadingSpinner /> : <RefreshCcw />}
+        // </div>
       );
     },
   },

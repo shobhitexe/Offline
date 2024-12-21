@@ -142,6 +142,7 @@ type TournamentsListData struct {
 	Name              string `json:"name"`
 	CompetitionRegion string `json:"competitionRegion"`
 	SportsId          string `json:"sportsId"`
+	Status            bool   `json:"status"`
 }
 
 //session
