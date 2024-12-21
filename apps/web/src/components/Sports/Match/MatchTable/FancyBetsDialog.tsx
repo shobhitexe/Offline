@@ -16,7 +16,7 @@ export default function FancyBetsDialog({ fancyData }: { fancyData: Fancy }) {
         <div className="flex items-center gap-2">
           <ArrowRight className="w-3 h-3 -top-px relative" />{" "}
           {`${fancyData.TotalExposure}`}{" "}
-          <ChartArea className="w-4 h-4 text-white -top-px relative" />
+          <ChartArea className="w-4 h-4 text-black -top-px relative" />
         </div>
       </DialogTrigger>
       <DialogContent>

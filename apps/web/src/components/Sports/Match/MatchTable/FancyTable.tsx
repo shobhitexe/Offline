@@ -66,7 +66,7 @@ export default function FancyTableComponent({
   }, [settings, type]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-0">
       <div className="flex items-center gap-2 text-main sm:text-lg text-xs font-medium border-b border-inputField pb-1">
         <span className="inline-block w-2 h-2 bg-red-400 rounded-full"></span>
         {data.MarketName}
@@ -101,7 +101,7 @@ export default function FancyTableComponent({
         return (
           <div
             key={item.RunnerId}
-            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,60px)] gap-2 items-center"
+            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,60px)] gap-2 mt-1 items-center"
           >
             <div className="flex flex-col gap-2">
               {/* <span className="font-semibold">
