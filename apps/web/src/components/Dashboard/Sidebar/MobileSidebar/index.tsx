@@ -30,7 +30,7 @@ export default function MobileSidebar(): JSX.Element {
           width={30}
           height={30}
         />
-        <div className="text-white text-xs font-medium">Menu</div>
+        <div className="text-white text-xs font-semibold">Menu</div>
       </SheetTrigger>
       <SheetContent
         className="ui-w-full ui-bg-main border-none ui-p-5"

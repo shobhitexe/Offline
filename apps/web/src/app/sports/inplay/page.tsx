@@ -1,6 +1,7 @@
 import { GameCard } from "@/components";
 import { BackendURL } from "@/config/env";
 import { EventType } from "@/types";
+import { ReactNode } from "react";
 
 async function getData() {
   try {
@@ -26,36 +27,45 @@ export default async function page() {
   } = await getData();
 
   return (
-    <div className="flex flex-col gap-5 text-main min-h-screen">
+    <div className="flex flex-col text-main min-h-screen">
       {data.cricket && (
         <div>
+          <Title>Cricket</Title>
           <div className="flex flex-col divide-y divide-inputField">
             {data.cricket.map((item) => (
-              <GameCard key={item.eventId} event={item} />
+              <GameCard key={item.eventId} event={item} isInPlay={true} />
             ))}
           </div>
         </div>
       )}
       {data.tennis && (
         <div>
-          <div className="bg-[#444446] h-1 w-full mt-3" />
-
+          <Title>Tennis</Title>
           <div className="flex flex-col divide-y divide-inputField">
             {data.tennis.map((item) => (
-              <GameCard key={item.eventId} event={item} />
+              <GameCard key={item.eventId} event={item} isInPlay={true} />
             ))}
           </div>
         </div>
       )}
       {data.football && (
         <div>
+          <Title>Football</Title>
           <div className="flex flex-col divide-y divide-inputField">
             {data.football.map((item) => (
-              <GameCard key={item.eventId} event={item} />
+              <GameCard key={item.eventId} event={item} isInPlay={true} />
             ))}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Title({ children }: { children: ReactNode }) {
+  return (
+    <div className="bg-main text-sm text-inputField p-2 font-semibold rounded-sm uppercase">
+      {children}
     </div>
   );
 }

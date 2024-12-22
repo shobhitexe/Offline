@@ -129,11 +129,11 @@ input[type="number"] {
   position: relative;
   background: linear-gradient(
     to right,
-    #1f4aad -30%,
-    #1f4aad 20%,
-    #1f4aad 130%
+    #040b1b -30%,
+    #040b1b 20%,
+    #040b1b 130%
   );
-  color: #1f4aad;
+  color: #040b1b;
   font-size: 8px;
   font-weight: 600;
   text-align: center;

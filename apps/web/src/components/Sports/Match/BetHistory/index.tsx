@@ -36,7 +36,7 @@ export default function BetHistory({
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="ui-text-black overflow-x-auto">
+      <DialogContent className="ui-text-black overflow-x-auto rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-black text-center flex items-center justify-center gap-3">
             My Bets <RefreshCcw className="w-3 h-3" onClick={() => mutate()} />

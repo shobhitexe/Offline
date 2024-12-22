@@ -69,11 +69,12 @@ export default function FancyTableComponent({
     <div className="flex flex-col gap-0">
       <div className="flex items-center gap-2 text-main sm:text-lg text-xs font-medium border-b border-inputField pb-1">
         <span className="inline-block w-2 h-2 bg-red-400 rounded-full"></span>
-        {data.MarketName}
+        <span className="relative top-px">{data.MarketName}</span>
+
         <TooltipProvider delayDuration={0.5}>
           <Tooltip>
             <TooltipTrigger>
-              <Info className="w-4 h-4" />
+              <Info className="w-3 h-3" />
             </TooltipTrigger>
             <TooltipContent>
               {settings?.active ? (
@@ -101,17 +102,18 @@ export default function FancyTableComponent({
         return (
           <div
             key={item.RunnerId}
-            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,60px)] gap-2 mt-1 items-center"
+            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,65px)] gap-1 mt-1 items-start"
           >
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-0">
               {/* <span className="font-semibold">
               {item.RunnerName.slice(0, 2).toUpperCase()}
             </span> */}
-              <span className="text-[#7e7e7e] sm:text-base text-sm font-medium uppercase">
+
+              <span className="text-[#7e7e7e] sm:text-sm text-xs font-semibold uppercase">
                 {item.RunnerName}
               </span>
 
-              <span className="text-red-500 flex items-center gap-2 text-sm">
+              <span className="text-red-500 flex items-center gap-1 font-medium text-xs">
                 {fancyData?.map((item) => <FancyBetsDialog fancyData={item} />)}
               </span>
             </div>
@@ -121,7 +123,7 @@ export default function FancyTableComponent({
               item.Back.Price === 0 ||
               item.Lay.Rate === 0 ||
               item.Lay.Price === 0) && (
-              <div className="absolute right-0 h-12 bg-main/40 ss:w-[167px] w-[129px] rounded-sm text-xs text-center flex items-center justify-center font-semibold">
+              <div className="absolute right-0 h-12 bg-main/40 ss:w-[167px] w-[133px] rounded-sm text-xs text-center flex items-center justify-center font-semibold">
                 Ball Running
               </div>
             )}

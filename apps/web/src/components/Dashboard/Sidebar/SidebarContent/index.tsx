@@ -25,6 +25,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSideBarOpen } from "@/store/slices/Sidebar/sidebar-open";
 import { RootState } from "@/store/root-reducer";
 
+import { Settings, BookOpen } from "lucide-react";
+
 export const sidebarArr = [
   {
     title: "My profile",
@@ -131,19 +133,19 @@ export default function SidebarContent({
                 <Link
                   href={"/dashboard/account/settings"}
                   onClick={() => dispatch(setSideBarOpen(false))}
-                  className="flex items-center gap-1 bg-sidebarButtons p-2 w-full rounded-t-lg mt-2"
+                  className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-t-lg mt-2"
                 >
-                  <SettingsIcon height={25} width={25} stroke="black" />
-                  Account Settings
+                  <Settings height={20} width={20} stroke="black" />
+                  <span className="relative -top-px">Account Settings</span>
                 </Link>
 
                 <Link
                   onClick={() => dispatch(setSideBarOpen(false))}
                   href={"/dashboard/account/statement"}
-                  className="flex items-center gap-1 bg-sidebarButtons p-2 w-full rounded-b-lg"
+                  className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
                 >
-                  <StatementIcon height={25} width={25} stroke="black" />
-                  Account Statement
+                  <BookOpen height={20} width={20} stroke="black" />
+                  <span className="relative -top-px">Account Statement</span>
                 </Link>
               </div>
             </div>

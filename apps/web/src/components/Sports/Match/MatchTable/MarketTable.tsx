@@ -98,17 +98,17 @@ export default function MarketTableComponent({
         return (
           <div
             key={item.RunnerId}
-            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,65px)] gap-1 items-center mt-1 relative"
+            className="grid ss:grid-cols-[1fr_repeat(5,80px)] grid-cols-[1fr_repeat(2,65px)] gap-1 items-start mt-1 relative"
           >
-            <div className="flex items-center gap-2 text-main">
+            <div className="flex flex-col items-start text-main">
               {/* <span className="font-semibold sm:text-base text-sm">
                 {item.RunnerName.slice(0, 2).toUpperCase()}
               </span> */}
-              <span className="text-[#7e7e7e] sm:text-base text-sm font-medium uppercase">
+              <span className="text-[#7e7e7e] sm:text-sm text-xs font-semibold uppercase">
                 {item.RunnerName}
               </span>
               <span
-                className={`${(currbets || 0) >= 0 ? "text-green-500" : "text-red-500"} flex items-center gap-2 text-sm`}
+                className={`${(currbets || 0) >= 0 ? "text-green-500" : "text-red-500"} flex font-medium items-center gap-1 text-xs`}
               >
                 <ArrowRight className="w-4 h-4" /> {currbets || 0}
               </span>

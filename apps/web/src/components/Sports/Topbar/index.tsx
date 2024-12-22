@@ -41,7 +41,7 @@ export default function TopBar() {
         className="w-full"
       />
 
-      <div className="flex rounded-md justify-start gap-7 p-1 border-b border-inputField w-full overflow-x-auto sm:mt-2">
+      <div className="flex rounded-md justify-start gap-5 p-1 border-b border-inputField w-full overflow-x-auto sm:mt-2">
         {Links.map((item) => (
           <Link
             href={`${item.href}`}
@@ -52,7 +52,7 @@ export default function TopBar() {
               className={`${pathname.includes(item.href) && "border-b-2 border-red-500"} absolute w-full -bottom-1`}
             />
 
-            <Image src={item.icon} alt={item.title} width={30} height={30} />
+            <Image src={item.icon} alt={item.title} width={25} height={25} />
             <div className="text-xs uppercase font-semibold whitespace-nowrap">
               {item.title}
             </div>

@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const providers = [
-  "TOP GAMES",
+  // "TOP GAMES",
   "Ezugi",
   "Evolution Gaming",
   "Super Spade Games",
@@ -50,7 +50,11 @@ const providers = [
   // "Parlaybay",
 ];
 
-export default function ProviderSelect() {
+export default function ProviderSelect({
+  position = "home",
+}: {
+  position?: "home" | "page";
+}) {
   const dispatch = useDispatch();
 
   const filterdata = useSelector((state: RootState) => state.filterCasinoGames);
@@ -63,11 +67,11 @@ export default function ProviderSelect() {
 
   const _providers = useMemo(() => {
     const updatedProviders = [...providers];
-    if (casinoName === "jackpot1x") {
-      updatedProviders.unshift("Color Prediction");
+    if (position === "home") {
+      updatedProviders.unshift("TOP GAMES");
     }
     return updatedProviders;
-  }, [casinoName]);
+  }, [position]);
 
   return (
     <div className="flex items-center md:justify-center justify-start gap-5 pt-2 w-[99%] mx-auto">

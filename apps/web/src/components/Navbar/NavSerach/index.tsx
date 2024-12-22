@@ -58,7 +58,7 @@ export default function NavSearch({
     <Dialog>
       <DialogTrigger
         style={{ backgroundColor: "#334155 " }}
-        className={`${position === "home" && "w-[95%] mx-auto flex justify-center mt-5"} rounded-md mt-1 relative`}
+        className={`${position === "home" && "w-[95%] mx-auto flex justify-center mt-14"} rounded-md mt-1 relative`}
       >
         <div
           className={`border border-gray-700 sm:py-2 py-2 text-xs flex items-center gap-1 ${
@@ -72,10 +72,12 @@ export default function NavSearch({
             height={position === "home" ? 15 : 20}
             className="absolute left-2 top-1/2 -translate-y-1/2"
           />
-          <span className={`${position === "navbar" && "sm:flex hidden"}`}>
+          <span
+            className={`${position === "navbar" && "sm:flex hidden"} relative top-px`}
+          >
             Search
           </span>{" "}
-          <span className="">your favorite games</span>
+          <span className="relative top-px">your favorite games</span>
         </div>
       </DialogTrigger>
       <DialogContent

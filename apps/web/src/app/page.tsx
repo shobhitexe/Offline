@@ -19,7 +19,7 @@ export default function Page(): JSX.Element {
       <Hero />
       {/* <Category /> */}
       <div className="md:hidden flex overflow-auto no-scrollbar mt-3 sm:px-5 px-3 w-[99%]">
-        <ProviderSelect />
+        <ProviderSelect position="home" />
       </div>
       {/* <Providers /> */}
       <AllGames />

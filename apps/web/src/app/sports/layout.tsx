@@ -14,7 +14,7 @@ export default function layout({ children }: { children: ReactNode }) {
         </div>
       </div>
       <div className="flex flex-col">
-        <div className="flex flex-1 flex-col gap-1 py-1 mt-1 sm:px-4 px-2 lg:gap-6 overflow-auto max-h-screen pb-40 bg-cardBG rounded-md">
+        <div className="flex flex-1 flex-col gap-1 py-1 mt-1 sm:px-4 px-2 lg:gap-6 overflow-auto max-h-screens pb-40 bg-cardBG rounded-md">
           <TopBar />
 
           {children}

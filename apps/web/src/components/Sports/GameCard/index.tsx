@@ -21,17 +21,23 @@ async function getMatchOddsData(eventId: string) {
   }
 }
 
-export default async function GameCard({ event }: { event: EventType }) {
+export default async function GameCard({
+  event,
+  isInPlay = false,
+}: {
+  event: EventType;
+  isInPlay?: boolean;
+}) {
   const data: Market = await getMatchOddsData(event.eventId);
 
   return (
     <Link href={`/sports/match/${event.eventId}`} className="py-1">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:p-4 p-2 cursor-pointer">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:py-4 py-2 cursor-pointer">
         <div className="flex items-start pt-1 w-full sm:gap-5 gap-3">
-          <PlayAnimation time={event.eventTime} />
+          <PlayAnimation time={event.eventTime} isInPlay={isInPlay} />
 
           <div className="flex flex-col gap-0 text-main">
-            <span className="font-medium hover:underline sm:text-sm text-xs uppercase">
+            <span className="hover:underline sm:text-sm text-xs uppercase font-semibold">
               {event.eventName}
             </span>
             <div className="text-sm text-muted-foreground sm:text-xs text-xxs">
