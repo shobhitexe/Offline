@@ -206,10 +206,12 @@ func (s *sportsService) BetHistoryPerGame(ctx context.Context, userId, eventId s
 	}
 
 	if runnerErr != nil {
+
 		return nil, models.GroupedData{}, runnerErr
 	}
 
 	if fancybetsErr != nil {
+
 		return nil, models.GroupedData{}, fancybetsErr
 	}
 

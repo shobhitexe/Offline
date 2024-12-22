@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS admins (
   password TEXT NOT NULL,
   balance NUMERIC(20, 2) NOT NULL DEFAULT 0.00 CHECK (balance >= 0),
   settlement NUMERIC(20, 2) NOT NULL DEFAULT 0.0,
-  added_by INTEGER NOT NULL,
+  credit_ref NUMERIC(20, 2) NOT NULL DEFAULT 0.0,
+  added_by INTEGER,
   downline INTEGER NOT NULL DEFAULT 0, 
   child_level INT NOT NULL CHECK (child_level IN (1, 2, 3, 4, 5, 6, 7, 8)),
   sports_share INT DEFAULT 0 CHECK (sports_share <= 100) NOT NULL,
@@ -17,6 +18,8 @@ CREATE TABLE IF NOT EXISTS admins (
   CONSTRAINT fk_added_by FOREIGN KEY (added_by) REFERENCES admins(id) ON DELETE SET NULL
 );
 
+INSERT INTO admins (username, name, password, balance, settlement, downline, child_level, sports_share, market_commission, session_commission, blocked) 
+VALUES ('shobhitexe', 'Shobhit', '$2a$10$inMlFvwHWG8OSTGX4YfgIuap.XaOFbcU6/r9CubUm9j07vjHVDAzu', 0.00, 0.00, 0, 8, 100, 100, 100, false);
 
 
 CREATE TABLE IF NOT EXISTS users (

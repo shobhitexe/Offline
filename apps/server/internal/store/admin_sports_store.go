@@ -320,7 +320,7 @@ func (s *adminStore) GetActiveFancyBets(ctx context.Context, eventId string) ([]
 func (s *adminStore) GetRunnerResults(ctx context.Context, eventId string) (map[string]int64, error) {
 	result := make(map[string]int64)
 
-	query := `SELECT runner_id, run FROM runner_results WHERE is_declared = false AND event_id = $1`
+	query := `SELECT runner_id, run FROM runner_results WHERE event_id = $1`
 
 	rows, err := s.db.Query(ctx, query, eventId)
 
@@ -419,6 +419,7 @@ func (s *adminStore) GetActiveSession(ctx context.Context, eventId string) ([]mo
        FROM sport_bets
 	   WHERE settled = false
 	   AND event_id = $1
+	   AND market_type = 'Fancy'
        GROUP BY runner_id`
 
 	rows, err := s.db.Query(ctx, query, eventId)

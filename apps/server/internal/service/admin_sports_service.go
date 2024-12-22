@@ -232,6 +232,8 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 		return err
 	}
 
+	log.Println(results)
+
 	tx, err := s.store.BeginTx(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
@@ -264,16 +266,20 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 					switch {
 					case result.OddsRate <= float64(payload.Run):
 						if err := s.store.BetResultLose(goroutineCtx, tx, result.Exposure, result.UserId); err != nil {
+							log.Println(err)
 							errChan <- fmt.Errorf("BetResultLose failed: %w", err)
 						}
 						if err := s.store.ChangeActiveBetStatus(ctx, tx, result.ID, "loss"); err != nil {
+							log.Println(err)
 							errChan <- fmt.Errorf("Bet change status Failed: %w", err)
 						}
 					case result.OddsRate > float64(payload.Run):
 						if err := s.store.BetResultWin(goroutineCtx, tx, result.Profit, result.Exposure, result.UserId); err != nil {
+							log.Println(err)
 							errChan <- fmt.Errorf("BetResultWin failed: %w", err)
 						}
 						if err := s.store.ChangeActiveBetStatus(ctx, tx, result.ID, "win"); err != nil {
+							log.Println(err)
 							errChan <- fmt.Errorf("Bet change status Failed: %w", err)
 						}
 					}
@@ -305,6 +311,7 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 
 	select {
 	case finalErr = <-errChan:
+		log.Println(finalErr)
 		return finalErr
 	default:
 	}
