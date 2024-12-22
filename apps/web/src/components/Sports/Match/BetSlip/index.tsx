@@ -160,7 +160,7 @@ export default function Betslip({
         ) : (
           <div className="flex flex-col items-center justify-center h-10 px-4 py-2 text-xs font-semibold">
             {rate}
-            <span className="block text-xxs font-normal">{price}</span>
+            <span className="block text-xxs">{price}</span>
           </div>
         )}
       </DrawerTrigger>
