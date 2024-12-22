@@ -49,7 +49,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 		active_events
 	WHERE 
 		sports_id = $1 AND is_declared = false AND active = true
-	ORDER BY opening_time DESC`
+	ORDER BY opening_time`
 
 	rows, err := s.db.Query(ctx, query, id)
 
