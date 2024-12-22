@@ -35,6 +35,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./collapsible";
+import Image from "next/image";
 
 const items = [
   {
@@ -138,6 +139,14 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
+            <Image
+              src={"/images/logo.jpeg"}
+              alt={"logo"}
+              width={150}
+              height={70}
+              className="mx-auto ss:hidden"
+            />
+
             <SidebarMenu className="mt-2">
               {items.map((item) => {
                 if (item.childrens) {

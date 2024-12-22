@@ -46,7 +46,13 @@ export default async function Navbar() {
     <div className="bg-black h-14 z-20 relative flex items-center justify-between pr-5">
       {/* <div className="text-white font-medium italic">OFFLINE ⚽ 🏏 🎾</div> */}
 
-      <Image src={"/images/logo.jpeg"} alt={"logo"} width={150} height={70} />
+      <Image
+        src={"/images/logo.jpeg"}
+        alt={"logo"}
+        className="ss:opacity-100 opacity-0 relative left-14"
+        width={150}
+        height={70}
+      />
 
       <div className="flex gap-5">
         <DropdownMenu>
