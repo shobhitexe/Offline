@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS admins (
 );
 
 INSERT INTO admins (username, name, password, balance, settlement, downline, child_level, sports_share, market_commission, session_commission, blocked) 
-VALUES ('shobhitexe', 'Shobhit', '$2a$10$inMlFvwHWG8OSTGX4YfgIuap.XaOFbcU6/r9CubUm9j07vjHVDAzu', 0.00, 0.00, 0, 8, 100, 100, 100, false);
+VALUES ('shobhitexe', 'Shobhit', '$2a$10$inMlFvwHWG8OSTGX4YfgIuap.XaOFbcU6/r9CubUm9j07vjHVDAzu', 1000000.00, 1000000.00, 0, 8, 100, 100, 100, false);
 
 
 CREATE TABLE IF NOT EXISTS users (
