@@ -44,14 +44,14 @@ func (h *UserHandler) WalletBalance(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
 	if len(id) == 0 || id == "" {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "No ID Provided", Data: "NaN"})
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "No ID Provided", Data: false})
 		return
 	}
 
 	balance, err := h.service.GetBalance(r.Context(), id)
 
 	if err != nil {
-		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Error fetching balance", Data: "NaN"})
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Error fetching balance", Data: false})
 		return
 	}
 
