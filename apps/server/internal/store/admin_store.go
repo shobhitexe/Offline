@@ -53,9 +53,30 @@ func (s *adminStore) RecordLoginHistory(ctx context.Context, userId, userType, l
 func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin, error) {
 	var admin models.Admin
 
-	query := `SELECT id, username, name, balance, settlement, child_level, sports_share, blocked, market_commission, session_commission,
-	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
-	FROM admins WHERE id = $1`
+	query := `
+	SELECT 
+		a.id, 
+		a.username, 
+		a.name, 
+		a.balance, 
+		a.settlement, 
+		a.child_level, 
+		a.sports_share, 
+		a.blocked, 
+		a.market_commission, 
+		a.session_commission,
+		TO_CHAR(a.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at,
+		ab.name AS added_by_name,
+		ab.username AS added_by_username,
+		ab.balance AS added_by_balance
+	FROM 
+		admins a
+	LEFT JOIN 
+		admins ab ON a.added_by = ab.id
+	WHERE 
+		a.id = $1;
+	`
+
 	err := s.db.QueryRow(ctx, query, id).Scan(
 		&admin.ID,
 		&admin.Username,
@@ -68,6 +89,9 @@ func (s *adminStore) AdminDetails(ctx context.Context, id string) (*models.Admin
 		&admin.MarketCommission,
 		&admin.SessionCommission,
 		&admin.CreatedAt,
+		&admin.AddedByName,
+		&admin.AddedByUserName,
+		&admin.AddedByBalance,
 	)
 
 	if err != nil {

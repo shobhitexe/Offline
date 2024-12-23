@@ -47,7 +47,14 @@ export default function DepositCreditAdmin({ id }: { id: string }) {
     mutate,
     isLoading,
   } = useSWR<{
-    data: { name: string; username: string; balance: string };
+    data: {
+      name: string;
+      username: string;
+      balance: string;
+      addedByName: string;
+      addedByUsername: string;
+      addedByBalance: number;
+    };
   }>(isOpen ? `/admin?id=${id}` : null, fetcher);
 
   async function FormActionClient(formdata: FormData) {
@@ -119,15 +126,18 @@ export default function DepositCreditAdmin({ id }: { id: string }) {
               containerClassname="max-w-full"
             />
 
-            <FormInput
-              name="agentName"
-              type="text"
-              id="agentName"
-              value={balance}
-              disabled
-              label={`${session.data?.user.name} [${session.data?.user.username}]`}
-            />
-
+            {isLoading ? (
+              <Skeleton className="h-10" />
+            ) : (
+              <FormInput
+                name="agentName"
+                type="text"
+                id="agentName"
+                value={userData?.data.addedByBalance}
+                disabled
+                label={`${userData?.data.addedByName} [${userData?.data.addedByUsername}]`}
+              />
+            )}
             {isLoading ? (
               <Skeleton className="h-10" />
             ) : (

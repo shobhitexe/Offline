@@ -30,9 +30,25 @@ func (s *userStore) UserDetails(ctx context.Context, id string) (*models.User, e
 
 	var user models.User
 
-	query := `SELECT id, username, name, balance, market_commission, session_commission,
-	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
-	FROM users WHERE id = $1`
+	query := `
+			SELECT 
+    			u.id, 
+    			u.username, 
+    			u.name, 
+    			u.balance, 
+    			u.market_commission, 
+    			u.session_commission,
+    			TO_CHAR(u.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at,
+    			a.name AS added_by_name,
+    			a.username AS added_by_username,
+    			a.balance AS added_by_balance
+			FROM 
+			    users u
+			LEFT JOIN 
+			    admins a ON u.added_by = a.id
+			WHERE 
+			    u.id = $1`
+
 	err := s.db.QueryRow(ctx, query, id).Scan(
 		&user.ID,
 		&user.Username,
@@ -40,7 +56,11 @@ func (s *userStore) UserDetails(ctx context.Context, id string) (*models.User, e
 		&user.Balance,
 		&user.MarketCommission,
 		&user.SessionCommission,
-		&user.CreatedAt)
+		&user.CreatedAt,
+		&user.AddedByName,
+		&user.AddedByUserName,
+		&user.AddedByBalance,
+	)
 
 	if err != nil {
 		log.Println(err)

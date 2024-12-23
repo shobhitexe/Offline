@@ -14,6 +14,10 @@ type Admin struct {
 	MarketCommission  int64   `json:"marketCommission"`
 	SessionCommission int64   `json:"sessionCommission"`
 	CreatedAt         string  `json:"createdAt"`
+
+	AddedByName     string  `json:"addedByName"`
+	AddedByUserName string  `json:"addedByUsername"`
+	AddedByBalance  float64 `json:"addedByBalance"`
 }
 
 type SportsSettings struct {
