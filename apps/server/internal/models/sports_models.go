@@ -10,6 +10,25 @@ type ActiveEvents struct {
 	MatchOdds     MarketInfo
 }
 
+type Bet struct {
+	ID         string
+	MatchId    string
+	EventId    string
+	UserId     string
+	OddsPrice  float64
+	OddsRate   float64
+	BetType    string
+	Profit     float64
+	Exposure   float64
+	MarketName string
+	MarketType string
+	Result     string
+	MarketId   string
+	RunnerName string
+	RunnerID   string
+	CreatedAt  string
+}
+
 type ActiveBet struct {
 	ID         string
 	MatchId    string

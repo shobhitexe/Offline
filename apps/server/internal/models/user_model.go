@@ -25,13 +25,18 @@ type UserWallet struct {
 	Exposure float64 `json:"exposure"`
 }
 
-type StatementRequest struct {
-	ID         string `json:"id" validate:"required"`
-	FromDate   string `json:"from" validate:"required"`
-	ToDate     string `json:"to" validate:"required"`
-	GameType   string `json:"gameType" validate:"required"`
-	MarketType string `json:"marketType" validate:"required"`
+type Transactions struct {
+	Amount          float64
+	TransactionType string
+	CreatedAt       string
 }
 
-type Transactions struct {
+type AccountStatement struct {
+	Credit          float64 `json:"credit"`
+	Debit           float64 `json:"debit"`
+	TransactionType string  `json:"transactionType"`
+	MatchName       string  `json:"matchName"`
+	MarketType      string  `json:"marketType"`
+	RunnerName      string  `json:"runnerName"`
+	CreatedAt       string  `json:"createdAt"`
 }

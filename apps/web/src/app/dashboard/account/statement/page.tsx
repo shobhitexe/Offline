@@ -1,65 +1,89 @@
-import { options } from "@/app/api/auth/[...nextauth]/options";
+"use client";
+
 import { BetStatementColumns, DashboardHeading, Statement } from "@/components";
 import { BackendURL } from "@/config/env";
-import { DataTable } from "@repo/ui";
-import { getServerSession } from "next-auth";
-import React from "react";
+import fetcher from "@/lib/data/setup";
+import {
+  DataTable,
+  DatePickerWithRange,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui";
+import { addDays } from "date-fns";
+import { useSession } from "next-auth/react";
+import React, { useState } from "react";
+import { DateRange } from "react-day-picker";
+import useSWR from "swr";
 
-async function getStatement(
-  id: string,
-  from: string,
-  to: string,
-  gameType: string,
-  marketType: string
-) {
-  try {
-    const res = await fetch(
-      `${BackendURL}/api/v1/user/statement?id=${id}&from=${from}&to=${to}&gameType=${gameType}&marketType=${marketType}`
-    );
+export default function AccountStatement() {
+  const session = useSession();
 
-    if (res.status !== 200) {
-      return [];
-    }
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: addDays(new Date(), -30),
+    to: new Date(),
+  });
 
-    const _res = await res.json();
+  const [gameType, setGameType] = useState<string | undefined>("all");
+  const [marketType, setmarketType] = useState<string | undefined>("all");
 
-    return _res.data;
-  } catch (error) {
-    return [];
-  }
-}
-
-export default async function AccountStatement({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const session = await getServerSession(options);
-
-  const params = {
-    from: (searchParams["from"] as string) || new Date().toISOString(),
-    to: (searchParams["to"] as string) || new Date().toISOString(),
-    gameType: (searchParams["gameType"] as string) || "all",
-    marketType: (searchParams["marketType"] as string) || "all",
-  };
-
-  const statement = await getStatement(
-    session?.user.id!,
-    params.from,
-    params.to,
-    params.gameType,
-    params.marketType
+  const { data } = useSWR<{ data: [] }>(
+    `${BackendURL}/api/v1/user/statement?id=${session.data?.user.id}&from=${date?.from?.toISOString()}&to=${date?.to?.toISOString()}&gameType=${gameType}&marketType=${marketType}`,
+    fetcher
   );
-
-  console.log(statement);
 
   return (
     <div className="w-[95%] mx-auto">
       <DashboardHeading heading={"Account Statement"} />
 
-      <div className="flex flex-col gap-5 sm:py-10 py-5 sm:px-5 px-3 rounded-xl mt-5 bg-cardBG">
-        <Statement />
-        <DataTable columns={BetStatementColumns} data={[]} />
+      <div className="flex flex-col gap-5 sm:py-10 py-5 sm:px-5 px-3 rounded-xl mt-5 bg-cardBG text-black">
+        <div className="flex sm:flex-row flex-col sm:items-center sm:gap-5 gap-2 text-white">
+          <DatePickerWithRange date={date} setDate={setDate} varient="main" />
+
+          <Select
+            value={gameType}
+            onValueChange={(e) => setGameType(e)}
+            defaultValue="all"
+          >
+            <SelectTrigger className="max-w-[180px] ui-bg-main">
+              <SelectValue placeholder="Game" defaultValue={"all"} />
+            </SelectTrigger>
+            <SelectContent className="ui-bg-main">
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="4">Cricket</SelectItem>
+              <SelectItem value="2">Tennis</SelectItem>
+              <SelectItem value="1">Football</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={marketType}
+            onValueChange={(e) => setmarketType(e)}
+            defaultValue="all"
+          >
+            <SelectTrigger className="max-w-[180px] ui-bg-main">
+              <SelectValue placeholder="market" defaultValue={"all"} />
+            </SelectTrigger>
+            <SelectContent className="ui-bg-main">
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="Match Odds">Match Odds</SelectItem>
+              <SelectItem value="Bookmaker">Bookmaker</SelectItem>
+              <SelectItem value="Fancy">Fancy</SelectItem>
+            </SelectContent>
+          </Select>
+          {/* 
+      <div
+        className={buttonVariants({
+          variant: "default",
+          className: "cursor-pointer flex items-center gap-2 text-white",
+        })}
+      >
+        Load <RefreshCwIcon className="w-4 h-4 dark:stroke-white" />
+      </div> */}
+        </div>
+        <DataTable columns={BetStatementColumns} data={data?.data || []} />
       </div>
     </div>
   );

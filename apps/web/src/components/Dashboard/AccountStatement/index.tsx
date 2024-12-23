@@ -43,7 +43,7 @@ export default function RefreshButton() {
   }, [date, gameType, marketType, router]);
 
   return (
-    <div className="flex sm:flex-row flex-col sm:items-center sm:gap-5 gap-2">
+    <div className="flex sm:flex-row flex-col sm:items-center sm:gap-5 gap-2 text-white">
       <DatePickerWithRange date={date} setDate={setDate} varient="main" />
 
       <Select
