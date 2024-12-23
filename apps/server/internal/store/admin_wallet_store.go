@@ -75,32 +75,30 @@ func (s *adminStore) TransferBalance(ctx context.Context, tx pgx.Tx, fromID, toI
 		return fmt.Errorf("invalid transfer amount: %f", amount)
 	}
 
+	var addedBy uint
+
+	creditQuery := `
+	UPDATE admins 
+	SET balance = balance + $1,
+	credit_ref = credit_ref + $1
+	WHERE id = $2
+	RETURNING added_by`
+	err := tx.QueryRow(ctx, creditQuery, amount, toID).Scan(&addedBy)
+	if err != nil {
+		return fmt.Errorf("failed to credit balance: %w", err)
+	}
+
 	debitQuery := `
 		UPDATE admins 
 		SET balance = balance - $1
-		WHERE id = $2 AND balance >= $1
-	`
-	debitResult, err := tx.Exec(ctx, debitQuery, amount, fromID)
+		WHERE id = $2 AND balance >= $1`
+	debitResult, err := tx.Exec(ctx, debitQuery, amount, addedBy)
+
 	if err != nil {
 		return fmt.Errorf("failed to debit balance: %w", err)
 	}
 
 	if debitResult.RowsAffected() == 0 {
-		return fmt.Errorf("insufficient balance in account %s for transfer", fromID)
-	}
-
-	creditQuery := `
-		UPDATE admins 
-		SET balance = balance + $1,
-		credit_ref = credit_ref + $1
-		WHERE id = $2
-	`
-	creditResult, err := tx.Exec(ctx, creditQuery, amount, toID)
-	if err != nil {
-		return fmt.Errorf("failed to credit balance: %w", err)
-	}
-
-	if creditResult.RowsAffected() == 0 {
 		return fmt.Errorf("failed to credit balance to account %s", toID)
 	}
 
@@ -112,33 +110,32 @@ func (s *adminStore) TransferBalanceToUser(ctx context.Context, tx pgx.Tx, fromI
 		return fmt.Errorf("invalid transfer amount: %f", amount)
 	}
 
+	var addedBy uint
+
+	creditQuery := `
+	UPDATE users 
+	SET balance = balance + $1,
+	credit_ref = credit_ref + $1
+	WHERE id = $2 
+	RETURNING added_by`
+
+	err := tx.QueryRow(ctx, creditQuery, amount, toID).Scan(&addedBy)
+	if err != nil {
+		return fmt.Errorf("failed to credit balance: %w", err)
+	}
+
 	debitQuery := `
 		UPDATE admins 
 		SET balance = balance - $1
 		WHERE id = $2 AND balance >= $1
 	`
-	debitResult, err := tx.Exec(ctx, debitQuery, amount, fromID)
+	debitResult, err := tx.Exec(ctx, debitQuery, amount, addedBy)
 	if err != nil {
 		return fmt.Errorf("failed to debit balance: %w", err)
 	}
 
 	if debitResult.RowsAffected() == 0 {
-		return fmt.Errorf("insufficient balance in account %s for transfer", fromID)
-	}
-
-	creditQuery := `
-		UPDATE users 
-		SET balance = balance + $1,
-		credit_ref = credit_ref + $1
-		WHERE id = $2
-	`
-	creditResult, err := tx.Exec(ctx, creditQuery, amount, toID)
-	if err != nil {
-		return fmt.Errorf("failed to credit balance: %w", err)
-	}
-
-	if creditResult.RowsAffected() == 0 {
-		return fmt.Errorf("failed to credit balance to account %s", toID)
+		return fmt.Errorf("insufficient balance in account %v for transfer", addedBy)
 	}
 
 	return nil
@@ -149,19 +146,18 @@ func (s *adminStore) DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID
 		return fmt.Errorf("invalid transfer amount: %f", amount)
 	}
 
+	var addedBy uint
+
 	debitQuery := `
 		UPDATE users 
 		SET balance = balance - $1,
 		credit_ref = credit_ref - $1
 		WHERE id = $2 AND balance >= $1
-	`
-	debitResult, err := tx.Exec(ctx, debitQuery, amount, fromID)
+		RETURNING added_by`
+
+	err := tx.QueryRow(ctx, debitQuery, amount, fromID).Scan(&addedBy)
 	if err != nil {
 		return fmt.Errorf("failed to debit balance: %w", err)
-	}
-
-	if debitResult.RowsAffected() == 0 {
-		return fmt.Errorf("insufficient balance in account %s for transfer", fromID)
 	}
 
 	creditQuery := `
@@ -169,9 +165,8 @@ func (s *adminStore) DebitBalanceFromUser(ctx context.Context, tx pgx.Tx, fromID
 		SET balance = balance + $1 
 		WHERE id = $2
 	`
-	creditResult, err := tx.Exec(ctx, creditQuery, amount, toID)
+	creditResult, err := tx.Exec(ctx, creditQuery, amount, addedBy)
 	if err != nil {
-
 		return fmt.Errorf("failed to credit balance: %w", err)
 	}
 
@@ -208,21 +203,19 @@ func (s *adminStore) RecordAdminTransaction(ctx context.Context, tx pgx.Tx, payl
 
 func (s *adminStore) Settlementuser(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error {
 
-	debitQuery := `UPDATE users SET settlement = settlement - $1 WHERE id = $2`
+	var addedBy uint
 
-	debitResult, err := tx.Exec(ctx, debitQuery, payload.Cash, payload.ToId)
+	debitQuery := `UPDATE users SET settlement = settlement - $1 WHERE id = $2 RETURNING added_by`
+
+	err := tx.QueryRow(ctx, debitQuery, payload.Cash, payload.ToId).Scan(&addedBy)
 
 	if err != nil {
 		return err
 	}
 
-	if debitResult.RowsAffected() == 0 {
-		return fmt.Errorf("no user record updated during debit operation")
-	}
-
 	creditQuery := `UPDATE admins SET settlement = settlement + $1 WHERE id = $2`
 
-	creditResult, err := tx.Exec(ctx, creditQuery, payload.Cash, payload.FromId)
+	creditResult, err := tx.Exec(ctx, creditQuery, payload.Cash, addedBy)
 
 	if err != nil {
 		return err
@@ -237,21 +230,19 @@ func (s *adminStore) Settlementuser(ctx context.Context, tx pgx.Tx, payload mode
 
 func (s *adminStore) Settlementagent(ctx context.Context, tx pgx.Tx, payload models.SettlementRequest) error {
 
-	debitQuery := `UPDATE admins SET settlement = settlement - $1 WHERE id = $2`
+	var addedBy uint
 
-	debitResult, err := tx.Exec(ctx, debitQuery, payload.Cash, payload.ToId)
+	debitQuery := `UPDATE admins SET settlement = settlement - $1 WHERE id = $2 RETURNING added_by`
+
+	err := tx.QueryRow(ctx, debitQuery, payload.Cash, payload.ToId).Scan(&addedBy)
 
 	if err != nil {
 		return err
 	}
 
-	if debitResult.RowsAffected() == 0 {
-		return fmt.Errorf("no user record updated during debit operation")
-	}
-
 	creditQuery := `UPDATE admins SET settlement = settlement + $1 WHERE id = $2`
 
-	creditResult, err := tx.Exec(ctx, creditQuery, payload.Cash, payload.FromId)
+	creditResult, err := tx.Exec(ctx, creditQuery, payload.Cash, addedBy)
 
 	if err != nil {
 		return err

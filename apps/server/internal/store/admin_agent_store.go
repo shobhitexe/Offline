@@ -36,6 +36,7 @@ func (s *adminStore) GetAgentsList(ctx context.Context, id string) (*[]models.Li
 	TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
 	FROM admins
 	WHERE added_by = $1
+	AND child_level < 8
 	ORDER BY created_at DESC;`
 
 	rows, err := s.db.Query(ctx, query, id)
