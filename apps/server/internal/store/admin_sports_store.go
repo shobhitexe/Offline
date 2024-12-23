@@ -445,7 +445,7 @@ func (s *adminStore) GetActiveSession(ctx context.Context, eventId string) ([]mo
 }
 
 func (s *adminStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, userID string) error {
-	query := `UPDATE users SET settlement = settlement + $1, exposure = exposure - $2 WHERE id = $3`
+	query := `UPDATE users SET settlement = settlement + $1, balance = balance + 1, exposure = exposure - $2 WHERE id = $3`
 	if _, err := s.db.Exec(ctx, query, profit, exposure, userID); err != nil {
 		return fmt.Errorf("failed to update settlement and exposure for user %s: %w", userID, err)
 	}
@@ -454,7 +454,7 @@ func (s *adminStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposu
 }
 
 func (s *adminStore) BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error {
-	query := `UPDATE users SET exposure = exposure - $1, settlement = settlement - $1 WHERE id = $2`
+	query := `UPDATE users SET exposure = exposure - $1, balance = balance - 1, settlement = settlement - $1 WHERE id = $2`
 	if _, err := s.db.Exec(ctx, query, exposure, userID); err != nil {
 		return fmt.Errorf("failed to update balance and exposure for user %s: %w", userID, err)
 	}

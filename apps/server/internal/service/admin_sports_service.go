@@ -232,8 +232,6 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 		return err
 	}
 
-	log.Println(results)
-
 	tx, err := s.store.BeginTx(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
