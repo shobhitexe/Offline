@@ -14,9 +14,6 @@ import Navbar from "./Navbar";
 import ProviderSelect from "./Navbar/ProviderSelect";
 import Referrals from "./Dashboard/Profile/Referrals";
 import WalletDetails from "./Dashboard/Profile/WalletDetails";
-import Transactiontype from "./Dashboard/AccountStatement/Transactiontype";
-import FromAndToDates from "./Dashboard/AccountStatement/FromAndToDates";
-import StatementTables from "./Dashboard/AccountStatement/StatementTables";
 import Statement from "./Dashboard/AccountStatement";
 import BonusButtons from "./Bonus/Buttons";
 import Bonuscard from "./Bonus/Bonuscard";
@@ -36,6 +33,7 @@ import MatchInfo from "./Sports/Match/MatchInfo";
 import MatchTable from "./Sports/Match/MatchTable/MatchTable";
 import TopBar from "./Sports/Topbar";
 import MatchLoading from "./Sports/Match/MatchLoading";
+import { BetStatementColumns } from "./Dashboard/AccountStatement/StatementTables/BetStatementTable/BetStatementColumns";
 
 export {
   Navbar,
@@ -55,9 +53,6 @@ export {
   ProviderSelect,
   ChangeName,
   ResetPassword,
-  Transactiontype,
-  FromAndToDates,
-  StatementTables,
   Statement,
   BonusButtons,
   Bonuscard,
@@ -76,4 +71,5 @@ export {
   MatchTable,
   TopBar,
   MatchLoading,
+  BetStatementColumns,
 };

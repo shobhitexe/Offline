@@ -20,6 +20,9 @@ func RegisterUserRoutes(r chi.Router, h *handlers.UserHandler) {
 			r.Get("/balance", h.WalletBalance)
 		})
 
+		//statement
+		r.Get("/statement", h.GetStatement)
+
 	})
 
 }

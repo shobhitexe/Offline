@@ -30,8 +30,7 @@ func (s *userStore) UserDetails(ctx context.Context, id string) (*models.User, e
 
 	var user models.User
 
-	query := `
-			SELECT 
+	query := `SELECT 
     			u.id, 
     			u.username, 
     			u.name, 
@@ -114,3 +113,5 @@ func (s *userStore) RecordLoginHistory(ctx context.Context, userId, userType, lo
 	return nil
 
 }
+
+func (s *userStore) GetUserTxns(ctx context.Context) {}

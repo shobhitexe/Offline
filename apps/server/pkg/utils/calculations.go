@@ -73,7 +73,7 @@ func CalculateActiveFancyBetsProjection(bets []models.FancyBets) []models.FancyB
 			betMap[bet.RunnerName].TotalExposure -= bet.TotalExposure
 			betMap[bet.RunnerName].TotalProfit += bet.TotalExposure
 
-			for diff := -5; diff <= 4; diff++ {
+			for diff := -7; diff <= 6; diff++ {
 				index := b + diff
 
 				if diff < 0 {
@@ -87,7 +87,7 @@ func CalculateActiveFancyBetsProjection(bets []models.FancyBets) []models.FancyB
 			betMap[bet.RunnerName].TotalExposure += bet.TotalExposure
 			betMap[bet.RunnerName].TotalProfit -= bet.TotalProfit
 
-			for diff := -5; diff <= 4; diff++ {
+			for diff := -7; diff <= 6; diff++ {
 				index := b + diff
 				if diff < 0 {
 					betMap[bet.RunnerName].Projections[index] -= bet.TotalExposure
@@ -110,6 +110,7 @@ func CalculateActiveFancyBetsProjection(bets []models.FancyBets) []models.FancyB
 
 					bet.Projections[i+1] = bet.Projections[rangeDiff]
 					bet.Projections[i-1] = bet.Projections[rangeDiff]
+
 				}
 
 			}

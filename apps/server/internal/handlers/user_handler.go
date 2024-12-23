@@ -78,3 +78,28 @@ func (h *UserHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Logged in", Data: user})
 
 }
+
+func (h *UserHandler) GetStatement(w http.ResponseWriter, r *http.Request) {
+
+	var statement models.StatementRequest
+
+	statement.ID = r.URL.Query().Get("id")
+	statement.FromDate = r.URL.Query().Get("from")
+	statement.ToDate = r.URL.Query().Get("to")
+	statement.GameType = r.URL.Query().Get("gameType")
+	statement.MarketType = r.URL.Query().Get("marketType")
+
+	if err := h.utils.Validate(&statement); err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Validation Failed", Data: err.Error()})
+		return
+	}
+
+	s, err := h.service.GetStatement(r.Context(), statement)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{Message: "Failed", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Data fetched", Data: s})
+}

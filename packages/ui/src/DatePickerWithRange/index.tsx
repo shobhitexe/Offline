@@ -21,7 +21,7 @@ export function DatePickerWithRange({
   className?: string;
   date?: DateRange | undefined;
   setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-  varient?: "white" | "brown";
+  varient?: "white" | "main";
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -34,7 +34,7 @@ export function DatePickerWithRange({
             // variant={"brown"}
             variant={varient === "white" ? "outline" : "default"}
             className={cn(
-              `ui-w-[250px] ui-justify-start ui-text-left ${varient === "white" ? "ui-text-black" : "ui-text-white"} py-2 ui-font-normal ${varient === "brown" && "ui-border ui-border-[#483B32]"}`,
+              `ui-w-[250px] ui-justify-start ui-text-left ${varient === "white" ? "ui-text-black" : "ui-text-white"} ui-py-2 ui-font-normal ${varient === "main" && "ui-border ui-border-[#483B32]"}`,
               !date && "ui-text-muted-foreground"
             )}
           >
@@ -54,12 +54,11 @@ export function DatePickerWithRange({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className={`ui-w-auto ui-p-0 ${varient === "white" && "ui-bg-white"} ui-flex ui-flex-col ui-items-center gap-5`}
+          className={`ui-w-auto ui-p-0 ${varient === "white" ? "ui-bg-white" : "ui-bg-main"} ui-flex ui-flex-col ui-items-center gap-5`}
           align="start"
         >
           {varient === "white" && (
             <CalendarWhite
-              initialFocus
               mode="range"
               defaultMonth={date?.from}
               selected={date}
@@ -68,9 +67,8 @@ export function DatePickerWithRange({
             />
           )}
 
-          {varient === "brown" && (
+          {varient === "main" && (
             <Calendar
-              initialFocus
               mode="range"
               defaultMonth={date?.from}
               selected={date}
@@ -79,7 +77,7 @@ export function DatePickerWithRange({
             />
           )}
           <Button
-            variant={varient === "brown" ? "outline" : "default"}
+            variant={varient === "main" ? "outline" : "default"}
             className="ui-mx-auto ui-w-fit ui-text-black"
             onClick={() => setIsOpen(false)}
           >

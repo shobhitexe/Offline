@@ -6,18 +6,9 @@ import {
   BoxesIcon,
   Button,
   DocumentIcon,
-  GiftIcon,
-  LinkComponent,
   ProfileIcon,
-  RegisterUserIcon,
-  ScrollArea,
   WalletIcon,
   LoginIcon,
-  DepositIcon,
-  WithdrawIcon,
-  BonusIcon,
-  SettingsIcon,
-  StatementIcon,
 } from "@repo/ui";
 import { signOut, useSession } from "next-auth/react";
 import NavSearch from "@/components/Navbar/NavSerach";
@@ -25,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSideBarOpen } from "@/store/slices/Sidebar/sidebar-open";
 import { RootState } from "@/store/root-reducer";
 
-import { Settings, BookOpen } from "lucide-react";
+import { User, BookOpen } from "lucide-react";
 
 export const sidebarArr = [
   {
@@ -135,8 +126,17 @@ export default function SidebarContent({
                   onClick={() => dispatch(setSideBarOpen(false))}
                   className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-t-lg mt-2"
                 >
-                  <Settings height={20} width={20} stroke="black" />
-                  <span className="relative -top-px">Account Settings</span>
+                  <User height={20} width={20} stroke="black" />
+                  <span className="relative -top-px">Profile</span>
+                </Link>
+
+                <Link
+                  onClick={() => dispatch(setSideBarOpen(false))}
+                  href={"/dashboard/account/statement"}
+                  className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
+                >
+                  <BookOpen height={20} width={20} stroke="black" />
+                  <span className="relative -top-px">My Bets</span>
                 </Link>
 
                 <Link
@@ -146,6 +146,24 @@ export default function SidebarContent({
                 >
                   <BookOpen height={20} width={20} stroke="black" />
                   <span className="relative -top-px">Account Statement</span>
+                </Link>
+
+                <Link
+                  onClick={() => dispatch(setSideBarOpen(false))}
+                  href={"/dashboard/account/statement"}
+                  className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
+                >
+                  <BookOpen height={20} width={20} stroke="black" />
+                  <span className="relative -top-px">Keyboard Settings</span>
+                </Link>
+
+                <Link
+                  onClick={() => dispatch(setSideBarOpen(false))}
+                  href={"/dashboard/account/statement"}
+                  className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
+                >
+                  <BookOpen height={20} width={20} stroke="black" />
+                  <span className="relative -top-px">Rules</span>
                 </Link>
               </div>
             </div>

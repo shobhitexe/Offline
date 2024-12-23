@@ -36,6 +36,7 @@ import {
   CollapsibleTrigger,
 } from "./collapsible";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 const items = [
   {
@@ -126,6 +127,8 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const session = useSession();
+
   const pathname = usePathname();
 
   const isLinkActive = (link: string, base: string) => {
@@ -148,7 +151,11 @@ export function AppSidebar() {
             />
 
             <SidebarMenu className="mt-2">
-              {items.map((item) => {
+              {items.map((item, idx) => {
+                if (session.data?.user.childLevel !== 8 && idx > 4) {
+                  return;
+                }
+
                 if (item.childrens) {
                   return (
                     <Collapsible key={item.title}>

@@ -14,6 +14,7 @@ type UserService interface {
 	UserDetails(ctx context.Context, id string) (*models.User, error)
 	GetBalance(ctx context.Context, id string) (*models.UserWallet, error)
 	SignIn(ctx context.Context, payload models.SignInRequest) (*models.User, error)
+	GetStatement(ctx context.Context, paylod models.StatementRequest) (any, error)
 }
 
 type userService struct {
@@ -68,4 +69,9 @@ func (s *userService) SignIn(ctx context.Context, payload models.SignInRequest) 
 	}()
 
 	return user, nil
+}
+
+func (s *userService) GetStatement(ctx context.Context, paylod models.StatementRequest) (any, error) {
+
+	return nil, nil
 }

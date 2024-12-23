@@ -84,15 +84,13 @@ CREATE TABLE IF NOT EXISTS user_txns (
   admin_id INTEGER,
   amount NUMERIC(20, 2) NOT NULL,
   remarks TEXT,
+  curr_balance NUMERIC(20, 2) NOT NULL,
   txn_type TEXT CHECK (txn_type IN ('debit', 'credit')) NOT NULL,
   wallet_type TEXT CHECK (wallet_type IN ('credit','cash')) NOT NULL, 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_admin_id FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
 );
-
-
-
 
 
 CREATE TABLE IF NOT EXISTS admin_txns (
