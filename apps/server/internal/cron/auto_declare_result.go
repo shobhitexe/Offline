@@ -34,7 +34,7 @@ func (c *Cron) AutoDeclareResult(ctx context.Context) error {
 		return err
 	}
 
-	// log.Println("All events processed successfully.")
+	log.Println("All results processed successfully.")
 	return nil
 }
 
@@ -78,41 +78,71 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 
 			defer func() {
 				if p := recover(); p != nil {
-					_ = tx.Rollback(ctx)
+					if rErr := tx.Rollback(ctx); rErr != nil {
+						fmt.Printf("Rollback failed: %v\n", rErr)
+					}
 					panic(p)
 				} else if err != nil {
-					_ = tx.Rollback(ctx)
-				} else {
-					// Commit only if no errors
-					if err := tx.Commit(ctx); err != nil {
-						log.Printf("Failed to commit transaction: %v", err)
+					if rErr := tx.Rollback(ctx); rErr != nil {
+						fmt.Printf("Rollback failed: %v\n", rErr)
 					}
 				}
 			}()
 
 			switch result.Status {
+
 			case "WINNER":
 				if bet.BetType == "back" {
-					err = c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
-					if err := c.sportsStore.ChangeActiveBetStatus(ctx, tx, bet.ID, "win"); err != nil {
+
+					err := c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
+
+					if err != nil {
+						log.Println(err)
 						return err
 					}
+
+					if err := c.sportsStore.ChangeActiveBetStatus(ctx, tx, bet.ID, "win"); err != nil {
+						log.Println(err)
+						return err
+					}
+
 				} else if bet.BetType == "lay" {
-					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
+					err := c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
+
+					if err != nil {
+						log.Println(err)
+						return err
+					}
+
 					if err := c.sportsStore.ChangeActiveBetStatus(ctx, tx, bet.ID, "loss"); err != nil {
+						log.Println(err)
 						return err
 					}
 				}
 				break
 			case "LOSER":
 				if bet.BetType == "back" {
-					err = c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
+					err := c.sportsStore.BetResultLose(ctx, tx, bet.Exposure, bet.UserId)
+
+					if err != nil {
+						log.Println(err)
+						return err
+					}
+
 					if err := c.sportsStore.ChangeActiveBetStatus(ctx, tx, bet.ID, "loss"); err != nil {
+						log.Println(err)
 						return err
 					}
 				} else if bet.BetType == "lay" {
-					err = c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
+					err := c.sportsStore.BetResultWin(ctx, tx, bet.Profit, bet.Exposure, bet.UserId)
+
+					if err != nil {
+						log.Println(err)
+						return err
+					}
+
 					if err := c.sportsStore.ChangeActiveBetStatus(ctx, tx, bet.ID, "win"); err != nil {
+						log.Println(err)
 						return err
 					}
 				}
@@ -121,6 +151,20 @@ func (c *Cron) processActiveEvents(ctx context.Context, matchType string) error 
 				// log.Printf("Unrecognized result status: %s for event %s", result.Status, result.EventID)
 				return nil
 
+			}
+
+			delkey := "sport:activeEvents:" + matchType
+
+			if err := c.redis.Del(ctx, delkey).Err(); err != nil {
+				return fmt.Errorf("Failed to delete cache: %w", err)
+			}
+
+			if err := c.sportsStore.DeclareEvent(ctx, tx, result.EventID); err != nil {
+				return fmt.Errorf("Failed to declare event as completed: %w", err)
+			}
+
+			if err := tx.Commit(ctx); err != nil {
+				return fmt.Errorf("failed to commit transaction: %w", err)
 			}
 
 		}

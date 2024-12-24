@@ -35,6 +35,7 @@ type AdminSportsStore interface {
 	ChangeTournamentStatus(ctx context.Context, competitionId string, status bool) error
 	GetAutoUpdatingTournaments(ctx context.Context) ([]models.TournamentsListData, error)
 	GroupActiveEventsForFancyBets(ctx context.Context, id string) ([]models.ActiveEvents, error)
+	DeclareEvent(ctx context.Context, tx pgx.Tx, eventId string) error
 }
 
 func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -740,4 +741,15 @@ func (s *adminStore) GroupActiveEventsForFancyBets(ctx context.Context, id strin
 	}
 
 	return events, nil
+}
+
+func (s *adminStore) DeclareEvent(ctx context.Context, tx pgx.Tx, eventId string) error {
+
+	query := `UPDATE active_events SET active = false, is_declared = true WHERE event_id = $1`
+
+	if _, err := tx.Exec(ctx, query, eventId); err != nil {
+		return fmt.Errorf("Failed to declare event as completed: %w", err)
+	}
+
+	return nil
 }

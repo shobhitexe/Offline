@@ -46,15 +46,23 @@ func (c *Cron) StartCron(ctx context.Context) {
 				taskCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 				defer cancel()
 
-				if err := c.GetMatchOddsResult(taskCtx); err != nil {
-					log.Printf("Error in auto declaring results: %v", err)
-				}
-				if err := c.AutoDeclareResult(taskCtx); err != nil {
-					log.Printf("Error in auto declaring results: %v", err)
-				}
-				if err := c.AutoAddMatches(ctx); err != nil {
-					log.Printf("Error in auto adding matches: %v", err)
-				}
+				go func() {
+					if err := c.GetMatchOddsResult(taskCtx); err != nil {
+						log.Printf("Error in auto declaring results: %v", err)
+					}
+				}()
+
+				go func() {
+					if err := c.AutoDeclareResult(taskCtx); err != nil {
+						log.Printf("Error in auto declaring results: %v", err)
+					}
+				}()
+
+				// go func() {
+				// 	if err := c.AutoAddMatches(ctx); err != nil {
+				// 		log.Printf("Error in auto adding matches: %v", err)
+				// 	}
+				// }()
 
 			case <-ctx.Done():
 				log.Println("Stopping 600-second cron tasks...")
