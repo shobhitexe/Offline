@@ -24,7 +24,10 @@ import { useSession } from "next-auth/react";
 import { KeyedMutator } from "swr";
 import { Minus, Plus } from "lucide-react";
 
-const amountsList = [100, 200, 500, 1000, 5000, 10000, 20000, 50000, 100000];
+type Chip = {
+  name: string;
+  value: number;
+};
 
 export default function Betslip({
   rate,
@@ -60,6 +63,24 @@ export default function Betslip({
   const session = useSession();
 
   const [loading, setIsLoading] = useState(false);
+
+  const [chips, setChips] = useState<Chip[]>(() => {
+    const savedChips = localStorage.getItem("chipsData");
+    return savedChips
+      ? JSON.parse(savedChips)
+      : [
+          { name: "100", value: 100 },
+          { name: "500", value: 500 },
+          { name: "1K", value: 1000 },
+          { name: "5K", value: 5000 },
+          { name: "10K", value: 10000 },
+          { name: "25K", value: 25000 },
+          { name: "50K", value: 50000 },
+          { name: "1L", value: 100000 },
+          { name: "5L", value: 500000 },
+          { name: "10L", value: 1000000 },
+        ];
+  });
 
   // const balance = useSelector(
   //   (state: RootState) => state.walletBalance.balance
@@ -326,15 +347,15 @@ export default function Betslip({
           </div>
 
           <div className="grid grid-cols-5 gap-1">
-            {amountsList.map((bet) => (
+            {chips.map((bet) => (
               <Button
                 type="button"
-                key={bet}
+                key={bet.name}
                 variant="outline"
-                onClick={() => setAmount(bet)}
+                onClick={() => setAmount(bet.value)}
                 className="ui-text-sm text-black"
               >
-                {bet.toLocaleString()}
+                {bet.name}
               </Button>
             ))}
             <Button

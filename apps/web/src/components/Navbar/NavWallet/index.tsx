@@ -2,7 +2,7 @@
 
 import { setWalletBalance } from "@/store/slices/Wallet/wallet-balance";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { RefreshCcw } from "lucide-react";
 import useSWR from "swr";
@@ -12,6 +12,7 @@ import { BackendURL } from "@/config/env";
 export default function NavWallet() {
   const session = useSession();
   const dispatch = useDispatch();
+  const previousBalanceRef = useRef<number | null>(null);
 
   const { data, mutate } = useSWR<{
     data: { balance: number; exposure: number };
@@ -23,9 +24,13 @@ export default function NavWallet() {
 
   useEffect(() => {
     if (data?.data) {
-      dispatch(setWalletBalance(data?.data));
+      const { balance } = data.data;
+      if (balance !== previousBalanceRef.current) {
+        previousBalanceRef.current = balance;
+        dispatch(setWalletBalance(data.data));
+      }
     }
-  }, [data]);
+  }, [data, dispatch]);
 
   return (
     <div className="flex items-center gap-2 relative -top-px">
@@ -37,17 +42,15 @@ export default function NavWallet() {
       />
       <div className="xs:text-xs text-xxs font-semibold">
         <div>
-          {" "}
-          Balance :{" "}
+          Balance:{" "}
           <span className="text-[#00EF80] font-semibold">
-            {data?.data ? data?.data.balance : 0}
+            {data?.data ? data.data.balance : 0}
           </span>
         </div>
-
         <div>
-          Exposure :{" "}
+          Exposure:{" "}
           <span className="text-[#FF6372] font-semibold">
-            {data?.data ? data?.data.exposure : 0}
+            {data?.data ? data.data.exposure : 0}
           </span>
         </div>
       </div>

@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSideBarOpen } from "@/store/slices/Sidebar/sidebar-open";
 import { RootState } from "@/store/root-reducer";
 
-import { User, BookOpen } from "lucide-react";
+import { User, BookOpen, MemoryStick, Keyboard, Book } from "lucide-react";
 
 export const sidebarArr = [
   {
@@ -34,27 +34,6 @@ export const sidebarArr = [
     icon: BoxesIcon,
     link: "/dashboard/account/statement",
   },
-  {
-    title: "Referral",
-    icon: DocumentIcon,
-    link: "/dashboard/referral",
-  },
-];
-
-export const sidebarArrMobile = [
-  { title: "TOP GAMES", link: "" },
-  { title: "DIGITAIN", link: "" },
-  { title: "EZUGI", link: "" },
-  { title: "EVOLUTION", link: "" },
-  { title: "SPRIBE", link: "" },
-  { title: "SEVENMOJOS", link: "" },
-  { title: "VIVO", link: "" },
-  { title: "KIRON", link: "" },
-  { title: "BGAMING", link: "" },
-  { title: "ASPECTGAMES", link: "" },
-  { title: "GLOBALBET", link: "" },
-  { title: "LUCKY STREAK", link: "" },
-  { title: "MATRIX GAMING", link: "" },
 ];
 
 export default function SidebarContent({
@@ -135,7 +114,7 @@ export default function SidebarContent({
                   href={"/dashboard/account/statement"}
                   className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
                 >
-                  <BookOpen height={20} width={20} stroke="black" />
+                  <MemoryStick height={20} width={20} stroke="black" />
                   <span className="relative -top-px">My Bets</span>
                 </Link>
 
@@ -150,19 +129,19 @@ export default function SidebarContent({
 
                 <Link
                   onClick={() => dispatch(setSideBarOpen(false))}
-                  href={"/dashboard/account/statement"}
+                  href={"/keyboard-settings"}
                   className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
                 >
-                  <BookOpen height={20} width={20} stroke="black" />
+                  <Keyboard height={20} width={20} stroke="black" />
                   <span className="relative -top-px">Keyboard Settings</span>
                 </Link>
 
                 <Link
                   onClick={() => dispatch(setSideBarOpen(false))}
-                  href={"/dashboard/account/statement"}
+                  href={"/rules"}
                   className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
                 >
-                  <BookOpen height={20} width={20} stroke="black" />
+                  <Book height={20} width={20} stroke="black" />
                   <span className="relative -top-px">Rules</span>
                 </Link>
               </div>
