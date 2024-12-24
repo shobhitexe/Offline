@@ -6,25 +6,23 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
   DrawerTrigger,
-  FormInput,
   Input,
   LoadingSpinner,
   useToast,
 } from "@repo/ui";
-import { SVGProps, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { submitBetAction } from "./submitBetAction";
 import { useSession } from "next-auth/react";
 // import { useSelector } from "react-redux";
 // import { RootState } from "@/store/root-reducer";
-import { KeyedMutator } from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import { Minus, Plus } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/root-reducer";
+import { BackendURL } from "@/config/env";
+import fetcher from "@/lib/data/setup";
+import { setWalletBalance } from "@/store/slices/Wallet/wallet-balance";
 
 type Chip = {
   name: string;
@@ -64,6 +62,8 @@ export default function Betslip({
 
   const session = useSession();
 
+  const dispatch = useDispatch();
+
   const [loading, setIsLoading] = useState(false);
 
   const [chips, setChips] = useState<Chip[]>(() => {
@@ -87,6 +87,20 @@ export default function Betslip({
   const balance = useSelector(
     (state: RootState) => state.walletBalance.balance
   );
+
+  const { data, mutate: balanceMutate } = useSWR<{
+    data: { balance: number; exposure: number };
+  }>(
+    `${BackendURL}/api/v1/user/wallet/balance?id=${session.data?.user.id}`,
+    fetcher
+    // { refreshInterval: 1000 }
+  );
+
+  useEffect(() => {
+    if (data?.data) {
+      dispatch(setWalletBalance(data?.data));
+    }
+  }, [data]);
 
   const [amount, setAmount] = useState(0);
   const [betRate, setRate] = useState(rate);
@@ -195,6 +209,7 @@ export default function Betslip({
     } catch (error) {
       toast({ description: "Failed to place bet", variant: "destructive" });
     } finally {
+      balanceMutate();
       setIsLoading(false);
     }
   }

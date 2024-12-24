@@ -3,23 +3,26 @@
 import { setWalletBalance } from "@/store/slices/Wallet/wallet-balance";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RefreshCcw } from "lucide-react";
 import useSWR from "swr";
 import fetcher from "@/lib/data/setup";
 import { BackendURL } from "@/config/env";
+import { RootState } from "@/store/root-reducer";
 
 export default function NavWallet() {
   const session = useSession();
   const dispatch = useDispatch();
   const previousBalanceRef = useRef<number | null>(null);
 
+  const balance = useSelector((root: RootState) => root.walletBalance);
+
   const { data, mutate } = useSWR<{
     data: { balance: number; exposure: number };
   }>(
     `${BackendURL}/api/v1/user/wallet/balance?id=${session.data?.user.id}`,
-    fetcher,
-    { refreshInterval: 1000 }
+    fetcher
+    // { refreshInterval: 1000 }
   );
 
   useEffect(() => {
@@ -44,13 +47,13 @@ export default function NavWallet() {
         <div>
           Balance:{" "}
           <span className="text-[#00EF80] font-semibold">
-            {data?.data ? data.data.balance : 0}
+            {data?.data ? balance.balance : 0}
           </span>
         </div>
         <div>
           Exposure:{" "}
           <span className="text-[#FF6372] font-semibold">
-            {data?.data ? data.data.exposure : 0}
+            {data?.data ? balance.exposure : 0}
           </span>
         </div>
       </div>
