@@ -167,11 +167,12 @@ type TournamentsListData struct {
 //session
 
 type FancyList struct {
-	RunnerName string `json:"RunnerName"`
-	Eventname  string `json:"eventName"`
-	RunnerId   string `json:"runnerId"`
-	Run        int64  `json:"run"`
-	EventId    string `json:"eventId"`
+	RunnerName     string `json:"RunnerName"`
+	Eventname      string `json:"eventName"`
+	RunnerId       string `json:"runnerId"`
+	Run            int64  `json:"run"`
+	EventId        string `json:"eventId"`
+	ResultDeclared bool   `json:"declared"`
 }
 
 type GetRunnerResults struct {

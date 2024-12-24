@@ -192,7 +192,6 @@ CREATE TABLE IF NOT EXISTS tournament_settings (
 );
 
 
-
 CREATE TABLE IF NOT EXISTS active_events (
     id SERIAL PRIMARY KEY,
     sports_id INTEGER CHECK (sports_id IN (4, 2, 1)) NOT NULL,
@@ -208,7 +207,6 @@ CREATE TABLE IF NOT EXISTS active_events (
     CONSTRAINT fk_sports_id FOREIGN KEY (sports_id) REFERENCES sports_settings(id) ON DELETE CASCADE,
     CONSTRAINT fk_competition_id FOREIGN KEY (competition_id) REFERENCES tournament_settings(id) ON DELETE CASCADE
 );
-
 
 
 CREATE TABLE IF NOT EXISTS sport_bets (

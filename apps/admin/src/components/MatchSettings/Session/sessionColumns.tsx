@@ -26,6 +26,11 @@ export const sessionColumns: ColumnDef<any>[] = [
     cell: () => <></>,
   },
   {
+    accessorKey: "declared",
+    header: "",
+    cell: () => <></>,
+  },
+  {
     accessorKey: "run",
     header: "Run",
     cell: ({ row }) => {
@@ -36,6 +41,7 @@ export const sessionColumns: ColumnDef<any>[] = [
       const RunnerName = row.getValue("RunnerName") as string;
       const RunnerId = row.getValue("runnerId") as string;
       const runVal = row.getValue("run") as number;
+      const declared = row.getValue("declared") as boolean;
 
       const [run, setRun] = useState(0);
       const [loading, setLoading] = useState(false);
@@ -80,16 +86,26 @@ export const sessionColumns: ColumnDef<any>[] = [
           className="cursor-pointer flex items-center gap-4 w-full"
           action={submitResultClient}
         >
-          <Input
-            name="run"
-            type="number"
-            id="run"
-            placeholder={"Run Value"}
-            className="min-w-[80px]"
-            disabled={runVal !== 0}
-            defaultValue={runVal}
-            onChange={(e) => setRun(Number(e.target.value))}
-          />
+          {!declared ? (
+            <Input
+              name="run"
+              type="number"
+              id="run"
+              placeholder={"Run Value"}
+              className="min-w-[80px]"
+              disabled={declared}
+              defaultValue={runVal}
+              onChange={(e) => setRun(Number(e.target.value))}
+            />
+          ) : (
+            <Input
+              type="text"
+              placeholder={"Run Value"}
+              className="min-w-[80px]"
+              disabled
+              defaultValue={`${runVal} (declared)`}
+            />
+          )}
           {run >= 0 ? (
             <Button>{loading ? <LoadingSpinner /> : <CircleCheck />}</Button>
           ) : (
