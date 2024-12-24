@@ -158,7 +158,8 @@ func (s *userStore) GetUserBets(ctx context.Context, id, gameType, marketType, f
               FROM sport_bets
               WHERE settled = true
               AND user_id = $1
-              AND created_at BETWEEN $2 AND $3`
+              AND created_at BETWEEN $2 AND $3
+			  ORDER BY created_at DESC`
 
 	args := []interface{}{id, from, to}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { BetStatementColumns, DashboardHeading, Statement } from "@/components";
+import { DashboardHeading, Statement, StatementColumns } from "@/components";
 import { BackendURL } from "@/config/env";
 import fetcher from "@/lib/data/setup";
 import {
@@ -83,7 +83,7 @@ export default function AccountStatement() {
         Load <RefreshCwIcon className="w-4 h-4 dark:stroke-white" />
       </div> */}
         </div>
-        <DataTable columns={BetStatementColumns} data={data?.data || []} />
+        <DataTable columns={StatementColumns} data={data?.data || []} />
       </div>
     </div>
   );
