@@ -39,4 +39,6 @@ type AccountStatement struct {
 	MarketType      string  `json:"marketType"`
 	RunnerName      string  `json:"runnerName"`
 	CreatedAt       string  `json:"createdAt"`
+	OddsPrice       float64 `json:"oddsPrice"`
+	OddsRate        float64 `json:"oddsRate"`
 }

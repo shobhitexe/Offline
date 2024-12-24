@@ -10,22 +10,12 @@ export const BetStatementColumns: ColumnDef<BetTableDataType>[] = [
     cell: ({ row }) => <div>{row.index + 1}</div>,
   },
   {
-    accessorKey: "transactionType",
+    accessorKey: "oddsPrice",
     header: "Description",
     cell: ({ row }) => {
-      const type = row.getValue("transactionType") as string;
-
       const matchName = row.getValue("matchName") as string;
       const marketType = row.getValue("marketType") as string;
       const runnerName = row.getValue("runnerName") as string;
-
-      if (type === "Deposit" || type === "Withdraw") {
-        return (
-          <div className="bg-black text-white rounded-sm p-1 w-fit font-medium">
-            {type}
-          </div>
-        );
-      }
 
       return (
         <div className="flex flex-wrap gap-2 font-medium">
@@ -47,12 +37,25 @@ export const BetStatementColumns: ColumnDef<BetTableDataType>[] = [
     cell: () => <></>,
   },
   {
+    accessorKey: "oddsRate",
+    header: "Odds",
+    cell: ({ row }) => {
+      const rate = row.getValue("oddsRate") as string;
+      const price = row.getValue("oddsPrice") as string;
+      return (
+        <div>
+          {rate}/{price}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "credit",
-    header: "Credit",
+    header: "Profit",
   },
   {
     accessorKey: "debit",
-    header: "Debit",
+    header: "Stake",
   },
   {
     accessorKey: "createdAt",

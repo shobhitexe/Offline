@@ -3,7 +3,7 @@ import { ChangeName, DashboardHeading, ResetPassword } from "@/components";
 export default async function AccountSettings() {
   return (
     <div className="sm:w-[70%] w-[90%] mx-auto mb-10">
-      <DashboardHeading heading={"Account Settings"} />
+      <DashboardHeading heading={"My Profile"} />
 
       <div className="bg-cardBG sm:p-10 p-5 sm:rounded-3xl rounded-xl sm:mt-10 mt-5">
         <div className="text-xl text-main font-medium">Profile</div>

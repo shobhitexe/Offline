@@ -22,6 +22,7 @@ func RegisterUserRoutes(r chi.Router, h *handlers.UserHandler) {
 
 		//statement
 		r.Get("/statement", h.GetStatement)
+		r.Get("/statement/bets", h.GetBetStatement)
 
 	})
 

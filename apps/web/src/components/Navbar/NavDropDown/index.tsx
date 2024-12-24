@@ -81,7 +81,7 @@ export default async function NavDropDown() {
             </Link>
 
             <Link
-              href={"/dashboard/account/statement"}
+              href={"/dashboard/account/statement/bets"}
               className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
             >
               <MemoryStick height={20} width={20} stroke="black" />

@@ -21,51 +21,51 @@ export default function page() {
               </span>
             </div>
             <div>
-              All https://bright247exch.com users including 'Agent', 'Master'
+              All https://cricbazaar99.com/ users including 'Agent', 'Master'
               and 'Sub' account holders are advised to read the following 'Terms
-              and Conditions'. All users who use https://bright247exch.com agree
+              and Conditions'. All users who use https://cricbazaar99.com/ agree
               and accept to the following:
             </div>
 
             <ol className="list-decimal">
               <li>
-                The site https://bright247exch.com and all of its original
-                content are the sole property of ‘https://bright247exch.com
+                The site https://cricbazaar99.com/ and all of its original
+                content are the sole property of ‘https://cricbazaar99.com/
                 Infotech Limited’ and are, as such, fully protected by
                 International Copyright and other intellectual property rights
                 laws.
               </li>
               <li>
                 Any form of ‘Passing of funds’, ‘Self Matching’ will not be
-                tolerated on https://bright247exch.com Exchange. Any users found
+                tolerated on https://cricbazaar99.com/ Exchange. Any users found
                 participating in such activites will be locked with the funds
                 being reversed. Accounts participating in such activities must
-                note that https://bright247exch.com reserves the right to Void
+                note that https://cricbazaar99.com/ reserves the right to Void
                 any bets of such nature at any time within 1 week of the bet
                 being placed.
               </li>
               <li>
                 Please note that if any account has been locked due to ‘Passing
-                of funds’ within the last 72 hours, https://bright247exch.com
+                of funds’ within the last 72 hours, https://cricbazaar99.com/
                 Exchange reserves the right to void any bet of this nature
                 within the account irrespective of when the bet was placed.
               </li>
               <li>
                 No Arguments or claim in the above context will be entertained
-                by https://bright247exch.com and the decision made by
-                https://bright247exch.com will stand as final.
+                by https://cricbazaar99.com/ and the decision made by
+                https://cricbazaar99.com/ will stand as final.
               </li>
               <li>
-                https://bright247exch.com Endeavors to have our services run 24
+                https://cricbazaar99.com/ Endeavors to have our services run 24
                 hours a day. However due to any technical issue, or
                 disruptionenglish of services from our provider (Betfair.com),
-                https://bright247exch.com will not be liable for any market
+                https://cricbazaar99.com/ will not be liable for any market
                 positions that any account holders may hold.
               </li>
               <li>
                 Betfair.com reserves the right to resettle or void any market
                 for reasons such as technical delayed suspension from the
-                provider. In any such case https://bright247exch.com will settle
+                provider. In any such case https://cricbazaar99.com/ will settle
                 according to Betfair.com
               </li>
               <li>
@@ -85,27 +85,27 @@ export default function page() {
                 which have been placed from the stadium or from a source at the
                 stadium maybe voided at anytime. The decision of whether to void
                 the particular bet in question or to void the entire market will
-                remain at the discretion of https://bright247exch.com Exchange.
+                remain at the discretion of https://cricbazaar99.com/ Exchange.
                 The final decision of whether bets are suspicious will be taken
-                by https://bright247exch.com and that decision will be full and
+                by https://cricbazaar99.com/ and that decision will be full and
                 final.
               </li>
               <li>
                 Any sort of cheating bet , any sort of Matching (Passing of
                 funds), Court Siding (Ghaobaazi on commentary), Sharpening,
-                Commission making is not allowed in https://bright247exch.com
-                Exchange, If any https://bright247exch.com User is caught in any
+                Commission making is not allowed in https://cricbazaar99.com/
+                Exchange, If any https://cricbazaar99.com/ User is caught in any
                 of such act then all the funds belonging that account would be
                 seized and confiscated. No argument or claim in that context
                 would be entertained and the decision made by
-                https://bright247exch.com management will stand as final
+                https://cricbazaar99.com/ management will stand as final
                 authority.
               </li>
               <li>
-                Fluke hunting/Seeking is prohibited in https://bright247exch.com
+                Fluke hunting/Seeking is prohibited in https://cricbazaar99.com/
                 Exchange, All the fluke bets will be reversed. Cricket
                 commentary is just an additional feature and facility for
-                https://bright247exch.com user but https://bright247exch.com is
+                https://cricbazaar99.com/ user but https://cricbazaar99.com/ is
                 not responsible for any delay or mistake in commentary.
               </li>
               <li>
@@ -448,14 +448,14 @@ export default function page() {
             <div>
               'एजेंट', 'मास्टर' और 'सब' खाताधारकों सहित सभी शक्ती99बूक
               उपयोगकर्ताओं को सलाह दी जाती है कि वे पढ़ें निम्नलिखित 'नियम और
-              शर्तें'। https://bright247exch.com का उपयोग करने वाले सभी
+              शर्तें'। https://cricbazaar99.com/ का उपयोग करने वाले सभी
               उपयोगकर्ता निम्नलिखित से सहमत और स्वीकार करते हैं:
             </div>
 
             <ol className="list-decimal">
               <li>
-                साइट https://bright247exch.com और इसकी सभी मूल सामग्री
-                https://bright247exch.com की एकमात्र संपत्ति है लिमिटेड' और इस
+                साइट https://cricbazaar99.com/ और इसकी सभी मूल सामग्री
+                https://cricbazaar99.com/ की एकमात्र संपत्ति है लिमिटेड' और इस
                 प्रकार, अंतर्राष्ट्रीय कॉपीराइट और अन्य बौद्धिक संपदा द्वारा
                 पूरी तरह से संरक्षित हैं अधिकार कानून।
               </li>
@@ -464,7 +464,7 @@ export default function page() {
                 मैचिंग' बर्दाश्त नहीं किया जाएगा। कोई भी उपयोगकर्ता मिला इस तरह
                 की गतिविधियों में भाग लेने वाले धन को वापस करने के साथ लॉक कर
                 दिया जाएगा। इसमें भाग लेने वाले खाते ऐसी गतिविधियों पर ध्यान
-                देना चाहिए कि https://bright247exch.com किसी भी समय ऐसी प्रकृति
+                देना चाहिए कि https://cricbazaar99.com/ किसी भी समय ऐसी प्रकृति
                 के किसी भी दांव को रद्द करने का अधिकार सुरक्षित रखता है बेट
                 लगाने के 1 सप्ताह के भीतर।
               </li>
@@ -476,20 +476,20 @@ export default function page() {
               </li>
               <li>
                 उपरोक्त संदर्भ में किसी भी तर्क या दावे पर
-                https://bright247exch.com और द्वारा किए गए निर्णय पर विचार नहीं
+                https://cricbazaar99.com/ और द्वारा किए गए निर्णय पर विचार नहीं
                 किया जाएगा शक्ती99बूक फाइनल के रूप में खड़ा होगा।
               </li>
               <li>
-                https://bright247exch.com हमारी सेवाओं को 24 घंटे चलाने का
+                https://cricbazaar99.com/ हमारी सेवाओं को 24 घंटे चलाने का
                 प्रयास करता है। हालांकि किसी तकनीकी समस्या के कारण, या हमारे
                 प्रदाता (Betfair.com) से सेवाओं में व्यवधान,
-                https://bright247exch.com किसी भी बाजार के लिए उत्तरदायी नहीं
+                https://cricbazaar99.com/ किसी भी बाजार के लिए उत्तरदायी नहीं
                 होगा पद जो कोई भी खाताधारक धारण कर सकता है।
               </li>
               <li>
                 Betfair.com तकनीकी देरी जैसे कारणों से किसी भी बाजार को फिर से
                 बसाने या शून्य करने का अधिकार सुरक्षित रखता है प्रदाता से
-                निलंबन। ऐसी किसी भी स्थिति में https://bright247exch.com
+                निलंबन। ऐसी किसी भी स्थिति में https://cricbazaar99.com/
                 Betfair.com के अनुसार समझौता करेगा
               </li>
               <li>
@@ -510,17 +510,17 @@ export default function page() {
                 हो गया। विशेष शर्त को रद्द करने का निर्णय प्रश्न में या पूरे
                 बाजार को रद्द करने के लिए फिक्स 2 बेट एक्सचेंज के विवेक पर
                 रहेगा। अंतिम फैसला दांव संदिग्ध हैं या नहीं, इसका निर्धारण
-                https://bright247exch.com द्वारा किया जाएगा और यह निर्णय पूर्ण
+                https://cricbazaar99.com/ द्वारा किया जाएगा और यह निर्णय पूर्ण
                 और अंतिम होगा।
               </li>
               <li>
                 किसी भी प्रकार की धोखाधड़ी की शर्त, किसी भी प्रकार का मिलान (धन
                 का पासिंग), कोर्ट साइडिंग (घाबाज़ी पर) कमेंट्री), शार्पनिंग,
-                कमीशन बनाने की अनुमति https://bright247exch.com में नहीं है, यदि
-                कोई https://bright247exch.comExchange उपयोगकर्ता है है इस तरह के
+                कमीशन बनाने की अनुमति https://cricbazaar99.com/ में नहीं है, यदि
+                कोई https://cricbazaar99.com/Exchange उपयोगकर्ता है है इस तरह के
                 किसी भी कृत्य में पकड़े जाने पर उस खाते से संबंधित सभी धनराशि को
                 जब्त कर लिया जाएगा और जब्त कर लिया जाएगा। नहीं उस संदर्भ में
-                तर्क या दावे पर विचार किया जाएगा और https://bright247exch.com
+                तर्क या दावे पर विचार किया जाएगा और https://cricbazaar99.com/
                 प्रबंधन द्वारा लिया गया निर्णय अंतिम प्राधिकरण के रूप में खड़ा
                 होगा।
               </li>
@@ -863,51 +863,51 @@ export default function page() {
               </span>
             </div>
             <div>
-              All https://bright247exch.com users including 'Agent', 'Master'
+              All https://cricbazaar99.com/ users including 'Agent', 'Master'
               and 'Sub' account holders are advised to read the following 'Terms
-              and Conditions'. All users who use https://bright247exch.com agree
+              and Conditions'. All users who use https://cricbazaar99.com/ agree
               and accept to the following:
             </div>
 
             <ol className="list-decimal">
               <li>
-                The site https://bright247exch.com and all of its original
-                content are the sole property of ‘https://bright247exch.com
+                The site https://cricbazaar99.com/ and all of its original
+                content are the sole property of ‘https://cricbazaar99.com/
                 Infotech Limited’ and are, as such, fully protected by
                 International Copyright and other intellectual property rights
                 laws.
               </li>
               <li>
                 Any form of ‘Passing of funds’, ‘Self Matching’ will not be
-                tolerated on https://bright247exch.com Exchange. Any users found
+                tolerated on https://cricbazaar99.com/ Exchange. Any users found
                 participating in such activites will be locked with the funds
                 being reversed. Accounts participating in such activities must
-                note that https://bright247exch.com reserves the right to Void
+                note that https://cricbazaar99.com/ reserves the right to Void
                 any bets of such nature at any time within 1 week of the bet
                 being placed.
               </li>
               <li>
                 Please note that if any account has been locked due to ‘Passing
-                of funds’ within the last 72 hours, https://bright247exch.com
+                of funds’ within the last 72 hours, https://cricbazaar99.com/
                 Exchange reserves the right to void any bet of this nature
                 within the account irrespective of when the bet was placed.
               </li>
               <li>
                 No Arguments or claim in the above context will be entertained
-                by https://bright247exch.com and the decision made by
-                https://bright247exch.com will stand as final.
+                by https://cricbazaar99.com/ and the decision made by
+                https://cricbazaar99.com/ will stand as final.
               </li>
               <li>
-                https://bright247exch.com Endeavors to have our services run 24
+                https://cricbazaar99.com/ Endeavors to have our services run 24
                 hours a day. However due to any technical issue, or
                 disruptionenglish of services from our provider (Betfair.com),
-                https://bright247exch.com will not be liable for any market
+                https://cricbazaar99.com/ will not be liable for any market
                 positions that any account holders may hold.
               </li>
               <li>
                 Betfair.com reserves the right to resettle or void any market
                 for reasons such as technical delayed suspension from the
-                provider. In any such case https://bright247exch.com will settle
+                provider. In any such case https://cricbazaar99.com/ will settle
                 according to Betfair.com
               </li>
               <li>
@@ -927,27 +927,27 @@ export default function page() {
                 which have been placed from the stadium or from a source at the
                 stadium maybe voided at anytime. The decision of whether to void
                 the particular bet in question or to void the entire market will
-                remain at the discretion of https://bright247exch.com Exchange.
+                remain at the discretion of https://cricbazaar99.com/ Exchange.
                 The final decision of whether bets are suspicious will be taken
-                by https://bright247exch.com and that decision will be full and
+                by https://cricbazaar99.com/ and that decision will be full and
                 final.
               </li>
               <li>
                 Any sort of cheating bet , any sort of Matching (Passing of
                 funds), Court Siding (Ghaobaazi on commentary), Sharpening,
-                Commission making is not allowed in https://bright247exch.com
-                Exchange, If any https://bright247exch.com User is caught in any
+                Commission making is not allowed in https://cricbazaar99.com/
+                Exchange, If any https://cricbazaar99.com/ User is caught in any
                 of such act then all the funds belonging that account would be
                 seized and confiscated. No argument or claim in that context
                 would be entertained and the decision made by
-                https://bright247exch.com management will stand as final
+                https://cricbazaar99.com/ management will stand as final
                 authority.
               </li>
               <li>
-                Fluke hunting/Seeking is prohibited in https://bright247exch.com
+                Fluke hunting/Seeking is prohibited in https://cricbazaar99.com/
                 Exchange, All the fluke bets will be reversed. Cricket
                 commentary is just an additional feature and facility for
-                https://bright247exch.com user but https://bright247exch.com is
+                https://cricbazaar99.com/ user but https://cricbazaar99.com/ is
                 not responsible for any delay or mistake in commentary.
               </li>
               <li>

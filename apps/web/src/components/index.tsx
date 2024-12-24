@@ -33,7 +33,8 @@ import MatchInfo from "./Sports/Match/MatchInfo";
 import MatchTable from "./Sports/Match/MatchTable/MatchTable";
 import TopBar from "./Sports/Topbar";
 import MatchLoading from "./Sports/Match/MatchLoading";
-import { BetStatementColumns } from "./Dashboard/AccountStatement/StatementTables/BetStatementTable/BetStatementColumns";
+import { StatementColumns } from "./Dashboard/AccountStatement/StatementTables/StatementColumns";
+import { BetStatementColumns } from "./Dashboard/AccountStatement/StatementTables/BetStatementColumns";
 
 export {
   Navbar,
@@ -71,5 +72,6 @@ export {
   MatchTable,
   TopBar,
   MatchLoading,
+  StatementColumns,
   BetStatementColumns,
 };

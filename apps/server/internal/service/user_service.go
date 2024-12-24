@@ -18,6 +18,7 @@ type UserService interface {
 	GetBalance(ctx context.Context, id string) (*models.UserWallet, error)
 	SignIn(ctx context.Context, payload models.SignInRequest) (*models.User, error)
 	GetStatement(ctx context.Context, paylod models.StatementRequest) ([]models.AccountStatement, error)
+	GetBetStatement(ctx context.Context, paylod models.StatementRequest) ([]models.AccountStatement, error)
 }
 
 type userService struct {
@@ -178,6 +179,52 @@ func (s *userService) GetStatement(ctx context.Context, paylod models.StatementR
 		}
 		return timeI.After(timeJ)
 	})
+
+	return statement, nil
+}
+
+func (s *userService) GetBetStatement(ctx context.Context, paylod models.StatementRequest) ([]models.AccountStatement, error) {
+
+	var bets []models.Bet
+
+	bets, err := s.store.GetUserBets(ctx, paylod.ID, paylod.GameType, paylod.MarketType, paylod.FromDate, paylod.ToDate)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var statement []models.AccountStatement
+
+	for _, bet := range bets {
+
+		var credit float64
+		var debit float64
+
+		// games := map[string]string{
+		// 	"1": "Football",
+		// 	"2": "Tennis",
+		// 	"4": "Cricket",
+		// }
+
+		if bet.Result == "win" {
+			credit = bet.Profit
+		} else {
+			debit = bet.Exposure
+		}
+
+		item := models.AccountStatement{
+			Credit: credit,
+			Debit:  debit,
+			// TransactionType: games[bet.MatchId],
+			MatchName:  bet.MarketName,
+			MarketType: bet.MarketType,
+			RunnerName: bet.RunnerName,
+			CreatedAt:  bet.CreatedAt,
+			OddsRate:   bet.OddsRate,
+			OddsPrice:  bet.OddsPrice,
+		}
+		statement = append(statement, item)
+	}
 
 	return statement, nil
 }
