@@ -16,7 +16,7 @@ import {
   LoadingSpinner,
   useToast,
 } from "@repo/ui";
-import { SVGProps, useState } from "react";
+import { SVGProps, useEffect, useState } from "react";
 import { submitBetAction } from "./submitBetAction";
 import { useSession } from "next-auth/react";
 // import { useSelector } from "react-redux";
@@ -90,6 +90,10 @@ export default function Betslip({
   const [betRate, setRate] = useState(rate);
 
   const [open, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setRate(rate);
+  }, [rate]);
 
   const adjustAmount = (increment: boolean) => {
     const currentAmount = Number(amount);
