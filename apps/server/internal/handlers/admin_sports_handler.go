@@ -188,3 +188,22 @@ func (h *AdminHandler) ChangeTournamentStatus(w http.ResponseWriter, r *http.Req
 	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Status Changed", Data: true})
 
 }
+
+func (h *AdminHandler) GroupActiveEventsForFancyBets(w http.ResponseWriter, r *http.Request) {
+
+	id := r.URL.Query().Get("id")
+
+	if len(id) == 0 || id == "" {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch No id provided", Data: false})
+		return
+	}
+
+	b, err := h.service.GroupActiveEventsForFancyBets(r.Context(), id)
+
+	if err != nil {
+		h.utils.WriteJSON(w, http.StatusInternalServerError, models.Response{Message: "Failed to fetch", Data: err.Error()})
+		return
+	}
+
+	h.utils.WriteJSON(w, http.StatusOK, models.Response{Message: "Fetched", Data: b})
+}

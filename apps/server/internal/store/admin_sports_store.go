@@ -34,6 +34,7 @@ type AdminSportsStore interface {
 	IsTournamentAutoUpdateEnabled(ctx context.Context, id string) (bool, error)
 	ChangeTournamentStatus(ctx context.Context, competitionId string, status bool) error
 	GetAutoUpdatingTournaments(ctx context.Context) ([]models.TournamentsListData, error)
+	GroupActiveEventsForFancyBets(ctx context.Context, id string) ([]models.ActiveEvents, error)
 }
 
 func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.ActiveEvents, error) {
@@ -449,7 +450,6 @@ func (s *adminStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposu
 	if _, err := s.db.Exec(ctx, query, profit, exposure, userID); err != nil {
 		return fmt.Errorf("failed to update settlement and exposure for user %s: %w", userID, err)
 	}
-
 	return nil
 }
 
@@ -690,4 +690,52 @@ func (s *adminStore) GetAutoUpdatingTournaments(ctx context.Context) ([]models.T
 	}
 
 	return list, nil
+}
+
+func (s *adminStore) GroupActiveEventsForFancyBets(ctx context.Context, id string) ([]models.ActiveEvents, error) {
+
+	var events []models.ActiveEvents
+
+	query := `SELECT 
+    			ae.match_name, 
+    			ae.event_id,
+    			ae.competition_id,
+    			ae.category,
+    			ae.active
+			  FROM 
+    			active_events ae
+			  JOIN 
+    			sport_bets sb
+			  ON 
+    			ae.id = sb.match_id
+			  WHERE 
+    			ae.sports_id = $1 
+    			AND ae.is_declared = false 
+    			AND ae.active = true
+    			AND sb.settled = false
+				AND sb.market_type = 'Fancy'
+			  GROUP BY 
+    			ae.match_name, ae.event_id, ae.competition_id, ae.category, ae.active`
+
+	rows, err := s.db.Query(ctx, query, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var item models.ActiveEvents
+
+		if err := rows.Scan(&item.EventName, &item.EventId, &item.CompetitionId, &item.Category, &item.Active); err != nil {
+			return nil, err
+		}
+
+		events = append(events, item)
+
+	}
+
+	return events, nil
 }

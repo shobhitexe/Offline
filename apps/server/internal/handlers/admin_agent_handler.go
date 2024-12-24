@@ -182,7 +182,7 @@ func (h *AdminHandler) GetUsersAndAgentsList(w http.ResponseWriter, r *http.Requ
 	if len(id) == 0 {
 		h.utils.WriteJSON(w, http.StatusBadRequest, models.Response{
 			Message: "Failed, no ID provided",
-			Data:    "[]",
+			Data:    []any{},
 		})
 		return
 	}

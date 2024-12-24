@@ -63,7 +63,7 @@ export default function MarketTableComponent({
       } else {
         setMatchSettings({
           minStake: settings.minStake,
-          maxStake: settings.minStake,
+          maxStake: settings.maxStake,
           maxProfit: Number(settings.maxStake) * 5,
           betDelay: Number(settings.betDelay),
         });

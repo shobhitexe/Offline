@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   password TEXT NOT NULL,
   balance NUMERIC(20, 2) NOT NULL DEFAULT 0.0 CHECK (balance >= 0),
-  exposure NUMERIC(20, 2) NOT NULL DEFAULT 0.0,
+  exposure NUMERIC(20, 2) NOT NULL DEFAULT 0.0 CHECK (exposure >= 0),
   settlement NUMERIC(20, 2) NOT NULL DEFAULT 0.0,
   credit_ref NUMERIC(20, 2) NOT NULL DEFAULT 0.0,
   market_commission INT NOT NULL,

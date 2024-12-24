@@ -11,7 +11,7 @@ type Matches = {
 
 async function activeMatches() {
   try {
-    const res = await universalGET(`/sports/getActiveEvents?id=4`);
+    const res = await universalGET(`/admin/sports/groupactivebets?id=4`);
 
     if (!res.data) {
       return [];
