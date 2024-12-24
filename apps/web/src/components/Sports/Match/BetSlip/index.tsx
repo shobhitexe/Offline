@@ -317,7 +317,11 @@ export default function Betslip({
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => setRate((prev) => prev - 0.01)}
+                onClick={() => {
+                  if (betType === "back") {
+                    setRate((prev) => prev - 0.01);
+                  }
+                }}
                 className="text-black"
               >
                 <Minus className="h-4 w-4" />
@@ -342,7 +346,11 @@ export default function Betslip({
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => setRate((prev) => prev + 0.01)}
+                onClick={() => {
+                  if (betType === "lay") {
+                    setRate((prev) => prev + 0.01);
+                  }
+                }}
                 className="text-black"
               >
                 <Plus className="h-4 w-4" />
