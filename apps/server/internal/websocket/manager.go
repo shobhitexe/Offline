@@ -203,7 +203,6 @@ func (m *Manager) subscribeToSportsUpdates() {
 			clientsForEventId, exists := m.clientsMapByEventId[event.EventId]
 			m.RUnlock()
 			if !exists {
-				// log.Printf("No clients found for eventId %s", event.EventId)
 				continue
 			}
 
@@ -235,6 +234,7 @@ func (m *Manager) subscribeToSportsUpdates() {
 						m.removeClient(targetClient)
 					} else {
 						log.Printf("Client %s is not ready, retry %d/%d.", targetClient.clientId, targetClient.retryCount, targetClient.maxRetries)
+						m.removeClient(targetClient)
 						time.Sleep(100 * time.Millisecond)
 					}
 				}

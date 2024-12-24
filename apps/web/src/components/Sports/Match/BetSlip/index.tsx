@@ -23,6 +23,8 @@ import { useSession } from "next-auth/react";
 // import { RootState } from "@/store/root-reducer";
 import { KeyedMutator } from "swr";
 import { Minus, Plus } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/root-reducer";
 
 type Chip = {
   name: string;
@@ -82,9 +84,9 @@ export default function Betslip({
         ];
   });
 
-  // const balance = useSelector(
-  //   (state: RootState) => state.walletBalance.balance
-  // );
+  const balance = useSelector(
+    (state: RootState) => state.walletBalance.balance
+  );
 
   const [amount, setAmount] = useState(0);
   const [betRate, setRate] = useState(rate);
@@ -107,30 +109,55 @@ export default function Betslip({
     try {
       setIsLoading(true);
 
-      const exposure =
-        betType === "back" || betType === "yes" ? amount : (rate - 1) * amount;
+      let exposure;
 
-      // if (amount < minStake) {
-      //   toast({
-      //     title: "Failed to place bet",
-      //     description: `Min stake is ${minStake}`,
-      //     variant: "destructive",
-      //   });
-      //   return;
-      // }
+      switch (betType) {
+        case "back":
+          exposure = amount;
+          break;
+        case "lay":
+          exposure = (rate - 1) * amount;
+          break;
+        case "no":
+          exposure = price * (amount / 100);
+          break;
+        case "yes":
+          exposure = amount;
+          break;
+        default:
+          exposure = 0;
+      }
 
-      // if (amount > maxStake) {
-      //   toast({
-      //     title: "Failed to place bet",
-      //     description: `Max stake is ${maxStake}`,
-      //     variant: "destructive",
-      //   });
-      //   return;
-      // }
-
-      if (exposure <= 0) {
+      if (exposure < minStake) {
         toast({
           title: "Failed to place bet",
+          description: `Min stake is ${minStake}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (exposure > maxStake) {
+        toast({
+          title: "Failed to place bet",
+          description: `Max stake is ${maxStake}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (balance <= 0) {
+        toast({
+          title: "Failed to place bet",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (balance - exposure < 0) {
+        toast({
+          title: "Failed to place bet",
+          description: "Insufficient balance",
           variant: "destructive",
         });
         return;
@@ -204,48 +231,8 @@ export default function Betslip({
           </div>
         )}
 
-        {/* <DrawerHeader className="border-b pb-4">
-          <DrawerTitle>Place Bet</DrawerTitle>
-        </DrawerHeader> */}
-
         <form method="POST" className="p-3 space-y-2">
           <div className="grid grid-cols-2 gap-3 text-center text-black text-sm">
-            {/* <div className="bg-red-400 text-white sm:p-3 p-1 max-sm:px-2 max-sm:text-center rounded-lg max-sm:space-y-1">
-              <span className="text-xs text-black font-medium">Exposure</span>
-              <div className="text-sm font-semibold">
-                {(betType === "back" || betType === "lay") && (
-                  <>
-                    {betType === "back"
-                      ? amount
-                      : ((rate - 1) * amount).toFixed(2)}
-                  </>
-                )}
-
-                {(betType === "no" || betType === "yes") && (
-                  <>{betType === "no" ? price * (amount / 100) : amount}</>
-                )}
-              </div>
-            </div>
-
-            <div className="bg-emerald-500 text-white sm:p-3 p-1 max-sm:px-2 max-sm:text-center rounded-lg max-sm:space-y-1">
-              <span className="text-xs text-black font-medium">
-                Potential Win
-              </span>
-              <div className="text-sm font-semibold">
-                {" "}
-                {(betType === "back" || betType === "lay") && (
-                  <>
-                    {betType === "back"
-                      ? ((rate - 1) * amount).toFixed(2)
-                      : amount}
-                  </>
-                )}
-                {(betType === "no" || betType === "yes") && (
-                  <> {betType === "no" ? amount : price * (amount / 100)}</>
-                )}
-              </div>
-            </div> */}
-
             <div className="bg-red-400 rounded-md font-medium py-1">
               Exposure:
               <span>
@@ -327,10 +314,6 @@ export default function Betslip({
                 <Minus className="h-4 w-4" />
               </Button>
 
-              {/* <div className="text-xl font-semibold text-white text-center w-full">
-                {betRate}
-              </div> */}
-
               <Input
                 name="betRate"
                 type="number"
@@ -401,34 +384,7 @@ export default function Betslip({
             </DrawerClose>
           </div>
         </form>
-
-        {/* <DrawerFooter>
-          <DrawerClose>
-            <Button variant="default">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter> */}
       </DrawerContent>
     </Drawer>
-  );
-}
-
-function Loading(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      className="spinner absolute z-50 w-full h-full left-0 top-0"
-      viewBox="0 0 66 66"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <circle
-        className="path"
-        fill="none"
-        stroke-width="6"
-        stroke-linecap="round"
-        cx="33"
-        cy="33"
-        r="30"
-      ></circle>
-    </svg>
   );
 }

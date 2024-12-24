@@ -15,11 +15,11 @@ export default function SportsSettingsTable({
   const [data, setData] = useState(settingsdata);
 
   const updateCellValue = (rowIndex: number, key: string, value: any) => {
-    setData((prevData) =>
-      prevData.map((row, index) =>
-        index === rowIndex ? { ...row, [key]: value } : row
-      )
-    );
+    setData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIndex] = { ...newData[rowIndex], [key]: value };
+      return newData;
+    });
   };
 
   const sportsSettingsColumns: ColumnDef<any>[] = [
@@ -38,10 +38,20 @@ export default function SportsSettingsTable({
       cell: ({ row }) => (
         <Input
           type="number"
-          value={data[row.index]["maxStake"]}
-          onChange={(e) =>
-            updateCellValue(row.index, "maxStake", e.target.value)
-          }
+          defaultValue={data[row.index]["maxStake"]}
+          onBlur={(e) => updateCellValue(row.index, "maxStake", e.target.value)}
+          className="min-w-[80px] border border-gray-300 rounded p-2"
+        />
+      ),
+    },
+    {
+      accessorKey: "minStake",
+      header: "Min Stake",
+      cell: ({ row }) => (
+        <Input
+          type="number"
+          defaultValue={data[row.index]["minStake"]}
+          onBlur={(e) => updateCellValue(row.index, "minStake", e.target.value)}
           className="min-w-[80px] border border-gray-300 rounded p-2"
         />
       ),
@@ -52,8 +62,8 @@ export default function SportsSettingsTable({
       cell: ({ row }) => (
         <Input
           type="number"
-          value={data[row.index]["beforeInPlayMaxStake"]}
-          onChange={(e) =>
+          defaultValue={data[row.index]["beforeInPlayMaxStake"]}
+          onBlur={(e) =>
             updateCellValue(row.index, "beforeInPlayMaxStake", e.target.value)
           }
           className="min-w-[80px] border border-gray-300 rounded p-2"
@@ -66,8 +76,8 @@ export default function SportsSettingsTable({
       cell: ({ row }) => (
         <Input
           type="number"
-          value={data[row.index]["beforeInPlayMinStake"]}
-          onChange={(e) =>
+          defaultValue={data[row.index]["beforeInPlayMinStake"]}
+          onBlur={(e) =>
             updateCellValue(row.index, "beforeInPlayMinStake", e.target.value)
           }
           className="min-w-[80px] border border-gray-300 rounded p-2"
@@ -80,10 +90,8 @@ export default function SportsSettingsTable({
       cell: ({ row }) => (
         <Input
           type="number"
-          value={data[row.index]["maxOdds"]}
-          onChange={(e) =>
-            updateCellValue(row.index, "maxOdds", e.target.value)
-          }
+          defaultValue={data[row.index]["maxOdds"]}
+          onBlur={(e) => updateCellValue(row.index, "maxOdds", e.target.value)}
           className="min-w-[80px] border border-gray-300 rounded p-2"
         />
       ),
@@ -94,10 +102,8 @@ export default function SportsSettingsTable({
       cell: ({ row }) => (
         <Input
           type="number"
-          value={data[row.index]["betDelay"]}
-          onChange={(e) =>
-            updateCellValue(row.index, "betDelay", e.target.value)
-          }
+          defaultValue={data[row.index]["betDelay"]}
+          onBlur={(e) => updateCellValue(row.index, "betDelay", e.target.value)}
           className="min-w-[80px] border border-gray-300 rounded p-2"
         />
       ),

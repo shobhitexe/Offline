@@ -84,7 +84,7 @@ export default function ExpandedRiskAnalysis({ eventId }: { eventId: string }) {
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Fancy</h3>
 
-        <div className="flex flex-wrap items-center gap-5">
+        <div className="flex flex-wrap items-center gap-5 overflow-x-auto">
           {fancy.map((fancyData) => (
             <div className="flex flex-col gap-5">
               <div className="text-center text-black">
