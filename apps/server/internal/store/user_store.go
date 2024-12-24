@@ -120,7 +120,8 @@ func (s *userStore) GetUserTxns(ctx context.Context, id string, from string, to 
 
 	var txns []models.Transactions
 
-	query := `SELECT amount, txn_type, TO_CHAR(created_at AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
+	query := `SELECT amount, txn_type, 
+	TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
 	FROM user_txns WHERE user_id = $1
 	AND created_at BETWEEN $2 AND $3`
 
@@ -154,7 +155,7 @@ func (s *userStore) GetUserBets(ctx context.Context, id, gameType, marketType, f
 	var history []models.Bet
 
 	query := `SELECT market_name, market_type, runner_name, profit, exposure, result, odds_price, odds_rate,
-              TO_CHAR(created_at AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
+              TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
               FROM sport_bets
               WHERE settled = true
               AND user_id = $1

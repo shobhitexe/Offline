@@ -44,7 +44,7 @@ func (s *sportsStore) GetActiveEvents(ctx context.Context, id string) (*[]models
 		competition_id,
 		category,
 		active,
-		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+		TO_CHAR((opening_time AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
 	WHERE 
@@ -87,7 +87,7 @@ func (s *sportsStore) GetInPlayEvents(ctx context.Context, id string) (*[]models
 		event_id,
 		competition_id,
 		category,
-		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+		TO_CHAR((opening_time AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
 	WHERE 
@@ -130,7 +130,8 @@ func (s *sportsStore) GetAllEvents(ctx context.Context, id string) (*[]models.Ac
 		match_name, 
 		event_id,
 		competition_id,
-		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+		TO_CHAR((opening_time AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+
 	FROM 
 		active_events
 	WHERE 

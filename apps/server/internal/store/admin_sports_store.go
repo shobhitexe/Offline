@@ -47,7 +47,7 @@ func (s *adminStore) GetOpenMarket(ctx context.Context, id string) (*[]models.Ac
 		competition_id,
 		category,
 		active,
-		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+		TO_CHAR((opening_time AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
 	WHERE 
@@ -90,7 +90,7 @@ func (s *adminStore) GetActiveEvents(ctx context.Context, id string) (*[]models.
 		event_id,
 		competition_id,
 		category,
-		TO_CHAR(opening_time AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
+		TO_CHAR((opening_time AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS opening_time
 	FROM 
 		active_events
 	WHERE 
@@ -141,7 +141,8 @@ func (s *adminStore) GetRunnerHistory(ctx context.Context) ([]models.RunnerHisto
 
 	query := `SELECT
 	 event_name, runner_name, run, 
-	 TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at 
+	 TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'DD/MM/YYYY, HH12:MI:SS') AS created_at
+	  
 	 FROM runner_results
 	 ORDER BY created_at DESC`
 
