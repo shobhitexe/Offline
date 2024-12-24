@@ -179,8 +179,7 @@ func (s *sportsStore) TransferBetValueToExposure(ctx context.Context, tx pgx.Tx,
 	UPDATE users 
 	SET exposure = exposure + $1,
 	balance = balance - $1
-	WHERE id = $2 AND balance >= $1
-`
+	WHERE id = $2 AND balance >= $1`
 
 	result, err := tx.Exec(ctx, query, amount, id)
 	if err != nil {

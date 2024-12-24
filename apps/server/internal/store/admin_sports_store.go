@@ -16,7 +16,7 @@ type AdminSportsStore interface {
 	GetActiveBetsListByMarketID(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error)
 	BetHistoryPerGame(ctx context.Context, eventId string) (*[]models.BetHistoryPerGame, error)
 	FancyBetsPerEventId(ctx context.Context, eventId string) ([]models.FancyBets, error)
-	SaveRunnerResultHistory(ctx context.Context, payload models.SetRunnerResultRequest) error
+	SaveRunnerResultHistory(ctx context.Context, tx pgx.Tx, payload models.SetRunnerResultRequest) error
 	GetRunnerResults(ctx context.Context, eventId string) (map[string]int64, error)
 	SaveActiveEvents(ctx context.Context, payload models.ListEvents, runners []models.SavedRunner, id string) error
 	GetActiveSession(ctx context.Context, eventId string) ([]models.ActiveSession, error)
@@ -344,15 +344,16 @@ func (s *adminStore) GetRunnerResults(ctx context.Context, eventId string) (map[
 	return result, nil
 }
 
-func (s *adminStore) SaveRunnerResultHistory(ctx context.Context, payload models.SetRunnerResultRequest) error {
+func (s *adminStore) SaveRunnerResultHistory(ctx context.Context, tx pgx.Tx, payload models.SetRunnerResultRequest) error {
 
 	query := `INSERT INTO 
 	runner_results (event_id, event_name, runner_name, runner_id, run) 
 	VALUES ($1, $2, $3, $4, $5)`
 
-	_, err := s.db.Exec(ctx, query, payload.EventId, payload.EventName, payload.RunnerName, payload.RunnerId, payload.Run)
+	_, err := tx.Exec(ctx, query, payload.EventId, payload.EventName, payload.RunnerName, payload.RunnerId, payload.Run)
 
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -447,7 +448,7 @@ func (s *adminStore) GetActiveSession(ctx context.Context, eventId string) ([]mo
 
 func (s *adminStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposure float64, userID string) error {
 	query := `UPDATE users SET settlement = settlement + $1, balance = balance + ($1 * 2), exposure = exposure - $2 WHERE id = $3`
-	if _, err := s.db.Exec(ctx, query, profit, exposure, userID); err != nil {
+	if _, err := tx.Exec(ctx, query, profit, exposure, userID); err != nil {
 		return fmt.Errorf("failed to update settlement and exposure for user %s: %w", userID, err)
 	}
 	return nil
@@ -455,7 +456,7 @@ func (s *adminStore) BetResultWin(ctx context.Context, tx pgx.Tx, profit, exposu
 
 func (s *adminStore) BetResultLose(ctx context.Context, tx pgx.Tx, exposure float64, userID string) error {
 	query := `UPDATE users SET exposure = exposure - $1, settlement = settlement - $1 WHERE id = $2`
-	if _, err := s.db.Exec(ctx, query, exposure, userID); err != nil {
+	if _, err := tx.Exec(ctx, query, exposure, userID); err != nil {
 		return fmt.Errorf("failed to update balance and exposure for user %s: %w", userID, err)
 	}
 	return nil

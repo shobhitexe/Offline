@@ -236,7 +236,6 @@ func (s *adminService) GetRunnersofEvent(ctx context.Context, eventId string) ([
 }
 
 func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRunnerResultRequest) error {
-
 	results, err := s.store.GetActiveFancyBets(ctx, payload.EventId)
 	if err != nil {
 		log.Println(err)
@@ -248,94 +247,81 @@ func (s *adminService) SetRunnerResult(ctx context.Context, payload models.SetRu
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
-	var finalErr error
 	defer func() {
 		if p := recover(); p != nil {
 			_ = tx.Rollback(ctx)
 			panic(p)
-		} else if finalErr != nil {
+		} else if err != nil {
 			_ = tx.Rollback(ctx)
 		}
 	}()
 
-	errChan := make(chan error, len(results))
-	defer close(errChan)
-
-	// var wg sync.WaitGroup
-
 	for _, result := range results {
-
-		// wg.Add(1)
-		// go func(result models.ActiveBet) {
-		// defer wg.Done()
-
 		goroutineCtx := ctx
 
 		if result.RunnerID == payload.RunnerId {
-			if result.BetType == "no" {
-				switch {
-				case result.OddsRate <= float64(payload.Run):
+			switch result.BetType {
+			case "no":
+				if result.OddsRate <= float64(payload.Run) {
 					if err := s.store.BetResultLose(goroutineCtx, tx, result.Exposure, result.UserId); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("BetResultLose failed: %w", err)
+						log.Println("BetResultLose failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("BetResultLose failed: %w", err)
 					}
 					if err := s.store.ChangeActiveBetStatus(ctx, tx, result.ID, "loss"); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("Bet change status Failed: %w", err)
+						log.Println("ChangeActiveBetStatus failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("Bet change status failed: %w", err)
 					}
-				case result.OddsRate > float64(payload.Run):
+				} else {
 					if err := s.store.BetResultWin(goroutineCtx, tx, result.Profit, result.Exposure, result.UserId); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("BetResultWin failed: %w", err)
+						log.Println("BetResultWin failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("BetResultWin failed: %w", err)
 					}
 					if err := s.store.ChangeActiveBetStatus(ctx, tx, result.ID, "win"); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("Bet change status Failed: %w", err)
+						log.Println("ChangeActiveBetStatus failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("Bet change status failed: %w", err)
 					}
 				}
-			}
 
-			if result.BetType == "yes" {
-				switch {
-				case result.OddsRate <= float64(payload.Run):
+			case "yes":
+				if result.OddsRate <= float64(payload.Run) {
 					if err := s.store.BetResultWin(goroutineCtx, tx, result.Profit, result.Exposure, result.UserId); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("BetResultWin failed: %w", err)
+						log.Println("BetResultWin failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("BetResultWin failed: %w", err)
 					}
 					if err := s.store.ChangeActiveBetStatus(ctx, tx, result.ID, "win"); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("Bet change status Failed: %w", err)
+						log.Println("ChangeActiveBetStatus failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("Bet change status failed: %w", err)
 					}
-				case result.OddsRate > float64(payload.Run):
+				} else {
 					if err := s.store.BetResultLose(goroutineCtx, tx, result.Exposure, result.UserId); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("BetResultLose failed: %w", err)
+						log.Println("BetResultLose failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("BetResultLose failed: %w", err)
 					}
 					if err := s.store.ChangeActiveBetStatus(ctx, tx, result.ID, "loss"); err != nil {
-						log.Println(err)
-						errChan <- fmt.Errorf("Bet change status Failed: %w", err)
+						log.Println("ChangeActiveBetStatus failed:", err)
+						_ = tx.Rollback(ctx)
+						return fmt.Errorf("Bet change status failed: %w", err)
 					}
 				}
 			}
 		}
-		// }(result)
 	}
 
-	// wg.Wait()
-
-	select {
-	case finalErr = <-errChan:
-		log.Println(finalErr)
-		return finalErr
-	default:
-	}
-
-	if err := s.store.SaveRunnerResultHistory(ctx, payload); err != nil {
-		log.Println(err)
+	if err := s.store.SaveRunnerResultHistory(ctx, tx, payload); err != nil {
+		log.Println("SaveRunnerResultHistory failed:", err)
+		_ = tx.Rollback(ctx)
 		return fmt.Errorf("failed to save runner result history: %w", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
+		log.Println("Transaction commit failed:", err)
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
