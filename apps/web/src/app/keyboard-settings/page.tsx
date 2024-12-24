@@ -50,7 +50,7 @@ export default function Page() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-gray-900 text-white sm:w-[60%] w-[90%] mx-auto mb-40">
+    <div className="flex flex-col gap-6 p-6 bg-gray-900 text-white sm:w-[60%] w-[90%] mx-auto mb-40 sm:mt-28 mt-16">
       <form onSubmit={handleSubmit} className="w-full">
         <div className="flex sm:gap-6 gap-3">
           <div className="flex-1">

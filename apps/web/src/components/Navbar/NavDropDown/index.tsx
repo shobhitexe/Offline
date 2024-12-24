@@ -20,6 +20,8 @@ import React from "react";
 import NavWalletData from "./Wallet";
 import LogOut from "./LogOutButton";
 
+import { User, BookOpen, MemoryStick, Keyboard, Book } from "lucide-react";
+
 export const DropDownItems = [
   {
     title: "Account Settings",
@@ -68,22 +70,49 @@ export default async function NavDropDown() {
 
         <NavWalletData />
 
-        {DropDownItems.map((item) => {
-          return (
-            <DropdownMenuItem
-              key={item.title}
-              className="flex items-center gap-3 cursor-pointer border-y border-main/5"
+        <DropdownMenuItem className="flex flex-col gap-2">
+          <div className="flex flex-col divide-y divide-[#483B32] bg-cardBG rounded-lg text-black text-sm mt-2">
+            <Link
+              href={"/dashboard/account/settings"}
+              className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-t-lg mt-2"
             >
-              <item.icon width={24} height={24} />
-              <Link
-                href={item.link}
-                className="py-1 mr-10 text-sm font-medium cursor-pointer"
-              >
-                {item.title}
-              </Link>
-            </DropdownMenuItem>
-          );
-        })}
+              <User height={20} width={20} stroke="black" />
+              <span className="relative -top-px">Profile</span>
+            </Link>
+
+            <Link
+              href={"/dashboard/account/statement"}
+              className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
+            >
+              <MemoryStick height={20} width={20} stroke="black" />
+              <span className="relative -top-px">My Bets</span>
+            </Link>
+
+            <Link
+              href={"/dashboard/account/statement"}
+              className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
+            >
+              <BookOpen height={20} width={20} stroke="black" />
+              <span className="relative -top-px">Account Statement</span>
+            </Link>
+
+            <Link
+              href={"/keyboard-settings"}
+              className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
+            >
+              <Keyboard height={20} width={20} stroke="black" />
+              <span className="relative -top-px">Keyboard Settings</span>
+            </Link>
+
+            <Link
+              href={"/rules"}
+              className="flex items-center gap-2 bg-sidebarButtons p-2 w-full rounded-b-lg"
+            >
+              <Book height={20} width={20} stroke="black" />
+              <span className="relative -top-px">Rules</span>
+            </Link>
+          </div>
+        </DropdownMenuItem>
 
         <DropdownMenuItem className="flex items-center gap-3 cursor-pointer">
           <LogOut />

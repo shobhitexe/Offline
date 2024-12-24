@@ -18,24 +18,6 @@ import { RootState } from "@/store/root-reducer";
 
 import { User, BookOpen, MemoryStick, Keyboard, Book } from "lucide-react";
 
-export const sidebarArr = [
-  {
-    title: "My profile",
-    icon: ProfileIcon,
-    link: "/dashboard/profile/details",
-  },
-  {
-    title: "Deposits and withdrawals",
-    icon: WalletIcon,
-    link: "/dashboard/wallet/deposit",
-  },
-  {
-    title: "Account statement",
-    icon: BoxesIcon,
-    link: "/dashboard/account/statement",
-  },
-];
-
 export default function SidebarContent({
   isButton = false,
 }: {
@@ -198,27 +180,5 @@ export default function SidebarContent({
         )}
       </div>
     </div>
-  );
-}
-
-function SupportIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        opacity="0.4"
-        d="M5 7.5C5 4.73828 7.23828 2.5 10 2.5C12.7617 2.5 15 4.73828 15 7.5C15 8.04297 14.9141 8.56641 14.7539 9.05469C14.4297 9.62109 13.8203 10 13.125 10H12.7891C12.3555 9.25391 11.5508 8.75 10.625 8.75H9.375C7.99609 8.75 6.875 9.87109 6.875 11.25C6.875 11.3047 6.875 11.3555 6.87891 11.4062C5.73438 10.4922 5 9.08203 5 7.5Z"
-        fill="white"
-      />
-      <path
-        d="M10 1.25C6.54688 1.25 3.75 4.04688 3.75 7.5V8.125C3.75 8.46875 3.46875 8.75 3.125 8.75C2.78125 8.75 2.5 8.46875 2.5 8.125V7.5C2.5 3.35938 5.85938 0 10 0C14.1406 0 17.5 3.35938 17.5 7.5V8.125C17.5 10.543 15.543 12.5 13.125 12.5H10.625H10H9.375C8.68359 12.5 8.125 11.9414 8.125 11.25C8.125 10.5586 8.68359 10 9.375 10H10.625C11.3164 10 11.875 10.5586 11.875 11.25H13.125C14.8516 11.25 16.25 9.85156 16.25 8.125V7.5C16.25 4.04688 13.4531 1.25 10 1.25ZM6.5 13.75H13.5C16.3984 13.75 18.75 16.1016 18.75 19C18.75 19.5508 18.3008 20 17.75 20H2.25C1.69922 20 1.25 19.5508 1.25 19C1.25 16.1016 3.60156 13.75 6.5 13.75Z"
-        fill="white"
-      />
-    </svg>
   );
 }
